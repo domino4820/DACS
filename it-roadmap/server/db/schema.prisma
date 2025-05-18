@@ -1,0 +1,200 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int            @id @default(autoincrement()) @map("user_id")
+  username       String         @unique
+  email          String         @unique
+  password       String
+  isAdmin        Boolean        @default(false)
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  roadmaps       Roadmap[]
+  userProgress   UserProgress[]
+  favorites      Favorite[]
+  notifications  Notification[]
+
+  @@map("users")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement()) @map("category_id")
+  name        String    @unique
+  color       String?
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  roadmaps    Roadmap[]
+  courses     Course[]
+
+  @@map("categories")
+}
+
+model Skill {
+  id          Int       @id @default(autoincrement()) @map("skill_id")
+  name        String    @unique
+  type        String
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  roadmaps    Roadmap[]
+  courses     Course[]
+
+  @@map("skills")
+}
+
+model Roadmap {
+  id          Int           @id @default(autoincrement()) @map("roadmap_id")
+  title       String
+  description String?
+  categoryId  Int?          @map("category_id")
+  skillId     Int?          @map("skill_id")
+  userId      Int           @map("user_id")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  skill       Skill?        @relation(fields: [skillId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+  nodes       Node[]
+  edges       Edge[]
+  favorites   Favorite[]
+  notifications Notification[]
+  roadmapTags RoadmapTag[]
+
+  @@map("roadmaps")
+}
+
+model Course {
+  id          Int           @id @default(autoincrement()) @map("course_id")
+  code        String        @unique
+  label       String
+  description String?
+  url         String?
+  categoryId  Int?          @map("category_id")
+  skillId     Int?          @map("skill_id")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  skill       Skill?        @relation(fields: [skillId], references: [id])
+  nodes       Node[]
+  userProgress UserProgress[]
+  documents   Document[]
+
+  @@map("courses")
+}
+
+model Node {
+  id              Int      @id @default(autoincrement()) @map("node_id")
+  roadmapId       Int      @map("roadmap_id")
+  nodeIdentifier  String   @map("node_identifier")
+  positionX       Float    @map("position_x")
+  positionY       Float    @map("position_y")
+  data            Json?
+  courseId        Int?     @map("course_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+  roadmap         Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  course          Course?  @relation(fields: [courseId], references: [id])
+
+  @@map("nodes")
+}
+
+model Edge {
+  id            Int      @id @default(autoincrement()) @map("edge_id")
+  roadmapId     Int      @map("roadmap_id")
+  edgeIdentifier String  @map("edge_identifier")
+  source        String
+  target        String
+  type          String?
+  animated      Boolean  @default(false)
+  style         Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  roadmap       Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+
+  @@map("edges")
+}
+
+model UserProgress {
+  id          Int       @id @default(autoincrement()) @map("progress_id")
+  userId      Int       @map("user_id")
+  courseId    Int       @map("course_id")
+  completed   Boolean   @default(false)
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("user_progress")
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement()) @map("favorite_id")
+  userId    Int      @map("user_id")
+  roadmapId Int      @map("roadmap_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roadmap   Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roadmapId])
+  @@map("favorites")
+}
+
+model Document {
+  id          Int      @id @default(autoincrement()) @map("document_id")
+  title       String
+  url         String
+  description String?
+  courseId    Int      @map("course_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement()) @map("notification_id")
+  userId    Int      @map("user_id")
+  roadmapId Int      @map("roadmap_id")
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roadmap   Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Tag {
+  id          Int          @id @default(autoincrement()) @map("tag_id")
+  name        String       @unique
+  color       String?
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  roadmapTags RoadmapTag[]
+
+  @@map("tags")
+}
+
+model RoadmapTag {
+  roadmapId Int     @map("roadmap_id")
+  tagId     Int     @map("tag_id")
+  roadmap   Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([roadmapId, tagId])
+  @@map("roadmap_tags")
+} 
