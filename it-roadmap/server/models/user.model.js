@@ -1,61 +1,77 @@
-const prisma = require("../db/prisma");
-const bcrypt = require("bcryptjs");
+// models/user.model.js
+const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcrypt");
+
+const prisma = new PrismaClient();
+const SALT_ROUNDS = 10;
 
 class UserModel {
+  // Lấy tất cả users
   async findAll() {
     return prisma.user.findMany();
   }
 
+  // Tìm user theo ID (nhớ ép thành Number)
   async findById(id) {
     return prisma.user.findUnique({
-      where: { id: Number(id) },
+      where: {
+        // nếu id từ HTTP param là chuỗi, ép thành số:
+        id: Number(id),
+        // hoặc, nếu bạn chắc id đã là số:
+        // id: id
+      },
     });
   }
 
-  async findByEmail(email) {
-    return prisma.user.findUnique({
-      where: { email },
-    });
-  }
-
+  // Tìm user theo username
   async findByUsername(username) {
     return prisma.user.findUnique({
       where: { username },
     });
   }
 
-  async create(userData) {
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
+  // Tìm user theo email
+  async findByEmail(email) {
+    return prisma.user.findUnique({
+      where: { email },
+    });
+  }
 
+  // Tạo mới user (hash password trước khi lưu)
+  async create({ username, email, password, isAdmin }) {
+    const hash = await bcrypt.hash(password, SALT_ROUNDS);
     return prisma.user.create({
       data: {
-        ...userData,
-        password: hashedPassword,
+        username,
+        email,
+        password: hash,
+        isAdmin,
       },
     });
   }
 
-  async update(id, userData) {
-    const data = { ...userData };
-
-    if (userData.password) {
-      data.password = await bcrypt.hash(userData.password, 10);
+  // Cập nhật user (nếu có password mới cũng hash lại)
+  async update(id, data) {
+    const updateData = { ...data };
+    if (data.password) {
+      updateData.password = await bcrypt.hash(data.password, SALT_ROUNDS);
     }
-
     return prisma.user.update({
       where: { id: Number(id) },
-      data,
+      data: updateData,
     });
   }
 
+  // Xoá user
   async delete(id) {
     return prisma.user.delete({
       where: { id: Number(id) },
     });
   }
 
-  async validatePassword(plainPassword, hashedPassword) {
-    return bcrypt.compare(plainPassword, hashedPassword);
+  // So sánh mật khẩu plaintext vs hash
+  async validatePassword(plainText, hash) {
+    return bcrypt.compare(plainText, hash);
   }
 }
 

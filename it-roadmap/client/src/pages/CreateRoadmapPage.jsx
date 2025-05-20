@@ -1,40 +1,59 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { createRoadmap } from "../services/roadmapService"
-import { getCategories } from "../services/categoryService"
-import { getSkills } from "../services/skillService"
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { Label } from "../components/ui/label"
-import { Textarea } from "../components/ui/textarea"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
-import { useToast } from "../components/ui/use-toast"
-import { ChevronLeft } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { createRoadmap } from "../services/roadmapService";
+import { getCategories } from "../services/categoryService";
+import { getSkills } from "../services/skillService";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+import { useToast } from "../components/ui/use-toast";
+import { ChevronLeft, Save } from "lucide-react";
+import { typeText } from "../lib/animations";
 
 export default function CreateRoadmapPage() {
-  const navigate = useNavigate()
-  const { toast } = useToast()
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [categoryId, setCategoryId] = useState("")
-  const [skillId, setSkillId] = useState("")
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    difficulty: "beginner",
+    isPublic: true,
+  });
 
   // Fetch categories
   const { data: categories, isLoading: isLoadingCategories } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
-    // For demo purposes, use mock data if API call fails
     placeholderData: [
       { id: "frontend", name: "Frontend" },
       { id: "backend", name: "Backend" },
-      { id: "database", name: "Database" },
+      { id: "fullstack", name: "Full Stack" },
       { id: "devops", name: "DevOps" },
+      { id: "security", name: "Security" },
+      { id: "data-science", name: "Data Science" },
     ],
-  })
+  });
 
   // Fetch skills
   const { data: skills, isLoading: isLoadingSkills } = useQuery({
@@ -47,7 +66,7 @@ export default function CreateRoadmapPage() {
       { id: "cybersecurity", name: "Cybersecurity", type: "role" },
       { id: "programming", name: "Programming", type: "skill" },
     ],
-  })
+  });
 
   // Create roadmap mutation
   const createRoadmapMutation = useMutation({
@@ -56,84 +75,122 @@ export default function CreateRoadmapPage() {
       toast({
         title: "Roadmap created",
         description: "Your roadmap has been created successfully",
-      })
-      navigate(`/roadmaps/${data.id}/edit`)
+      });
+      navigate(`/roadmaps/${data.id}`);
     },
     onError: (error) => {
       toast({
-        title: "Error creating roadmap",
-        description: error.message || "An error occurred while creating the roadmap",
+        title: "Error",
+        description: error.message || "Failed to create roadmap",
         variant: "destructive",
-      })
+      });
+      setIsSubmitting(false);
     },
-  })
+  });
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleSelectChange = (name, value) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    setIsSubmitting(true);
+    createRoadmapMutation.mutate(formData);
+  };
 
-    // For demo purposes, create a mock roadmap ID
-    const mockRoadmapId = `roadmap-${Date.now()}`
-
-    // In a real app, this would call the API
-    // createRoadmapMutation.mutate({ title, description, categoryId, skillId });
-
-    // For demo, simulate success
-    toast({
-      title: "Roadmap created",
-      description: "Your roadmap has been created successfully",
-    })
-    navigate(`/roadmaps/${mockRoadmapId}/edit`)
-  }
+  useEffect(() => {
+    // Apply typing effect to the page title
+    typeText(".create-roadmap-title", null, 800);
+  }, []);
 
   return (
-    <main className="container mx-auto py-6 px-4">
-      <div className="flex items-center gap-4 mb-6">
-        <Link to="/roadmaps">
-          <Button variant="ghost" size="sm">
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Back to Roadmaps
-          </Button>
-        </Link>
-        <h1 className="text-2xl font-bold tracking-tight">Create New Roadmap</h1>
+    <div className="container mx-auto py-8 px-4">
+      <div className="mb-8">
+        <Button
+          variant="outline"
+          onClick={() => navigate("/roadmaps")}
+          className="border-purple-500/30 bg-transparent hover:bg-purple-900/20 hover:border-purple-500/50 text-gray-300 mb-4"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Back to Roadmaps
+        </Button>
+        <h1 className="text-3xl font-bold font-cyber neon-text create-roadmap-title">
+          Create New Roadmap
+        </h1>
+        <p className="text-gray-400 font-mono-cyber mt-2">
+          Design a custom learning path for others to follow
+        </p>
       </div>
 
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Create New Roadmap</CardTitle>
-          <CardDescription>Create a new learning roadmap to organize your courses</CardDescription>
+      <Card className="border-purple-500/30 shadow-lg bg-gradient-to-br from-cyberpunk-darker to-cyberpunk-dark max-w-2xl mx-auto">
+        <CardHeader className="border-b border-purple-500/20 pb-4">
+          <CardTitle className="text-xl font-cyber text-purple-300">
+            Roadmap Details
+          </CardTitle>
+          <CardDescription className="font-mono-cyber text-gray-400">
+            Fill in the information for your new learning roadmap
+          </CardDescription>
         </CardHeader>
+
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6 pt-6">
+            {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title" className="text-gray-300 font-cyber">
+                Title <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Web Development Fundamentals"
+                name="title"
+                placeholder="e.g. Web Development Fundamentals"
+                value={formData.title}
+                onChange={handleChange}
                 required
+                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
               />
             </div>
 
+            {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="text-gray-300 font-cyber">
+                Description <span className="text-red-500">*</span>
+              </Label>
               <Textarea
                 id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="A comprehensive roadmap for learning web development from scratch"
-                rows={4}
+                name="description"
+                placeholder="Provide a detailed description of this roadmap..."
+                value={formData.description}
+                onChange={handleChange}
                 required
+                className="min-h-[120px] bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
               />
             </div>
 
+            {/* Category */}
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select value={categoryId} onValueChange={setCategoryId}>
-                <SelectTrigger>
+              <Label htmlFor="category" className="text-gray-300 font-cyber">
+                Category <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => handleSelectChange("category", value)}
+                required
+              >
+                <SelectTrigger className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-cyberpunk-dark border-purple-500/30">
                   {isLoadingCategories ? (
                     <SelectItem value="loading" disabled>
                       Loading categories...
@@ -149,42 +206,67 @@ export default function CreateRoadmapPage() {
               </Select>
             </div>
 
+            {/* Difficulty */}
             <div className="space-y-2">
-              <Label htmlFor="skill">Skill (Optional)</Label>
-              <Select value={skillId} onValueChange={setSkillId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a skill" />
+              <Label htmlFor="difficulty" className="text-gray-300 font-cyber">
+                Difficulty
+              </Label>
+              <Select
+                value={formData.difficulty}
+                onValueChange={(value) =>
+                  handleSelectChange("difficulty", value)
+                }
+              >
+                <SelectTrigger className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white">
+                  <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  {isLoadingSkills ? (
-                    <SelectItem value="loading" disabled>
-                      Loading skills...
-                    </SelectItem>
-                  ) : (
-                    skills.map((skill) => (
-                      <SelectItem key={skill.id} value={skill.id}>
-                        {skill.name} ({skill.type})
-                      </SelectItem>
-                    ))
-                  )}
+                <SelectContent className="bg-cyberpunk-dark border-purple-500/30">
+                  <SelectItem value="beginner">Beginner</SelectItem>
+                  <SelectItem value="intermediate">Intermediate</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                Associating your roadmap with a skill will display it in that skill's section on the home page
-              </p>
+            </div>
+
+            {/* Public/Private Toggle */}
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isPublic"
+                name="isPublic"
+                checked={formData.isPublic}
+                onChange={handleChange}
+                className="w-4 h-4 accent-purple-600 bg-cyberpunk-darker/50 border-purple-500/30"
+              />
+              <Label
+                htmlFor="isPublic"
+                className="text-gray-300 font-mono-cyber"
+              >
+                Make this roadmap public
+              </Label>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button type="button" variant="outline" onClick={() => navigate("/roadmaps")}>
+
+          <CardFooter className="flex justify-between border-t border-purple-500/20 pt-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate("/roadmaps")}
+              className="border-purple-500/30 bg-transparent hover:bg-purple-900/20 hover:border-purple-500/50 text-gray-300"
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={createRoadmapMutation.isLoading}>
-              {createRoadmapMutation.isLoading ? "Creating..." : "Create Roadmap"}
+            <Button
+              type="submit"
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              disabled={isSubmitting}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {isSubmitting ? "Creating..." : "Create Roadmap"}
             </Button>
           </CardFooter>
         </form>
       </Card>
-    </main>
-  )
+    </div>
+  );
 }

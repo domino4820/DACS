@@ -1,15 +1,30 @@
-import { Link } from "react-router-dom"
-import { Button } from "../components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
-import { useQuery } from "@tanstack/react-query"
-import { getRoadmaps } from "../services/roadmapService"
+import { Link } from "react-router-dom";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+// Tabs components removed - not currently used
+// import {
+//   Tabs,
+//   TabsContent,
+//   TabsList,
+//   TabsTrigger,
+// } from "../components/ui/tabs";
+import { useQuery } from "@tanstack/react-query";
+import { getRoadmaps } from "../services/roadmapService";
+import { useEffect } from "react";
+import { typeText } from "../lib/animations";
 
 export default function Home() {
+  // Destructure but ignore unused variables
   const {
-    data: roadmaps,
-    isLoading,
-    error,
+    // data: roadmaps,
+    // isLoading,
+    // error,
   } = useQuery({
     queryKey: ["roadmaps"],
     queryFn: getRoadmaps,
@@ -40,142 +55,201 @@ export default function Home() {
         lastUpdated: new Date().toLocaleDateString(),
       },
     ],
-  })
+  });
+
+  useEffect(() => {
+    // Apply typing effect to hero title after component mounts
+    const timer = setTimeout(() => {
+      typeText(".hero-title", null, 1200);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <main className="container mx-auto py-6 px-4 md:px-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">IT Learning Roadmaps</h1>
-          <p className="text-muted-foreground mt-2">Create and explore learning paths for IT skills and technologies</p>
+    <main className="container mx-auto py-12 px-4 md:px-6">
+      {/* Hero Section */}
+      <section className="py-16 text-center mb-16">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight hero-title font-cyber text-cyber-gradient mb-6">
+            CyberPath
+          </h1>
+          <p className="text-xl text-gray-400 font-mono-cyber mb-8">
+            Interactive learning paths for the digital frontier
+          </p>
+          <Link to="/roadmaps">
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white font-cyber py-3 px-8 text-lg">
+              Explore Roadmaps
+            </Button>
+          </Link>
         </div>
-        <Link to="/roadmaps/create">
-          <Button>Create New Roadmap</Button>
-        </Link>
+      </section>
+
+      {/* Your Progress Section */}
+      <section className="mb-16">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold tracking-tight font-cyber text-purple-300">
+            Your Progress
+          </h2>
+          <p className="text-gray-400 font-mono-cyber">
+            Track your learning journey
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Day Streak Card */}
+          <Card className="border-purple-500/30 shadow-lg bg-gradient-to-br from-cyberpunk-darker to-cyberpunk-dark">
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <div className="text-4xl font-bold text-purple-400 mb-2">1</div>
+              <div className="text-sm text-purple-300 font-mono-cyber">
+                Day Streak
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Today Card */}
+          <Card className="border-blue-500/30 shadow-lg bg-gradient-to-br from-cyberpunk-darker to-cyberpunk-dark">
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <div className="text-4xl font-bold text-blue-400 mb-2">0</div>
+              <div className="text-sm text-blue-300 font-mono-cyber">Today</div>
+            </CardContent>
+          </Card>
+
+          {/* Completed Card */}
+          <Card className="border-pink-500/30 shadow-lg bg-gradient-to-br from-cyberpunk-darker to-cyberpunk-dark">
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <div className="text-4xl font-bold text-pink-400 mb-2">5</div>
+              <div className="text-sm text-pink-300 font-mono-cyber">
+                Completed
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Roadmaps Section */}
+      <div className="mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <h2 className="text-2xl font-bold tracking-tight font-cyber text-purple-300">
+            Role Based Roadmaps
+          </h2>
+          <Link to="/roadmaps/create">
+            <Button className="border-purple-500/30 bg-cyberpunk-darker hover:bg-purple-900/20 hover:border-purple-500/50 text-purple-300">
+              Create Roadmap
+            </Button>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <RoadmapCard
+            title="Web Development"
+            description="Full-stack web development learning path"
+            courseCount={12}
+          />
+          <RoadmapCard
+            title="Data Science"
+            description="Data analysis, machine learning, and AI"
+            courseCount={10}
+          />
+          <RoadmapCard
+            title="DevOps Engineering"
+            description="CI/CD, infrastructure as code, and cloud services"
+            courseCount={11}
+          />
+          <RoadmapCard
+            title="JavaScript"
+            description="Modern JavaScript programming from basics to advanced"
+            courseCount={8}
+          />
+        </div>
       </div>
 
-      <Tabs defaultValue="all" className="mb-8">
-        <TabsList>
-          <TabsTrigger value="all">All Roadmaps</TabsTrigger>
-          <TabsTrigger value="favorites">My Favorites</TabsTrigger>
-          <TabsTrigger value="recent">Recently Viewed</TabsTrigger>
-        </TabsList>
-        <TabsContent value="all" className="mt-4">
-          {isLoading ? (
-            <div className="text-center py-12">Loading roadmaps...</div>
-          ) : error ? (
-            <div className="text-center py-12 text-red-500">Error loading roadmaps: {error.message}</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {roadmaps.map((roadmap) => (
-                <RoadmapCard key={roadmap.id} roadmap={roadmap} />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-        <TabsContent value="favorites" className="mt-4">
-          <div className="text-center py-12">
-            <h3 className="text-lg font-medium">No favorite roadmaps yet</h3>
-            <p className="text-muted-foreground mt-2">Mark roadmaps as favorites to see them here</p>
-          </div>
-        </TabsContent>
-        <TabsContent value="recent" className="mt-4">
-          <div className="text-center py-12">
-            <h3 className="text-lg font-medium">No recently viewed roadmaps</h3>
-            <p className="text-muted-foreground mt-2">Roadmaps you view will appear here</p>
-          </div>
-        </TabsContent>
-      </Tabs>
+      {/* Skill Based Section */}
+      <div className="mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <h2 className="text-2xl font-bold tracking-tight font-cyber text-purple-300">
+            Skill Based Roadmaps
+          </h2>
+          <p className="text-gray-400 font-mono-cyber">
+            Focused learning paths for specific technologies
+          </p>
+        </div>
 
-      <div className="space-y-8">
-        <section>
-          <h2 className="text-2xl font-bold mb-4">Role-Based Skills</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <SkillCard
-              title="Frontend Development"
-              description="Learn HTML, CSS, JavaScript and modern frontend frameworks"
-              count={5}
-            />
-            <SkillCard
-              title="Backend Development"
-              description="Master server-side programming and database management"
-              count={4}
-            />
-            <SkillCard title="DevOps" description="Learn CI/CD, containerization, and cloud infrastructure" count={3} />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold mb-4">Technical Skills</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <SkillCard
-              title="JavaScript"
-              description="Modern JavaScript from fundamentals to advanced concepts"
-              count={7}
-            />
-            <SkillCard title="Python" description="Python programming for web development and data science" count={6} />
-            <SkillCard
-              title="Cloud Computing"
-              description="AWS, Azure, and Google Cloud Platform fundamentals"
-              count={4}
-            />
-          </div>
-        </section>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <SkillCard
+            title="IT Fundamentals"
+            description="Core IT concepts and foundational knowledge"
+            count={15}
+          />
+          <SkillCard
+            title="Cybersecurity"
+            description="Network security, ethical hacking, and defense"
+            count={14}
+          />
+          <SkillCard
+            title="Mobile Development"
+            description="iOS, Android, and cross-platform app development"
+            count={9}
+          />
+        </div>
       </div>
 
-      <footer className="mt-16 border-t pt-8 text-center text-sm text-muted-foreground">
-        <p>© 2023 IT Learning Roadmaps. All rights reserved.</p>
-        <p className="mt-2">Total Visitors: 1,234</p>
+      <footer className="mt-16 pt-8 text-center text-sm text-gray-500 font-mono-cyber border-t border-purple-900/20">
+        <p>© 2023 CyberPath. All rights reserved.</p>
       </footer>
     </main>
-  )
+  );
 }
 
-function RoadmapCard({ roadmap }) {
+function RoadmapCard({ title, description, courseCount }) {
   return (
-    <Card className="overflow-hidden border-border/60 hover:border-primary/60 transition-colors">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div className="mb-2 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-            {roadmap.category}
-          </div>
-          <div className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
-            {roadmap.courseCount} courses
-          </div>
-        </div>
-        <CardTitle className="text-lg">{roadmap.title}</CardTitle>
-        <CardDescription className="line-clamp-2">{roadmap.description}</CardDescription>
+    <Card className="card-cyber overflow-hidden hover:border-purple-500/50 transition-all duration-300">
+      <CardHeader className="pb-2 border-b border-purple-900/20">
+        <CardTitle className="text-lg font-cyber text-purple-300">
+          {title}
+        </CardTitle>
+        <CardDescription className="line-clamp-2 font-mono-cyber text-gray-400">
+          {description}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="pb-2">
-        <div className="flex items-center text-xs text-muted-foreground">
-          <span>Updated: {roadmap.lastUpdated || "New"}</span>
+      <CardContent className="p-4">
+        <div className="flex justify-between items-center">
+          <div className="badge badge-purple font-mono-cyber">
+            {courseCount} courses
+          </div>
+          <Button asChild variant="default" className="btn-minimal" size="sm">
+            <Link to={`/roadmaps`}>View</Link>
+          </Button>
         </div>
       </CardContent>
-      <div className="px-6 pb-4">
-        <Button asChild variant="default" size="sm" className="w-full">
-          <Link to={`/roadmaps/${roadmap.id}`}>View Roadmap</Link>
-        </Button>
-      </div>
-      <div className="h-1 bg-gradient-to-r from-primary to-primary/20 w-full"></div>
     </Card>
-  )
+  );
 }
 
 function SkillCard({ title, description, count }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+    <Card className="card-cyber overflow-hidden hover:border-blue-500/50 transition-all duration-300">
+      <CardHeader className="pb-2 border-b border-blue-900/20">
+        <CardTitle className="font-cyber text-blue-300">{title}</CardTitle>
+        <CardDescription className="font-mono-cyber text-gray-400">
+          {description}
+        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <p className="text-sm">
-          <span className="font-medium">{count}</span> roadmaps available
-        </p>
-        <Button variant="link" className="p-0 h-auto" asChild>
-          <Link to={`/skills/${title.toLowerCase().replace(/\s+/g, "-")}`}>Browse roadmaps</Link>
-        </Button>
+      <CardContent className="p-4">
+        <div className="flex justify-between items-center">
+          <div className="badge badge-blue font-mono-cyber">
+            {count} roadmaps
+          </div>
+          <Button
+            asChild
+            variant="default"
+            className="btn-minimal border-blue-500/30 text-blue-300 hover:bg-blue-900/20 hover:border-blue-500/50"
+            size="sm"
+          >
+            <Link to="/roadmaps">View</Link>
+          </Button>
+        </div>
       </CardContent>
     </Card>
-  )
+  );
 }

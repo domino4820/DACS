@@ -2,7 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const path = require("path");
 require("dotenv").config();
+
+// Import Prisma client for database connection
+const prisma = require("./db/prisma");
 
 // Import routes
 const routes = require("./routes");
@@ -17,11 +21,43 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
 
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, "public")));
+
+/**
+ * Database connection test endpoint
+ * This demonstrates MVC pattern usage:
+ * - Models: Database queries using Prisma
+ * - Controllers: Logic to handle the request and response
+ * - Routes: Routes that map to controller functions
+ */
+app.get("/db-status", async (req, res) => {
+  try {
+    // Test database connection
+    const result = await prisma.$queryRaw`SELECT 1 as connected`;
+    res.json({
+      status: "ok",
+      database: "connected",
+      details: {
+        connected: result[0].connected === 1,
+        dbName: process.env.DATABASE_URL.split("/").pop().split("?")[0],
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      database: "disconnected",
+      error: error.message,
+    });
+  }
+});
+
 // Route mặc định cho trang chủ
 app.get("/", (req, res) => {
   res.json({
     message: "Welcome to IT Roadmap API",
     documentation: "/api-docs",
+    database: "/db-status",
   });
 });
 
@@ -30,7 +66,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-// API routes
+// API routes - these use the MVC pattern via controllers
 app.use("/api", routes);
 
 // Handle 404 errors
@@ -46,6 +82,28 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+// Connect to database and start server
+async function startServer() {
+  try {
+    await prisma.$connect();
+    console.log("✅ Connected to PostgreSQL database successfully");
+    console.log(
+      `📊 Database: ${process.env.DATABASE_URL.split("/").pop().split("?")[0]}`
+    );
+
+    // Database connection is now available for use by all models
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`🧩 API routes: http://localhost:${PORT}/api`);
+      console.log(`📋 Database status: http://localhost:${PORT}/db-status`);
+    });
+  } catch (error) {
+    console.error("❌ Database connection failed:", error);
+    process.exit(1);
+  }
+}
+
+// Initialize database and start server
+startServer();

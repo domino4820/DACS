@@ -202,6 +202,25 @@ class UserController {
       res.status(500).json({ message: error.message });
     }
   }
+
+  async getCurrentUser(req, res) {
+    try {
+      // User ID is available from the auth middleware
+      const userId = req.user.id;
+      const user = await userModel.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Remove password from response
+      const { password: _, ...userWithoutPassword } = user;
+
+      res.status(200).json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
 }
 
 module.exports = new UserController();
