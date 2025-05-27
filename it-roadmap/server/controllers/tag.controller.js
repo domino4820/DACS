@@ -42,7 +42,7 @@ class TagController {
 
   async createTag(req, res) {
     try {
-      const { name } = req.body;
+      const { name, color } = req.body;
 
       if (!name) {
         return res.status(400).json({ message: "Tag name is required" });
@@ -54,7 +54,7 @@ class TagController {
         return res.status(400).json({ message: "Tag name already exists" });
       }
 
-      const tag = await tagModel.create({ name });
+      const tag = await tagModel.create({ name, color });
       res.status(201).json(tag);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -64,7 +64,7 @@ class TagController {
   async updateTag(req, res) {
     try {
       const { id } = req.params;
-      const { name } = req.body;
+      const { name, color } = req.body;
 
       // Check if tag exists
       const existingTag = await tagModel.findById(id);
@@ -82,6 +82,7 @@ class TagController {
 
       const updatedTag = await tagModel.update(id, {
         name: name || existingTag.name,
+        color: color !== undefined ? color : existingTag.color,
       });
 
       res.status(200).json(updatedTag);

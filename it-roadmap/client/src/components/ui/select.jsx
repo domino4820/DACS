@@ -4,7 +4,21 @@ import { cn } from "../../lib/utils";
 
 const Select = SelectPrimitive.Root;
 const SelectGroup = SelectPrimitive.Group;
-const SelectValue = SelectPrimitive.Value;
+const SelectValue = React.forwardRef(
+  ({ className, placeholder, children, ...props }, ref) => {
+    return (
+      <SelectPrimitive.Value
+        ref={ref}
+        placeholder={placeholder}
+        className={cn("text-sm", className)}
+        {...props}
+      >
+        {children}
+      </SelectPrimitive.Value>
+    );
+  }
+);
+SelectValue.displayName = SelectPrimitive.Value.displayName;
 
 const SelectTrigger = React.forwardRef(
   ({ className, children, ...props }, ref) => (

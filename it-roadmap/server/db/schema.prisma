@@ -11,17 +11,17 @@ datasource db {
 }
 
 model User {
-  id             Int            @id @default(autoincrement()) @map("user_id")
-  username       String         @unique
-  email          String         @unique
-  password       String
-  isAdmin        Boolean        @default(false)
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedAt      DateTime       @updatedAt @map("updated_at")
-  roadmaps       Roadmap[]
-  userProgress   UserProgress[]
-  favorites      Favorite[]
-  notifications  Notification[]
+  id            Int            @id @default(autoincrement()) @map("user_id")
+  username      String         @unique
+  email         String         @unique
+  password      String
+  isAdmin       Boolean        @default(false)
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  roadmaps      Roadmap[]
+  userProgress  UserProgress[]
+  favorites     Favorite[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -40,88 +40,105 @@ model Category {
 }
 
 model Skill {
-  id          Int       @id @default(autoincrement()) @map("skill_id")
-  name        String    @unique
-  type        String
-  description String?
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  roadmaps    Roadmap[]
-  courses     Course[]
+  id            Int            @id @default(autoincrement()) @map("skill_id")
+  name          String         @unique
+  type          String
+  description   String?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  roadmaps      Roadmap[]
+  courses       Course[]
+  roadmapSkills RoadmapSkill[]
 
   @@map("skills")
 }
 
 model Roadmap {
-  id          Int           @id @default(autoincrement()) @map("roadmap_id")
-  title       String
-  description String?
-  categoryId  Int?          @map("category_id")
-  skillId     Int?          @map("skill_id")
-  userId      Int           @map("user_id")
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
-  category    Category?     @relation(fields: [categoryId], references: [id])
-  skill       Skill?        @relation(fields: [skillId], references: [id])
-  user        User          @relation(fields: [userId], references: [id])
-  nodes       Node[]
-  edges       Edge[]
-  favorites   Favorite[]
+  id            Int            @id @default(autoincrement()) @map("roadmap_id")
+  title         String
+  description   String?
+  categoryId    Int?           @map("category_id")
+  skillId       Int?           @map("skill_id")
+  userId        Int            @map("user_id")
+  nodesData     String?        @db.Text @map("nodes_data")
+  edgesData     String?        @db.Text @map("edges_data")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  category      Category?      @relation(fields: [categoryId], references: [id])
+  skill         Skill?         @relation(fields: [skillId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
+  nodes         Node[]
+  edges         Edge[]
+  courses       Course[]
+  favorites     Favorite[]
   notifications Notification[]
-  roadmapTags RoadmapTag[]
+  roadmapTags   RoadmapTag[]
+  roadmapSkills RoadmapSkill[]
 
   @@map("roadmaps")
 }
 
 model Course {
-  id          Int           @id @default(autoincrement()) @map("course_id")
-  code        String        @unique
-  label       String
-  description String?
-  url         String?
-  categoryId  Int?          @map("category_id")
-  skillId     Int?          @map("skill_id")
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
-  category    Category?     @relation(fields: [categoryId], references: [id])
-  skill       Skill?        @relation(fields: [skillId], references: [id])
-  nodes       Node[]
+  id           Int            @id @default(autoincrement())
+  title        String
+  code         String         @unique
+  description  String?        @db.Text
+  url          String?
+  content      String?        @db.Text
+  category     Category?      @relation(fields: [categoryId], references: [id])
+  categoryId   Int?
+  skill        Skill?         @relation(fields: [skillId], references: [id])
+  skillId      Int?
+  roadmap      Roadmap?       @relation(fields: [roadmapId], references: [id])
+  roadmapId    Int?
+  documents    Document[]
+  nodes        Node[]
+  edges        Edge[]
   userProgress UserProgress[]
-  documents   Document[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
-  @@map("courses")
+  @@index([categoryId])
+  @@index([skillId])
+  @@index([roadmapId])
 }
 
 model Node {
-  id              Int      @id @default(autoincrement()) @map("node_id")
-  roadmapId       Int      @map("roadmap_id")
-  nodeIdentifier  String   @map("node_identifier")
-  positionX       Float    @map("position_x")
-  positionY       Float    @map("position_y")
-  data            Json?
-  courseId        Int?     @map("course_id")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
-  roadmap         Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
-  course          Course?  @relation(fields: [courseId], references: [id])
+  id             Int      @id @default(autoincrement())
+  nodeIdentifier String   @unique
+  positionX      Float
+  positionY      Float
+  data           String?  @db.Text
+  roadmap        Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  roadmapId      Int
+  course         Course?  @relation(fields: [courseId], references: [id])
+  courseId       Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  @@map("nodes")
+  @@index([roadmapId])
+  @@index([nodeIdentifier])
+  @@index([courseId])
 }
 
 model Edge {
-  id            Int      @id @default(autoincrement()) @map("edge_id")
-  roadmapId     Int      @map("roadmap_id")
-  edgeIdentifier String  @map("edge_identifier")
-  source        String
-  target        String
-  type          String?
-  animated      Boolean  @default(false)
-  style         Json?
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
-  roadmap       Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  id             Int      @id @default(autoincrement())
+  edgeIdentifier String   @unique
+  source         String
+  target         String
+  type           String?
+  animated       Boolean  @default(false)
+  style          String?  @db.Text
+  roadmap        Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  roadmapId      Int
+  course         Course?  @relation(fields: [courseId], references: [id])
+  courseId       Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  @@map("edges")
+  @@index([roadmapId])
+  @@index([edgeIdentifier])
+  @@index([courseId])
 }
 
 model UserProgress {
@@ -197,4 +214,14 @@ model RoadmapTag {
 
   @@id([roadmapId, tagId])
   @@map("roadmap_tags")
-} 
+}
+
+model RoadmapSkill {
+  roadmapId Int     @map("roadmap_id")
+  skillId   Int     @map("skill_id")
+  roadmap   Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  skill     Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([roadmapId, skillId])
+  @@map("roadmap_skills")
+}

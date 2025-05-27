@@ -28,34 +28,101 @@ class NodeController {
   async getNodesByRoadmapId(req, res) {
     try {
       const { roadmapId } = req.params;
+      console.log(`Getting nodes for roadmap ${roadmapId}`);
+
+      // Kiểm tra xem roadmap có tồn tại không
+      const { roadmapModel } = require("../models");
+      const roadmap = await roadmapModel.findById(roadmapId);
+
+      if (!roadmap) {
+        console.log(`Roadmap ${roadmapId} not found`);
+        return res.status(404).json({ message: "Roadmap not found" });
+      }
+
+      // Phương pháp 1: Lấy nodes từ quan hệ
       const nodes = await nodeModel.findByRoadmapId(roadmapId);
+      console.log(
+        `Found ${nodes.length} nodes in relationship table for roadmap ${roadmapId}`
+      );
+
+      // Phương pháp 2: Kiểm tra nếu có dữ liệu JSON
+      if (nodes.length === 0 && roadmap.nodesData) {
+        try {
+          console.log(`Using JSON nodes data for roadmap ${roadmapId}`);
+          const jsonNodes = JSON.parse(roadmap.nodesData);
+
+          if (Array.isArray(jsonNodes) && jsonNodes.length > 0) {
+            console.log(`Found ${jsonNodes.length} nodes from JSON data`);
+            return res.status(200).json(jsonNodes);
+          }
+        } catch (jsonError) {
+          console.error(
+            `Error parsing nodesData for roadmap ${roadmapId}:`,
+            jsonError
+          );
+        }
+      }
+
       res.status(200).json(nodes);
     } catch (error) {
+      console.error(
+        `Error getting nodes for roadmap ${req.params.roadmapId}:`,
+        error
+      );
       res.status(500).json({ message: error.message });
     }
   }
 
   async createNode(req, res) {
     try {
-      const { label, roadmapId, courseId, positionX, positionY, type } =
-        req.body;
+      console.log("Creating node with payload:", req.body);
 
-      if (!label || !roadmapId || !positionX || !positionY) {
-        return res.status(400).json({ message: "Required fields are missing" });
-      }
-
-      const node = await nodeModel.create({
-        label,
+      const {
+        nodeIdentifier,
+        id,
         roadmapId,
         courseId,
         positionX,
         positionY,
-        type: type || "default",
-      });
+        data,
+        position,
+        type,
+      } = req.body;
 
-      res.status(201).json(node);
+      // Support both legacy and new format
+      const nodeData = {
+        nodeIdentifier:
+          nodeIdentifier ||
+          id ||
+          `node_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+        roadmapId: Number(roadmapId),
+        courseId: courseId ? Number(courseId) : null,
+        positionX: positionX || position?.x || 0,
+        positionY: positionY || position?.y || 0,
+        data: data || {},
+      };
+
+      console.log("Processed node data:", nodeData);
+
+      // Create the node
+      try {
+        const node = await nodeModel.create(nodeData);
+        console.log("Node created successfully:", node.id);
+        res.status(201).json(node);
+      } catch (createError) {
+        console.error("Error creating node:", createError);
+        res.status(500).json({
+          message: "Failed to create node",
+          error: createError.message,
+          stack: createError.stack,
+        });
+      }
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error("Error in createNode:", error);
+      res.status(500).json({
+        message: error.message,
+        stack: error.stack,
+      });
     }
   }
 

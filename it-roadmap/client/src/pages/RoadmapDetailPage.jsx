@@ -237,7 +237,8 @@ export default function RoadmapDetailPage() {
                 variant="outline"
                 className="bg-blue-900/20 text-blue-300 border-blue-500/30"
               >
-                <Tag className="h-3 w-3 mr-1" /> {roadmap.categoryName}
+                <Tag className="h-3 w-3 mr-1" />{" "}
+                {roadmap.category?.name || roadmap.categoryName || "General"}
               </Badge>
               <Badge
                 variant="outline"
@@ -276,7 +277,7 @@ export default function RoadmapDetailPage() {
                 <div className="flex items-center">
                   <User className="h-5 w-5 mr-2 text-blue-400" />
                   <span className="font-mono-cyber text-gray-300">
-                    {roadmap.author || "Anonymous"}
+                    {roadmap.user?.username || roadmap.author || "Anonymous"}
                   </span>
                 </div>
               </CardContent>
@@ -375,7 +376,7 @@ export default function RoadmapDetailPage() {
               </CardTitle>
               <CardDescription className="font-mono-cyber text-gray-400">
                 Follow this learning path to master{" "}
-                {roadmap.categoryName.toLowerCase()} skills
+                {roadmap.categoryName?.toLowerCase() || "these"} skills
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">

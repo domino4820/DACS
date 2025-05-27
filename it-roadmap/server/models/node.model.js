@@ -23,42 +23,44 @@ class NodeModel {
     });
   }
 
-  async create(nodeData) {
-    return prisma.node.create({
-      data: {
-        ...nodeData,
-        roadmapId: Number(nodeData.roadmapId),
-        courseId: nodeData.courseId ? Number(nodeData.courseId) : null,
-        positionX: Number(nodeData.positionX),
-        positionY: Number(nodeData.positionY),
-      },
-      include: {
-        course: true,
-      },
-    });
+  async create(data) {
+    try {
+      // Validate data trước khi tạo
+      if (!data.nodeIdentifier) {
+        console.error("[NODE] Missing nodeIdentifier:", data);
+        throw new Error("Node identifier is required");
+      }
+
+      if (
+        typeof data.positionX !== "number" ||
+        typeof data.positionY !== "number"
+      ) {
+        console.error("[NODE] Invalid position:", data);
+        data.positionX = data.positionX || 0;
+        data.positionY = data.positionY || 0;
+      }
+
+      return prisma.node.create({
+        data: {
+          nodeIdentifier: data.nodeIdentifier,
+          positionX: data.positionX,
+          positionY: data.positionY,
+          data: data.data,
+          roadmapId: Number(data.roadmapId),
+          courseId: data.courseId ? Number(data.courseId) : null,
+        },
+      });
+    } catch (error) {
+      console.error("[NODE] Error creating node:", error);
+      throw error;
+    }
   }
 
-  async update(id, nodeData) {
-    const data = { ...nodeData };
-
-    if (data.courseId) {
-      data.courseId = Number(data.courseId);
-    }
-
-    if (data.positionX !== undefined) {
-      data.positionX = Number(data.positionX);
-    }
-
-    if (data.positionY !== undefined) {
-      data.positionY = Number(data.positionY);
-    }
-
+  async update(id, data) {
     return prisma.node.update({
       where: { id: Number(id) },
       data,
-      include: {
-        course: true,
-      },
+      include: { course: true },
     });
   }
 
@@ -69,9 +71,39 @@ class NodeModel {
   }
 
   async deleteByRoadmapId(roadmapId) {
-    return prisma.node.deleteMany({
-      where: { roadmapId: Number(roadmapId) },
+    try {
+      const result = await prisma.node.deleteMany({
+        where: { roadmapId: Number(roadmapId) },
+      });
+      return result.count;
+    } catch (error) {
+      console.error(
+        `[NODE] Error deleting nodes for roadmap ${roadmapId}:`,
+        error
+      );
+      throw error;
+    }
+  }
+
+  async findByNodeIdentifier(nodeIdentifier) {
+    return prisma.node.findUnique({
+      where: { nodeIdentifier },
+      include: { course: true },
     });
+  }
+
+  async countByRoadmapId(roadmapId) {
+    try {
+      return await prisma.node.count({
+        where: { roadmapId: Number(roadmapId) },
+      });
+    } catch (error) {
+      console.error(
+        `[NODE] Error counting nodes for roadmap ${roadmapId}:`,
+        error
+      );
+      throw error;
+    }
   }
 }
 

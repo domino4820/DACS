@@ -19,7 +19,42 @@ const app = express();
 app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Debug middleware to track requests and responses
+app.use((req, res, next) => {
+  const start = Date.now();
+  console.log(`--> ${req.method} ${req.path}`);
+
+  // For POST and PUT requests, log the body size
+  if (req.method === "POST" || req.method === "PUT") {
+    const contentLength = req.headers["content-length"] || 0;
+    console.log(`Request body size: ${contentLength} bytes`);
+    console.log(
+      `Request body preview:`,
+      JSON.stringify(req.body).substring(0, 200) + "..."
+    );
+  }
+
+  // Track response
+  const originalSend = res.send;
+  res.send = function (body) {
+    const duration = Date.now() - start;
+    console.log(
+      `<-- ${req.method} ${req.path} ${res.statusCode} (${duration}ms)`
+    );
+
+    // For error responses, log more details
+    if (res.statusCode >= 400) {
+      console.error(`Error response: ${body}`);
+    }
+
+    return originalSend.call(this, body);
+  };
+
+  next();
+});
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "public")));

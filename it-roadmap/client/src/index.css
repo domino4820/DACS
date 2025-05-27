@@ -40,3 +40,138 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+/* Improve edge connections and handle interaction */
+.react-flow .react-flow__handle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #6d28d9;
+  border: 2px solid #fff;
+  transition: all 0.2s ease;
+}
+
+.react-flow .react-flow__handle:hover {
+  width: 12px;
+  height: 12px;
+  background-color: #8b5cf6;
+  cursor: crosshair;
+}
+
+.react-flow .react-flow__edge {
+  transition: stroke-width 0.2s ease;
+}
+
+.react-flow .react-flow__edge:hover {
+  stroke-width: 3px;
+}
+
+.react-flow .react-flow__edge-path {
+  stroke: #6d28d9;
+  stroke-width: 2px;
+}
+
+.react-flow .react-flow__edge.selected .react-flow__edge-path {
+  stroke: #8b5cf6;
+  stroke-width: 3px;
+}
+
+/* Improve edge connections */
+.improved-edge-connection .react-flow__connection-path {
+  stroke: #6d28d9;
+  stroke-width: 3px;
+  stroke-dasharray: 5;
+  animation: flowAnimation 1s infinite linear;
+}
+
+@keyframes flowAnimation {
+  0% {
+    stroke-dashoffset: 10;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Better handle styling for different handle positions */
+.connection-handle {
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  border: 2px solid white !important;
+}
+
+.connection-handle-top {
+  top: -6px !important;
+  background-color: #4ade80 !important;
+}
+
+.connection-handle-right {
+  right: -6px !important;
+  background-color: #60a5fa !important;
+}
+
+.connection-handle-bottom {
+  bottom: -6px !important;
+  background-color: #f97316 !important;
+}
+
+.connection-handle-left {
+  left: -6px !important;
+  background-color: #a855f7 !important;
+}
+
+.connection-handle-center {
+  background-color: #f43f5e !important;
+}
+
+/* Make handles more visible on hover */
+.connection-handle:hover {
+  transform: scale(1.5);
+  z-index: 1000;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+/* Different colors for edges based on handle types using class names */
+.react-flow__edge.source-top .react-flow__edge-path {
+  stroke: #4ade80;
+}
+
+.react-flow__edge.source-right .react-flow__edge-path {
+  stroke: #60a5fa;
+}
+
+.react-flow__edge.source-bottom .react-flow__edge-path {
+  stroke: #f97316;
+}
+
+.react-flow__edge.source-left .react-flow__edge-path {
+  stroke: #a855f7;
+}
+
+.react-flow__edge.source-center .react-flow__edge-path {
+  stroke: #f43f5e;
+}
+
+/* Thicker edges for better visibility */
+.custom-edge .react-flow__edge-path {
+  stroke-width: 3px;
+}
+
+/* Enhanced edge path styling */
+.react-flow__edge-path {
+  stroke-width: 2.5px;
+  transition: stroke-width 0.2s ease, stroke 0.2s ease;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke-width: 4px;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+}
+
+/* Improved edge connection indicator */
+.improved-edge-connection .react-flow__connection-path {
+  stroke-width: 3px;
+  stroke-dasharray: 5;
+  animation: flowAnimation 1s infinite linear;
+}

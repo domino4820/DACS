@@ -20,41 +20,14 @@ import { useEffect } from "react";
 import { typeText } from "../lib/animations";
 
 export default function Home() {
-  // Destructure but ignore unused variables
+  // Uncomment to use actual roadmaps data
   const {
-    // data: roadmaps,
-    // isLoading,
-    // error,
+    data: roadmaps,
+    isLoading,
+    error,
   } = useQuery({
     queryKey: ["roadmaps"],
     queryFn: getRoadmaps,
-    // For demo purposes, use mock data if API call fails
-    placeholderData: [
-      {
-        id: "web-development",
-        title: "Web Development",
-        description: "Full-stack web development learning path",
-        category: "frontend",
-        courseCount: 12,
-        lastUpdated: new Date().toLocaleDateString(),
-      },
-      {
-        id: "data-science",
-        title: "Data Science",
-        description: "Data analysis, machine learning, and AI",
-        category: "data-science",
-        courseCount: 10,
-        lastUpdated: new Date().toLocaleDateString(),
-      },
-      {
-        id: "cybersecurity",
-        title: "Cybersecurity",
-        description: "Network security, ethical hacking, and defense",
-        category: "security",
-        courseCount: 14,
-        lastUpdated: new Date().toLocaleDateString(),
-      },
-    ],
   });
 
   useEffect(() => {
@@ -141,26 +114,41 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <RoadmapCard
-            title="Web Development"
-            description="Full-stack web development learning path"
-            courseCount={12}
-          />
-          <RoadmapCard
-            title="Data Science"
-            description="Data analysis, machine learning, and AI"
-            courseCount={10}
-          />
-          <RoadmapCard
-            title="DevOps Engineering"
-            description="CI/CD, infrastructure as code, and cloud services"
-            courseCount={11}
-          />
-          <RoadmapCard
-            title="JavaScript"
-            description="Modern JavaScript programming from basics to advanced"
-            courseCount={8}
-          />
+          {isLoading ? (
+            // Hiển thị trạng thái loading
+            <div className="col-span-4 text-center py-12">
+              <div className="font-mono-cyber text-gray-400">
+                Loading roadmaps...
+              </div>
+            </div>
+          ) : error ? (
+            // Hiển thị lỗi nếu có
+            <div className="col-span-4 text-center py-12">
+              <div className="font-mono-cyber text-cyberpunk-red">
+                Error loading roadmaps: {error.message}
+              </div>
+            </div>
+          ) : roadmaps && roadmaps.length > 0 ? (
+            // Hiển thị roadmaps từ API
+            roadmaps
+              .slice(0, 4)
+              .map((roadmap) => (
+                <RoadmapCard
+                  key={roadmap.id}
+                  title={roadmap.title}
+                  description={roadmap.description}
+                  courseCount={roadmap.courseCount || 0}
+                  id={roadmap.id}
+                />
+              ))
+          ) : (
+            // Hiển thị khi không có roadmap nào
+            <div className="col-span-4 text-center py-12">
+              <div className="font-mono-cyber text-gray-400">
+                No roadmaps found. Create your first roadmap!
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -201,7 +189,7 @@ export default function Home() {
   );
 }
 
-function RoadmapCard({ title, description, courseCount }) {
+function RoadmapCard({ title, description, courseCount, id }) {
   return (
     <Card className="card-cyber overflow-hidden hover:border-purple-500/50 transition-all duration-300">
       <CardHeader className="pb-2 border-b border-purple-900/20">
@@ -218,7 +206,7 @@ function RoadmapCard({ title, description, courseCount }) {
             {courseCount} courses
           </div>
           <Button asChild variant="default" className="btn-minimal" size="sm">
-            <Link to={`/roadmaps`}>View</Link>
+            <Link to={`/roadmaps/${id}`}>View</Link>
           </Button>
         </div>
       </CardContent>

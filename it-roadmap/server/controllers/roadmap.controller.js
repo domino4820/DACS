@@ -13,14 +13,21 @@ class RoadmapController {
   async getRoadmapById(req, res) {
     try {
       const { id } = req.params;
-      const roadmap = await roadmapModel.findById(id);
+      console.log(`Getting roadmap by ID: ${id}`);
+      const roadmap = await roadmapModel.getRoadmapWithNodesAndEdges(id);
 
       if (!roadmap) {
         return res.status(404).json({ message: "Roadmap not found" });
       }
 
+      console.log(
+        `Found roadmap with ${roadmap.nodes?.length || 0} nodes and ${
+          roadmap.edges?.length || 0
+        } edges`
+      );
       res.status(200).json(roadmap);
     } catch (error) {
+      console.error(`Error getting roadmap by ID ${req.params.id}:`, error);
       res.status(500).json({ message: error.message });
     }
   }
@@ -37,8 +44,17 @@ class RoadmapController {
 
   async createRoadmap(req, res) {
     try {
-      const { title, description, categoryId, skillId, userId, nodes, edges } =
-        req.body;
+      const {
+        title,
+        description,
+        categoryId,
+        skillId,
+        userId,
+        nodes,
+        edges,
+        tags,
+        skills,
+      } = req.body;
 
       // Create roadmap
       const roadmap = await roadmapModel.create({
@@ -65,6 +81,20 @@ class RoadmapController {
             ...edge,
             roadmapId: roadmap.id,
           });
+        }
+      }
+
+      // Add tags if provided
+      if (tags && Array.isArray(tags) && tags.length > 0) {
+        for (const tagId of tags) {
+          await roadmapModel.addTag(roadmap.id, tagId);
+        }
+      }
+
+      // Add skills if provided (thêm nhiều skills cho roadmap)
+      if (skills && Array.isArray(skills) && skills.length > 0) {
+        for (const skillId of skills) {
+          await roadmapModel.addSkill(roadmap.id, skillId);
         }
       }
 
@@ -126,40 +156,153 @@ class RoadmapController {
       const { id } = req.params;
       const { nodes, edges } = req.body;
 
+      console.log(`[SERVER] Updating nodes and edges for roadmap ${id}`);
+      console.log(
+        `[SERVER] Received payload: nodes=${nodes?.length || 0}, edges=${
+          edges?.length || 0
+        }`
+      );
+
+      if (!nodes && !edges) {
+        console.warn(
+          "[SERVER] Warning: No nodes or edges provided in request body"
+        );
+        return res
+          .status(400)
+          .json({ message: "No nodes or edges data provided" });
+      }
+
       // Check if roadmap exists
       const existingRoadmap = await roadmapModel.findById(id);
       if (!existingRoadmap) {
+        console.error(`[SERVER] Roadmap ${id} not found`);
         return res.status(404).json({ message: "Roadmap not found" });
       }
 
-      // Delete existing nodes and edges
-      await nodeModel.deleteByRoadmapId(id);
-      await edgeModel.deleteByRoadmapId(id);
+      console.log(`[SERVER] Found existing roadmap: ${existingRoadmap.title}`);
 
-      // Create new nodes and edges
-      if (nodes && Array.isArray(nodes) && nodes.length > 0) {
-        for (const node of nodes) {
-          await nodeModel.create({
-            ...node,
-            roadmapId: Number(id),
-          });
-        }
+      // IMPORTANT: Always save nodes and edges as JSON first (most reliable method)
+      console.log("[SERVER] Step 1: Saving data as JSON in roadmap table");
+
+      try {
+        const jsonUpdateResult = await roadmapModel.updateNodesAndEdges(id, {
+          nodes: nodes || [],
+          edges: edges || [],
+        });
+        console.log("[SERVER] JSON update successful:", !!jsonUpdateResult);
+      } catch (jsonError) {
+        console.error("[SERVER] Error saving JSON data:", jsonError);
+        // Continue to try the next method, don't return error yet
       }
 
-      if (edges && Array.isArray(edges) && edges.length > 0) {
-        for (const edge of edges) {
-          await edgeModel.create({
-            ...edge,
-            roadmapId: Number(id),
-          });
+      // Method 2 (legacy): Delete existing nodes and edges and recreate them in separate tables
+      console.log("[SERVER] Step 2: Saving data in relationship tables");
+
+      try {
+        if (nodes && Array.isArray(nodes) && nodes.length > 0) {
+          // Delete existing nodes
+          const deletedNodesCount = await nodeModel.deleteByRoadmapId(id);
+          console.log(
+            `[SERVER] Deleted ${deletedNodesCount} existing nodes for roadmap ${id}`
+          );
+
+          // Create new nodes
+          const createdNodes = [];
+          for (const node of nodes) {
+            try {
+              // Ensure node data is properly formatted for database
+              const nodeData = {
+                nodeIdentifier: node.nodeIdentifier || node.id,
+                positionX: node.positionX || node.position?.x || 0,
+                positionY: node.positionY || node.position?.y || 0,
+                data:
+                  typeof node.data === "object"
+                    ? JSON.stringify(node.data)
+                    : node.data,
+                roadmapId: Number(id),
+                courseId: node.courseId || null,
+              };
+
+              console.log(`[SERVER] Creating node: ${nodeData.nodeIdentifier}`);
+              const createdNode = await nodeModel.create(nodeData);
+              createdNodes.push(createdNode);
+            } catch (nodeError) {
+              console.error(`[SERVER] Error creating node:`, nodeError);
+              console.error(`[SERVER] Problematic node data:`, node);
+            }
+          }
+          console.log(
+            `[SERVER] Created ${createdNodes.length} nodes in node table`
+          );
+        } else {
+          console.log("[SERVER] No nodes to create in node table");
         }
+
+        if (edges && Array.isArray(edges) && edges.length > 0) {
+          // Delete existing edges
+          const deletedEdgesCount = await edgeModel.deleteByRoadmapId(id);
+          console.log(
+            `[SERVER] Deleted ${deletedEdgesCount} existing edges for roadmap ${id}`
+          );
+
+          // Create new edges
+          const createdEdges = [];
+          for (const edge of edges) {
+            try {
+              // Ensure edge data is properly formatted for database
+              const edgeData = {
+                edgeIdentifier: edge.edgeIdentifier || edge.id,
+                source: edge.source,
+                target: edge.target,
+                type: edge.type || "smoothstep",
+                animated: edge.animated || false,
+                style:
+                  typeof edge.style === "object"
+                    ? JSON.stringify(edge.style)
+                    : edge.style,
+                roadmapId: Number(id),
+                courseId: edge.courseId || null,
+              };
+
+              console.log(`[SERVER] Creating edge: ${edgeData.edgeIdentifier}`);
+              const createdEdge = await edgeModel.create(edgeData);
+              createdEdges.push(createdEdge);
+            } catch (edgeError) {
+              console.error(`[SERVER] Error creating edge:`, edgeError);
+              console.error(`[SERVER] Problematic edge data:`, edge);
+            }
+          }
+          console.log(
+            `[SERVER] Created ${createdEdges.length} edges in edge table`
+          );
+        } else {
+          console.log("[SERVER] No edges to create in edge table");
+        }
+      } catch (relationError) {
+        console.error(
+          `[SERVER] Error in relationship tables update:`,
+          relationError
+        );
+        // Continue execution - we still have JSON data saved
       }
 
       // Get the updated roadmap with nodes and edges
       const updatedRoadmap = await roadmapModel.getRoadmapWithNodesAndEdges(id);
+      console.log(
+        `[SERVER] Returning roadmap with ${
+          updatedRoadmap.nodes?.length || 0
+        } nodes and ${updatedRoadmap.edges?.length || 0} edges`
+      );
       res.status(200).json(updatedRoadmap);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error(
+        `[SERVER] Error updating roadmap nodes and edges: ${error.message}`
+      );
+      console.error(error.stack);
+      res.status(500).json({
+        message: error.message,
+        stack: process.env.NODE_ENV === "production" ? "🥞" : error.stack,
+      });
     }
   }
 

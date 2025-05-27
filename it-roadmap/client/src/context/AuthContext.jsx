@@ -67,7 +67,8 @@ export const AuthProvider = ({ children }) => {
 
     // Real login
     try {
-      const response = await api.post("/auth/login", credentials);
+      // Simplify login flow - use only one endpoint
+      const response = await api.post("/users/login", credentials);
 
       // Save token to localStorage
       if (response.data.token) {

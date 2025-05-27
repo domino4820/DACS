@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { createRoadmap } from "../services/roadmapService";
 import { getCategories } from "../services/categoryService";
 import { getSkills } from "../services/skillService";
+import { getTags } from "../services/tagService";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -28,10 +29,13 @@ import {
 import { useToast } from "../components/ui/use-toast";
 import { ChevronLeft, Save } from "lucide-react";
 import { typeText } from "../lib/animations";
+import { MultiSelect } from "../components/ui/multi-select";
+import { useAuth } from "../context/AuthContext";
 
 export default function CreateRoadmapPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -39,6 +43,8 @@ export default function CreateRoadmapPage() {
     category: "",
     difficulty: "beginner",
     isPublic: true,
+    tags: [],
+    skills: [],
   });
 
   // Fetch categories
@@ -46,12 +52,12 @@ export default function CreateRoadmapPage() {
     queryKey: ["categories"],
     queryFn: getCategories,
     placeholderData: [
-      { id: "frontend", name: "Frontend" },
-      { id: "backend", name: "Backend" },
-      { id: "fullstack", name: "Full Stack" },
-      { id: "devops", name: "DevOps" },
-      { id: "security", name: "Security" },
-      { id: "data-science", name: "Data Science" },
+      { id: 1, name: "Frontend" },
+      { id: 2, name: "Backend" },
+      { id: 3, name: "Full Stack" },
+      { id: 4, name: "DevOps" },
+      { id: 5, name: "Security" },
+      { id: 6, name: "Data Science" },
     ],
   });
 
@@ -65,6 +71,18 @@ export default function CreateRoadmapPage() {
       { id: "data-science", name: "Data Science", type: "role" },
       { id: "cybersecurity", name: "Cybersecurity", type: "role" },
       { id: "programming", name: "Programming", type: "skill" },
+    ],
+  });
+
+  // Fetch tags
+  const { data: tags, isLoading: isLoadingTags } = useQuery({
+    queryKey: ["tags"],
+    queryFn: getTags,
+    placeholderData: [
+      { id: 1, name: "Beginner", color: "#4ade80" },
+      { id: 2, name: "Frontend", color: "#3b82f6" },
+      { id: 3, name: "Backend", color: "#ec4899" },
+      { id: 4, name: "Popular", color: "#f97316" },
     ],
   });
 
@@ -103,10 +121,56 @@ export default function CreateRoadmapPage() {
     });
   };
 
+  // Xử lý chọn nhiều tags
+  const handleTagsChange = (selectedTags) => {
+    setFormData({
+      ...formData,
+      tags: selectedTags,
+    });
+  };
+
+  // Xử lý chọn nhiều skills
+  const handleSkillsChange = (selectedSkills) => {
+    setFormData({
+      ...formData,
+      skills: selectedSkills,
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    createRoadmapMutation.mutate(formData);
+
+    // Convert category và skill IDs thành số
+    const dataToSubmit = {
+      ...formData,
+      // Đổi tên category thành categoryId để phù hợp với API
+      categoryId: formData.category ? Number(formData.category) : null,
+      // Convert tags array to array of numbers
+      tags: formData.tags.map((tagId) => Number(tagId)),
+      // Convert skills array to array of numbers
+      skills: formData.skills.map((skillId) => Number(skillId)),
+      // Giữ lại field skillId nếu có để tương thích ngược
+      skillId:
+        formData.skills && formData.skills.length > 0
+          ? Number(formData.skills[0])
+          : null,
+      // Lấy ID người dùng từ context authentication
+      userId: user?.id || 1,
+    };
+
+    console.log("Submitting roadmap data:", dataToSubmit);
+
+    createRoadmapMutation.mutate(dataToSubmit);
+  };
+
+  // Debug function để theo dõi giá trị được chọn
+  const getSelectedCategoryName = () => {
+    if (!formData.category || !categories) return "Select a category";
+    const selectedCategory = categories.find(
+      (cat) => cat.id.toString() === formData.category.toString()
+    );
+    return selectedCategory ? selectedCategory.name : "Select a category";
   };
 
   useEffect(() => {
@@ -184,11 +248,13 @@ export default function CreateRoadmapPage() {
               </Label>
               <Select
                 value={formData.category}
-                onValueChange={(value) => handleSelectChange("category", value)}
+                onValueChange={(value) => {
+                  handleSelectChange("category", value);
+                }}
                 required
               >
                 <SelectTrigger className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white">
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue>{getSelectedCategoryName()}</SelectValue>
                 </SelectTrigger>
                 <SelectContent className="bg-cyberpunk-dark border-purple-500/30">
                   {isLoadingCategories ? (
@@ -197,13 +263,58 @@ export default function CreateRoadmapPage() {
                     </SelectItem>
                   ) : (
                     categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
+                      <SelectItem
+                        key={category.id}
+                        value={category.id.toString()}
+                      >
                         {category.name}
                       </SelectItem>
                     ))
                   )}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Skills - Multiselect */}
+            <div className="space-y-2">
+              <Label htmlFor="skills" className="text-gray-300 font-cyber">
+                Skills
+              </Label>
+              <MultiSelect
+                options={
+                  isLoadingSkills
+                    ? []
+                    : skills.map((skill) => ({
+                        value: skill.id.toString(),
+                        label: skill.name,
+                      }))
+                }
+                value={formData.skills}
+                onChange={handleSkillsChange}
+                placeholder="Select skills"
+                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+              />
+            </div>
+
+            {/* Tags - Multiselect */}
+            <div className="space-y-2">
+              <Label htmlFor="tags" className="text-gray-300 font-cyber">
+                Tags
+              </Label>
+              <MultiSelect
+                options={
+                  isLoadingTags
+                    ? []
+                    : tags.map((tag) => ({
+                        value: tag.id.toString(),
+                        label: tag.name,
+                      }))
+                }
+                value={formData.tags}
+                onChange={handleTagsChange}
+                placeholder="Select tags"
+                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+              />
             </div>
 
             {/* Difficulty */}

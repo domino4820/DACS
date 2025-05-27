@@ -16,7 +16,9 @@ import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminSkillsPage from "./pages/AdminSkillsPage";
 import AdminCategoriesPage from "./pages/AdminCategoriesPage";
+import AdminTagsPage from "./pages/AdminTagsPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import CourseDetail from "./pages/CourseDetail";
 
 // Components
 import MainNav from "./components/MainNav";
@@ -124,6 +126,12 @@ function App() {
                         element={<RoadmapDetailPage />}
                       />
 
+                      {/* Course routes */}
+                      <Route
+                        path="/courses/:courseId"
+                        element={<CourseDetail />}
+                      />
+
                       {/* Protected routes */}
                       <Route
                         path="/roadmaps/create"
@@ -164,6 +172,14 @@ function App() {
                         element={
                           <AdminRoute>
                             <AdminCategoriesPage />
+                          </AdminRoute>
+                        }
+                      />
+                      <Route
+                        path="/admin/tags"
+                        element={
+                          <AdminRoute>
+                            <AdminTagsPage />
                           </AdminRoute>
                         }
                       />

@@ -94,6 +94,17 @@ export default function MainNav() {
                 >
                   Categories
                 </Link>
+                <Link
+                  to="/admin/tags"
+                  className={cn(
+                    "transition-colors hover:text-blue-300",
+                    location.pathname === "/admin/tags"
+                      ? "text-blue-300"
+                      : "text-gray-400"
+                  )}
+                >
+                  Tags
+                </Link>
               </>
             )}
           </nav>

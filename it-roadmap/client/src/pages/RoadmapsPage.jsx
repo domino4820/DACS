@@ -191,15 +191,24 @@ export default function RoadmapsPage() {
 }
 
 function RoadmapCard({ roadmap, onDelete }) {
+  // Xử lý dữ liệu từ API server
+  const categoryName =
+    roadmap.category?.name ||
+    roadmap.categoryName ||
+    roadmap.category ||
+    "General";
+  const courseCount = roadmap.courseCount || 0;
+  const lastUpdated = roadmap.lastUpdated || roadmap.updatedAt || "New";
+
   return (
     <Card className="cyberpunk-card cyber-scan-effect overflow-hidden border-border/60 hover:border-primary/60 transition-colors">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="mb-2 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 font-cyber">
-            {roadmap.category}
+            {categoryName}
           </div>
           <div className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 font-mono-cyber">
-            {roadmap.courseCount} courses
+            {courseCount} courses
           </div>
         </div>
         <CardTitle className="text-lg font-cyber neon-text">
@@ -211,7 +220,12 @@ function RoadmapCard({ roadmap, onDelete }) {
       </CardHeader>
       <CardContent className="pb-2">
         <div className="flex items-center text-xs text-muted-foreground font-mono-cyber">
-          <span>Updated: {roadmap.lastUpdated || "New"}</span>
+          <span>
+            Updated:{" "}
+            {typeof lastUpdated === "string"
+              ? lastUpdated
+              : new Date(lastUpdated).toLocaleDateString()}
+          </span>
         </div>
       </CardContent>
       <CardFooter>
