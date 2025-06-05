@@ -21,15 +21,15 @@ body.has-animated-bg {
 }
 
 @keyframes subtleMove1 {
-  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.15; }
-  50% { transform: translate(20px, 30px) rotate(5deg); opacity: 0.25; }
-  100% { transform: translate(0, 0) rotate(0deg); opacity: 0.15; }
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.25; } /* Refined */
+  50% { transform: translate(20px, 30px) rotate(5deg); opacity: 0.4; } /* Refined */
+  100% { transform: translate(0, 0) rotate(0deg); opacity: 0.25; } /* Refined */
 }
 
 @keyframes subtleMove2 {
-  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.1; }
-  50% { transform: translate(-25px, -15px) rotate(-8deg); opacity: 0.2; }
-  100% { transform: translate(0, 0) rotate(0deg); opacity: 0.1; }
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.2; } /* Refined */
+  50% { transform: translate(-25px, -15px) rotate(-8deg); opacity: 0.3; } /* Refined */
+  100% { transform: translate(0, 0) rotate(0deg); opacity: 0.2; } /* Refined */
 }
 
 .animated-bg-shapes-container::before,
@@ -48,11 +48,11 @@ body.has-animated-bg {
   /* Using CSS conic-gradient for dots to control sparsity and size */
   background: conic-gradient(
     from 0deg,
-    hsla(var(--primary)/0.2) 0deg 1deg, /* small dot */
+    hsla(var(--primary)/0.35) 0deg 1deg, /* small dot - Refined opacity */
     transparent 1deg 30deg /* space between dots */
   );
   /* Repeat the pattern to fill the area */
-  background-size: 60px 60px; /* size of each repeating cell */
+  background-size: 50px 50px; /* size of each repeating cell - Refined size */
   animation: subtleMove1 120s linear infinite alternate;
 }
 
@@ -64,10 +64,10 @@ body.has-animated-bg {
   top: 40vh;
   background: conic-gradient(
     from 0deg,
-    hsla(var(--secondary)/0.15) 0deg 0.8deg, /* smaller dot */
+    hsla(var(--secondary)/0.25) 0deg 0.8deg, /* smaller dot - Refined opacity */
     transparent 0.8deg 45deg /* more space */
   );
-  background-size: 80px 80px;
+  background-size: 70px 70px; /* Refined size */
   animation: subtleMove2 180s linear infinite alternate;
   animation-delay: -60s; /* Offset animation start */
 }
