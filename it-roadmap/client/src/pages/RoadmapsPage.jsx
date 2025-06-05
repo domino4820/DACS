@@ -103,10 +103,6 @@ export default function RoadmapsPage() {
     // Apply typing effect to page title
     typeText(".roadmaps-title", null, 1000);
 
-    // Apply scan line effect to cards
-    setTimeout(() => {
-      scanLineEffect(".cyber-scan-effect");
-    }, 500);
   }, []);
 
   return (
@@ -114,17 +110,17 @@ export default function RoadmapsPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1
-            className="text-3xl font-bold tracking-tight font-cyber glitch-this roadmaps-title"
-            data-text="IT Learning Roadmaps"
+            className="text-2xl font-semibold text-foreground roadmaps-title"
+            data-text="IT Learning Roadmaps" // data-text can remain if typeText uses it
           >
             IT Learning Roadmaps
           </h1>
-          <p className="text-muted-foreground mt-2 font-mono-cyber">
+          <p className="text-muted-foreground mt-2">
             Browse and manage interactive learning paths for IT education
           </p>
         </div>
         <Link to="/roadmaps/create">
-          <Button className="btn-cyber">
+          <Button variant="default">
             <PlusCircle className="h-4 w-4 mr-2" />
             Create New Roadmap
           </Button>
@@ -132,11 +128,11 @@ export default function RoadmapsPage() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12 neon-text font-mono-cyber">
+        <div className="text-center py-12 text-muted-foreground">
           Loading roadmaps...
         </div>
       ) : error ? (
-        <div className="text-center py-12 text-cyberpunk-red font-mono-cyber">
+        <div className="text-center py-12 text-destructive">
           Error loading roadmaps: {error.message}
         </div>
       ) : (
@@ -153,14 +149,14 @@ export default function RoadmapsPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="border-cyberpunk-red bg-gradient-to-br from-cyberpunk-darker to-cyberpunk-dark">
+        <DialogContent> {/* Removed cyberpunk classes, default Dialog styling will apply */}
           <DialogHeader>
-            <DialogTitle className="text-cyberpunk-red font-cyber">
+            <DialogTitle className="text-destructive"> {/* Removed font-cyber */}
               Confirm Deletion
             </DialogTitle>
-            <DialogDescription className="font-mono-cyber text-gray-400">
+            <DialogDescription className="text-muted-foreground"> {/* Removed font-mono-cyber, text-gray-400 */}
               Are you sure you want to delete the roadmap
-              <span className="text-purple-400">
+              <span className="text-accent font-semibold"> {/* Changed color, added font-semibold */}
                 {" "}
                 "{roadmapToDelete?.title}"
               </span>
@@ -171,14 +167,14 @@ export default function RoadmapsPage() {
             <Button
               onClick={() => setDeleteDialogOpen(false)}
               variant="outline"
-              className="mr-2 border-purple-500/30 bg-transparent hover:bg-purple-900/20 hover:border-purple-500/50 text-gray-300"
+              // Removed cyberpunk classes
             >
               Cancel
             </Button>
             <Button
               onClick={confirmDelete}
               variant="destructive"
-              className="bg-cyberpunk-red hover:bg-red-700"
+              // Removed cyberpunk classes
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending ? "Deleting..." : "Delete"}
@@ -201,25 +197,25 @@ function RoadmapCard({ roadmap, onDelete }) {
   const lastUpdated = roadmap.lastUpdated || roadmap.updatedAt || "New";
 
   return (
-    <Card className="cyberpunk-card cyber-scan-effect overflow-hidden border-border/60 hover:border-primary/60 transition-colors">
+    <Card> {/* Removed cyberpunk-card, cyber-scan-effect, overflow-hidden, border classes, hover classes, transition */}
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <div className="mb-2 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 font-cyber">
+          <div className="mb-2 text-xs bg-primary/10 text-primary py-0.5 px-2 rounded-full">
             {categoryName}
           </div>
-          <div className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 font-mono-cyber">
+          <div className="text-xs bg-muted text-muted-foreground py-0.5 px-2 rounded-full">
             {courseCount} courses
           </div>
         </div>
-        <CardTitle className="text-lg font-cyber neon-text">
+        <CardTitle className="text-lg text-primary"> {/* Removed font-cyber, neon-text. Added text-primary */}
           {roadmap.title}
         </CardTitle>
-        <CardDescription className="line-clamp-2 font-mono-cyber">
+        <CardDescription className="line-clamp-2 text-muted-foreground"> {/* Removed font-mono-cyber. Ensured text-muted-foreground */}
           {roadmap.description}
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-2">
-        <div className="flex items-center text-xs text-muted-foreground font-mono-cyber">
+        <div className="flex items-center text-xs text-muted-foreground"> {/* Removed font-mono-cyber */}
           <span>
             Updated:{" "}
             {typeof lastUpdated === "string"
@@ -231,7 +227,7 @@ function RoadmapCard({ roadmap, onDelete }) {
       <CardFooter>
         <div className="flex justify-between w-full">
           <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm" className="btn-cyber">
+            <Button asChild variant="outline" size="sm"> {/* Removed btn-cyber */}
               <Link to={`/roadmaps/${roadmap.id}`}>
                 <Eye className="h-4 w-4 mr-1" />
                 View
@@ -239,9 +235,9 @@ function RoadmapCard({ roadmap, onDelete }) {
             </Button>
             <Button
               asChild
-              variant="default"
+              variant="default" // Can also be "outline" if preferred
               size="sm"
-              className="btn-cyber-yellow"
+              // Removed btn-cyber-yellow
             >
               <Link to={`/roadmaps/${roadmap.id}/edit`}>
                 <Edit className="h-4 w-4 mr-1" />
@@ -250,9 +246,9 @@ function RoadmapCard({ roadmap, onDelete }) {
             </Button>
           </div>
           <Button
-            variant="outline"
+            variant="destructive" // Can also be "outline" with destructive text
             size="sm"
-            className="btn-cyber-pink"
+            // Removed btn-cyber-pink
             onClick={onDelete}
           >
             <Trash2 className="h-4 w-4 mr-1" />
@@ -260,7 +256,7 @@ function RoadmapCard({ roadmap, onDelete }) {
           </Button>
         </div>
       </CardFooter>
-      <div className="h-1 bg-gradient-to-r from-cyberpunk-secondary to-cyberpunk-secondary/20 w-full"></div>
+      {/* Removed bottom gradient line div */}
     </Card>
   );
 }

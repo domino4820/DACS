@@ -161,24 +161,26 @@ const AdminSkillsPage = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6 text-purple-300 font-cyber">
+      <h1 className="text-2xl font-semibold text-foreground mb-6">
         Admin - Manage Skills
       </h1>
 
       {error && (
-        <Alert className="mb-6 bg-red-900/20 border-red-500/30">
-          <AlertCircle className="h-4 w-4 text-red-400" />
-          <AlertDescription className="text-red-300">{error}</AlertDescription>
+        // Assuming Alert component itself will handle destructive variant styling or needs direct styling
+        // For now, just changing text colors as requested, border/bg might need more
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4 text-destructive" />
+          <AlertDescription className="text-destructive">{error}</AlertDescription>
         </Alert>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Skills List */}
         <div className="lg:col-span-2">
-          <Card className="border-purple-500/30 bg-cyberpunk-darker shadow-lg">
-            <CardHeader className="border-b border-purple-500/20 pb-3">
+          <Card>
+            <CardHeader className="pb-3">
               <div className="flex justify-between items-center">
-                <CardTitle className="text-xl text-purple-300 font-cyber">
+                <CardTitle className="text-lg font-semibold text-primary">
                   Skills
                 </CardTitle>
                 <Button
@@ -187,7 +189,7 @@ const AdminSkillsPage = () => {
                     setIsAdding(true);
                   }}
                   size="sm"
-                  className="bg-purple-600 hover:bg-purple-700"
+                  variant="default"
                 >
                   <Plus className="mr-1 h-4 w-4" /> Add Skill
                 </Button>
@@ -197,27 +199,27 @@ const AdminSkillsPage = () => {
               {loading ? (
                 <div className="text-center py-4">
                   <div className="spinner mx-auto"></div>
-                  <p className="mt-2 text-gray-400">Loading skills...</p>
+                  <p className="mt-2 text-muted-foreground">Loading skills...</p>
                 </div>
               ) : skills.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
+                <div className="text-center py-8 text-muted-foreground">
                   <p>No skills found. Create your first skill!</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="text-left border-b border-purple-500/20">
-                        <th className="py-2 px-2 font-cyber text-purple-300">
+                      <tr className="text-left border-b border-[hsl(var(--border))]">
+                        <th className="py-3 px-4 text-left font-medium text-muted-foreground uppercase tracking-wider">
                           Name
                         </th>
-                        <th className="py-2 px-2 font-cyber text-purple-300">
+                        <th className="py-3 px-4 text-left font-medium text-muted-foreground uppercase tracking-wider">
                           Type
                         </th>
-                        <th className="py-2 px-2 font-cyber text-purple-300">
+                        <th className="py-3 px-4 text-left font-medium text-muted-foreground uppercase tracking-wider">
                           Description
                         </th>
-                        <th className="py-2 px-2 font-cyber text-purple-300 text-right">
+                        <th className="py-3 px-4 text-left font-medium text-muted-foreground uppercase tracking-wider text-right">
                           Actions
                         </th>
                       </tr>
@@ -226,24 +228,24 @@ const AdminSkillsPage = () => {
                       {skills.map((skill) => (
                         <tr
                           key={skill.id}
-                          className="border-b border-gray-800 hover:bg-purple-900/10"
+                          className="border-b border-[hsl(var(--border))] hover:bg-muted/50 transition-colors"
                         >
-                          <td className="py-3 px-2 font-medium text-gray-200">
+                          <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-foreground">
                             {skill.name}
                           </td>
-                          <td className="py-3 px-2 text-cyan-300">
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">
                             {getSkillTypeLabel(skill.type)}
                           </td>
-                          <td className="py-3 px-2 text-gray-400 truncate max-w-[200px]">
+                          <td className="px-4 py-3 max-w-[200px] truncate text-sm text-muted-foreground">
                             {skill.description || "-"}
                           </td>
-                          <td className="py-3 px-2 text-right">
+                          <td className="py-3 px-4 text-right">
                             <div className="flex justify-end gap-2">
                               <Button
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleEdit(skill)}
-                                className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                                className="h-8 w-8 p-0 text-primary hover:text-primary/90"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -253,7 +255,7 @@ const AdminSkillsPage = () => {
                                 onClick={() =>
                                   handleDelete(skill.id, skill.name)
                                 }
-                                className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                className="h-8 w-8 p-0 text-destructive hover:text-destructive/90"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -272,17 +274,17 @@ const AdminSkillsPage = () => {
         {/* Add/Edit Form */}
         {isAdding && (
           <div className="lg:col-span-1">
-            <Card className="border-purple-500/30 bg-cyberpunk-darker shadow-lg">
-              <CardHeader className="border-b border-purple-500/20 pb-3">
+            <Card>
+              <CardHeader className="pb-3">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl text-purple-300 font-cyber">
+                  <CardTitle className="text-lg font-semibold text-primary">
                     {isEditing ? "Edit Skill" : "New Skill"}
                   </CardTitle>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={resetForm}
-                    className="h-8 w-8 p-0 text-gray-400 hover:text-gray-300"
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -291,7 +293,7 @@ const AdminSkillsPage = () => {
               <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4 pt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-gray-300">
+                    <Label htmlFor="name" className="block text-sm font-medium text-foreground">
                       Name
                     </Label>
                     <Input
@@ -301,22 +303,22 @@ const AdminSkillsPage = () => {
                       onChange={handleChange}
                       placeholder="Enter skill name"
                       required
-                      className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60"
+                      // Removed cyberpunk className
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="type" className="text-gray-300">
+                    <Label htmlFor="type" className="block text-sm font-medium text-foreground">
                       Type
                     </Label>
                     <Select
                       value={formData.type}
                       onValueChange={handleSelectChange}
                     >
-                      <SelectTrigger className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60">
+                      <SelectTrigger /* Removed cyberpunk className */ >
                         <SelectValue placeholder="Select skill type" />
                       </SelectTrigger>
-                      <SelectContent className="bg-cyberpunk-dark border-purple-500/30">
+                      <SelectContent /* Removed cyberpunk className */ >
                         {skillTypes.map((type) => (
                           <SelectItem key={type.value} value={type.value}>
                             {type.label}
@@ -327,7 +329,7 @@ const AdminSkillsPage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description" className="text-gray-300">
+                    <Label htmlFor="description" className="block text-sm font-medium text-foreground">
                       Description
                     </Label>
                     <Textarea
@@ -337,14 +339,15 @@ const AdminSkillsPage = () => {
                       onChange={handleChange}
                       placeholder="Enter skill description (optional)"
                       rows={3}
-                      className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60"
+                      // Removed cyberpunk className
                     />
                   </div>
                 </CardContent>
                 <CardFooter className="pt-2 pb-4">
                   <Button
                     type="submit"
-                    className="w-full bg-purple-600 hover:bg-purple-700"
+                    className="w-full"
+                    variant="default"
                   >
                     {isEditing ? (
                       <>
