@@ -76,21 +76,15 @@ const ErrorBoundary = ({ children }) => {
 };
 
 function App() {
-  useEffect(() => {
-    document.body.classList.add("has-animated-bg");
-    return () => {
-      document.body.classList.remove("has-animated-bg");
-    };
-  }, []);
+  // Removed useEffect for has-animated-bg
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ErrorBoundary>
           <Router>
-            <div className="animated-bg-parent-container">
-              <div className="animated-bg-shapes-container"></div>
-              <div className="relative flex min-h-screen flex-col font-sans antialiased">
+            {/* Removed animated-bg-parent-container and animated-bg-shapes-container divs */}
+            <div className="relative flex min-h-screen flex-col font-sans antialiased"> {/* This div might need adjustment if it was relying on the parent for certain layout properties, but likely fine. */}
                 <MainNav />
                 <div className="flex-1">
                   <Routes>

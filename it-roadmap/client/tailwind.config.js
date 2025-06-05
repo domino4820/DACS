@@ -34,9 +34,11 @@ module.exports = {
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))", // Added ring color
       },
       fontFamily: {
-        sans: ['Inter', ...defaultTheme.fontFamily.sans],
+        sans: ['Open Sans', ...defaultTheme.fontFamily.sans], // Updated sans font
+        heading: ['Inter', ...defaultTheme.fontFamily.sans], // Added heading font
       },
     },
   },

@@ -2,35 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 @import "./styles/custom.css";
-@import "./styles/animated-background.css";
+/* Removed @import "./styles/animated-background.css"; */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --primary: 210 95% 52%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 145 63% 49%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 30 90% 55%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
+    --background: 255 100% 100%; /* #FFFFFF */
+    --foreground: 210 17% 15%;  /* #212529 - Dark Gray for Primary Text */
+    --card: 255 100% 100%; /* Card background - White */
+    --card-foreground: 210 17% 15%; /* Text on card */
+
+    --muted: 220 13% 96%;    /* #F4F6F8 or #F8F9FA - UI Element Backgrounds / Muted Background */
+    --muted-foreground: 215 14% 47%; /* #6C757D - Secondary Text Color */
+
+    --primary: 211 100% 26%;  /* #004085 - Accent Color 1 (Classic Dark Blue) */
+    --primary-foreground: 255 100% 100%; /* White text on primary */
+
+    --secondary: 180 25% 25%; /* #2F4F4F - Accent Color 2 (Dark Slate Gray/Teal like) */
+    --secondary-foreground: 255 100% 100%; /* White text on secondary */
+
+    --accent: 211 100% 26%; /* Using primary as default accent for now, can be different */
+    --accent-foreground: 255 100% 100%;
+
+    --destructive: 0 84.2% 60.2%; /* Kept from previous theme, adjust if needed */
     --destructive-foreground: 0 0% 100%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
+
+    --border: 210 16% 87%;   /* #DEE2E6 - Border/Separator Color */
+    --input: 210 16% 87%;      /* Border color for inputs */
+    /* Ring color can be based on primary or accent */
+    --ring: 211 100% 26%;
   }
 }
 
 /* Import fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap'); /* For headings */
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Open Sans', sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -39,6 +51,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+/* Styles for react-flow, connection handles etc. from previous theme are kept below */
+/* They use CSS variables, so they should adapt, but might need fine-tuning later */
 
 /* Improve edge connections and handle interaction */
 .react-flow .react-flow__handle {
