@@ -115,22 +115,22 @@ export default function RegisterPage() {
 
   return (
     <div className="container flex items-center justify-center min-h-[80vh] py-8">
-      <div className="absolute inset-0 bg-cyber-grid bg-[length:50px_50px] opacity-10 pointer-events-none"></div>
-      <Card className="w-full max-w-md border-purple-500/30 shadow-lg bg-gradient-to-br from-cyberpunk-darker to-cyberpunk-dark">
-        <CardHeader className="space-y-2 pb-4 border-b border-purple-500/20">
-          <CardTitle className="text-2xl font-bold font-cyber text-purple-300 register-title">
+
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-2 pb-4">
+          <CardTitle className="text-2xl font-bold text-primary register-title">
             Create Account
           </CardTitle>
-          <CardDescription className="font-mono-cyber text-gray-400">
+          <CardDescription className="text-muted-foreground">
             Register to start creating and sharing roadmaps
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4 pt-6">
             {devMode && (
-              <Alert className="bg-amber-900/20 border-amber-500/30 text-amber-200">
-                <InfoIcon className="h-4 w-4 text-amber-400" />
-                <AlertDescription className="text-amber-200 text-xs">
+              <Alert className="bg-yellow-50 border border-yellow-300 text-yellow-700">
+                <InfoIcon className="h-4 w-4 text-yellow-600" />
+                <AlertDescription className="text-yellow-700 text-xs">
                   Development mode active. Registration will create a mock
                   account.
                   {formData.email.includes("admin") && (
@@ -144,7 +144,7 @@ export default function RegisterPage() {
 
             {/* Username */}
             <div className="space-y-2">
-              <Label htmlFor="username" className="font-cyber text-gray-300">
+              <Label htmlFor="username" className="text-sm font-medium text-foreground">
                 Username
               </Label>
               <Input
@@ -154,16 +154,16 @@ export default function RegisterPage() {
                 placeholder="Enter your username"
                 value={formData.username}
                 onChange={handleChange}
-                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+
               />
               {errors.username && (
-                <p className="text-red-500 text-xs mt-1">{errors.username}</p>
+                <p className="text-destructive text-xs mt-1">{errors.username}</p>
               )}
             </div>
 
             {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="font-cyber text-gray-300">
+              <Label htmlFor="email" className="text-sm font-medium text-foreground">
                 Email
               </Label>
               <Input
@@ -173,16 +173,16 @@ export default function RegisterPage() {
                 placeholder="your.email@example.com"
                 value={formData.email}
                 onChange={handleChange}
-                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+
               />
               {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                <p className="text-destructive text-xs mt-1">{errors.email}</p>
               )}
             </div>
 
             {/* Password */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="font-cyber text-gray-300">
+              <Label htmlFor="password" className="text-sm font-medium text-foreground">
                 Password
               </Label>
               <Input
@@ -192,10 +192,10 @@ export default function RegisterPage() {
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={handleChange}
-                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+
               />
               {errors.password && (
-                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+                <p className="text-destructive text-xs mt-1">{errors.password}</p>
               )}
             </div>
 
@@ -203,7 +203,7 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <Label
                 htmlFor="confirmPassword"
-                className="font-cyber text-gray-300"
+                className="text-sm font-medium text-foreground"
               >
                 Confirm Password
               </Label>
@@ -214,10 +214,10 @@ export default function RegisterPage() {
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+
               />
               {errors.confirmPassword && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-destructive text-xs mt-1">
                   {errors.confirmPassword}
                 </p>
               )}
@@ -226,16 +226,17 @@ export default function RegisterPage() {
           <CardFooter className="flex flex-col pt-2">
             <Button
               type="submit"
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-cyber"
+              className="w-full"
+              variant="default"
               disabled={isLoading}
             >
               {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
-            <p className="mt-4 text-center text-sm text-gray-400 font-mono-cyber">
+            <p className="mt-4 text-center text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link
                 to="/login"
-                className="text-purple-400 hover:text-purple-300"
+                className="text-primary hover:text-primary/90"
               >
                 Sign in
               </Link>

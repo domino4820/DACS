@@ -44,14 +44,14 @@ export default function Home() {
       {/* Hero Section */}
       <section className="py-16 text-center mb-16">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight hero-title font-cyber text-cyber-gradient mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight hero-title text-foreground mb-6">
             CyberPath
           </h1>
-          <p className="text-xl text-gray-400 font-mono-cyber mb-8">
+          <p className="text-xl text-muted-foreground mb-8">
             Interactive learning paths for the digital frontier
           </p>
           <Link to="/roadmaps">
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white font-cyber py-3 px-8 text-lg">
+            <Button variant="default" size="lg">
               Explore Roadmaps
             </Button>
           </Link>
@@ -61,38 +61,38 @@ export default function Home() {
       {/* Your Progress Section */}
       <section className="mb-16">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold tracking-tight font-cyber text-purple-300">
+          <h2 className="text-2xl font-bold tracking-tight text-primary">
             Your Progress
           </h2>
-          <p className="text-gray-400 font-mono-cyber">
+          <p className="text-muted-foreground">
             Track your learning journey
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Day Streak Card */}
-          <Card className="border-purple-500/30 shadow-lg bg-gradient-to-br from-cyberpunk-darker to-cyberpunk-dark">
+          <Card>
             <CardContent className="flex flex-col items-center justify-center p-6">
-              <div className="text-4xl font-bold text-purple-400 mb-2">1</div>
-              <div className="text-sm text-purple-300 font-mono-cyber">
+              <div className="text-4xl font-bold text-accent mb-2">1</div>
+              <div className="text-sm text-muted-foreground">
                 Day Streak
               </div>
             </CardContent>
           </Card>
 
           {/* Today Card */}
-          <Card className="border-blue-500/30 shadow-lg bg-gradient-to-br from-cyberpunk-darker to-cyberpunk-dark">
+          <Card>
             <CardContent className="flex flex-col items-center justify-center p-6">
-              <div className="text-4xl font-bold text-blue-400 mb-2">0</div>
-              <div className="text-sm text-blue-300 font-mono-cyber">Today</div>
+              <div className="text-4xl font-bold text-accent mb-2">0</div>
+              <div className="text-sm text-muted-foreground">Today</div>
             </CardContent>
           </Card>
 
           {/* Completed Card */}
-          <Card className="border-pink-500/30 shadow-lg bg-gradient-to-br from-cyberpunk-darker to-cyberpunk-dark">
+          <Card>
             <CardContent className="flex flex-col items-center justify-center p-6">
-              <div className="text-4xl font-bold text-pink-400 mb-2">5</div>
-              <div className="text-sm text-pink-300 font-mono-cyber">
+              <div className="text-4xl font-bold text-accent mb-2">5</div>
+              <div className="text-sm text-muted-foreground">
                 Completed
               </div>
             </CardContent>
@@ -103,11 +103,11 @@ export default function Home() {
       {/* Roadmaps Section */}
       <div className="mb-12">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <h2 className="text-2xl font-bold tracking-tight font-cyber text-purple-300">
+          <h2 className="text-2xl font-bold tracking-tight text-primary">
             Role Based Roadmaps
           </h2>
           <Link to="/roadmaps/create">
-            <Button className="border-purple-500/30 bg-cyberpunk-darker hover:bg-purple-900/20 hover:border-purple-500/50 text-purple-300">
+            <Button variant="outline">
               Create Roadmap
             </Button>
           </Link>
@@ -117,14 +117,14 @@ export default function Home() {
           {isLoading ? (
             // Hiển thị trạng thái loading
             <div className="col-span-4 text-center py-12">
-              <div className="font-mono-cyber text-gray-400">
+              <div className="text-muted-foreground">
                 Loading roadmaps...
               </div>
             </div>
           ) : error ? (
             // Hiển thị lỗi nếu có
             <div className="col-span-4 text-center py-12">
-              <div className="font-mono-cyber text-cyberpunk-red">
+              <div className="text-destructive">
                 Error loading roadmaps: {error.message}
               </div>
             </div>
@@ -144,7 +144,7 @@ export default function Home() {
           ) : (
             // Hiển thị khi không có roadmap nào
             <div className="col-span-4 text-center py-12">
-              <div className="font-mono-cyber text-gray-400">
+              <div className="text-muted-foreground">
                 No roadmaps found. Create your first roadmap!
               </div>
             </div>
@@ -155,10 +155,10 @@ export default function Home() {
       {/* Skill Based Section */}
       <div className="mb-12">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <h2 className="text-2xl font-bold tracking-tight font-cyber text-purple-300">
+          <h2 className="text-2xl font-bold tracking-tight text-primary">
             Skill Based Roadmaps
           </h2>
-          <p className="text-gray-400 font-mono-cyber">
+          <p className="text-muted-foreground">
             Focused learning paths for specific technologies
           </p>
         </div>
@@ -191,21 +191,21 @@ export default function Home() {
 
 function RoadmapCard({ title, description, courseCount, id }) {
   return (
-    <Card className="card-cyber overflow-hidden hover:border-purple-500/50 transition-all duration-300">
-      <CardHeader className="pb-2 border-b border-purple-900/20">
-        <CardTitle className="text-lg font-cyber text-purple-300">
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg text-primary">
           {title}
         </CardTitle>
-        <CardDescription className="line-clamp-2 font-mono-cyber text-gray-400">
+        <CardDescription className="line-clamp-2 text-muted-foreground">
           {description}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-4">
         <div className="flex justify-between items-center">
-          <div className="badge badge-purple font-mono-cyber">
+          <div className="text-xs text-muted-foreground">
             {courseCount} courses
           </div>
-          <Button asChild variant="default" className="btn-minimal" size="sm">
+          <Button asChild variant="outline" size="sm">
             <Link to={`/roadmaps/${id}`}>View</Link>
           </Button>
         </div>
@@ -216,22 +216,21 @@ function RoadmapCard({ title, description, courseCount, id }) {
 
 function SkillCard({ title, description, count }) {
   return (
-    <Card className="card-cyber overflow-hidden hover:border-blue-500/50 transition-all duration-300">
-      <CardHeader className="pb-2 border-b border-blue-900/20">
-        <CardTitle className="font-cyber text-blue-300">{title}</CardTitle>
-        <CardDescription className="font-mono-cyber text-gray-400">
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-primary">{title}</CardTitle>
+        <CardDescription className="text-muted-foreground">
           {description}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-4">
         <div className="flex justify-between items-center">
-          <div className="badge badge-blue font-mono-cyber">
+          <div className="text-xs text-muted-foreground">
             {count} roadmaps
           </div>
           <Button
             asChild
-            variant="default"
-            className="btn-minimal border-blue-500/30 text-blue-300 hover:bg-blue-900/20 hover:border-blue-500/50"
+            variant="outline"
             size="sm"
           >
             <Link to="/roadmaps">View</Link>
