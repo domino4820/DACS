@@ -36,8 +36,7 @@ module.exports = {
         input: "hsl(var(--input))",
       },
       fontFamily: {
-        sans: ['Pixelify Sans', ...defaultTheme.fontFamily.sans],
-        pixel: ["Pixelify Sans", "Arial", "sans-serif"],
+        sans: ['Inter', ...defaultTheme.fontFamily.sans],
       },
     },
   },

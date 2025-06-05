@@ -30,6 +30,7 @@ import DevModeToggle from "./components/DevModeToggle";
 const queryClient = new QueryClient();
 
 // Error boundary component
+// Error boundary component
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
   const [error, setError] = useState(null);
@@ -58,10 +59,11 @@ const ErrorBoundary = ({ children }) => {
   if (hasError) {
     return (
       <div className="p-8 text-center">
-        <h2 className="text-2xl text-red-500 mb-4">Something went wrong</h2>
-        <p className="mb-4 text-gray-400">{error}</p>
+        <h2 className="text-2xl text-destructive mb-4">Something went wrong</h2>
+        <p className="mb-4 text-muted-foreground">{error}</p>
         <button
-          className="btn-primary px-4 py-2"
+          // TODO: Replace with <Button variant="default"> once available here or adjust styling
+          className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-none"
           onClick={() => window.location.reload()}
         >
           Reload Application
@@ -74,27 +76,11 @@ const ErrorBoundary = ({ children }) => {
 };
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
-    // Initialize cyberpunk animations after the DOM is fully loaded
-    try {
-      const timer = setTimeout(() => {
-        try {
-          console.log("Initializing animations...");
-          initCyberpunkAnimations();
-          setIsLoading(false);
-        } catch (error) {
-          console.error("Animation initialization failed:", error);
-          setIsLoading(false);
-        }
-      }, 800); // Reduced delay for faster loading
-
-      return () => clearTimeout(timer);
-    } catch (error) {
-      console.error("Failed to setup animation timer:", error);
-      setIsLoading(false);
-    }
+    document.body.classList.add("has-animated-bg");
+    return () => {
+      document.body.classList.remove("has-animated-bg");
+    };
   }, []);
 
   return (
@@ -102,21 +88,12 @@ function App() {
       <AuthProvider>
         <ErrorBoundary>
           <Router>
-            <div className="min-h-screen bg-cyberpunk-darker font-sans antialiased">
-              <div className="relative flex min-h-screen flex-col">
+            <div className="animated-bg-parent-container">
+              <div className="animated-bg-shapes-container"></div>
+              <div className="relative flex min-h-screen flex-col font-sans antialiased">
                 <MainNav />
-                <div className="flex-1 bg-grid">
-                  {isLoading ? (
-                    <div className="flex items-center justify-center h-[80vh]">
-                      <div className="text-center">
-                        <h2 className="text-xl mb-4 text-purple-300 font-cyber">
-                          Loading
-                        </h2>
-                        <div className="spinner mx-auto"></div>
-                      </div>
-                    </div>
-                  ) : (
-                    <Routes>
+                <div className="flex-1">
+                  <Routes>
                       <Route path="/" element={<Home />} />
                       <Route path="/login" element={<LoginPage />} />
                       <Route path="/register" element={<RegisterPage />} />
@@ -187,7 +164,6 @@ function App() {
                       {/* 404 page */}
                       <Route path="*" element={<NotFoundPage />} />
                     </Routes>
-                  )}
                 </div>
                 {/* Development mode toggle - only shown in dev environment */}
                 <DevModeToggle />

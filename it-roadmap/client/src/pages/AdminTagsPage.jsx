@@ -128,24 +128,24 @@ const AdminTagsPage = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6 text-purple-300 font-cyber">
+      <h1 className="text-2xl font-semibold text-foreground mb-6">
         Admin - Manage Tags
       </h1>
 
       {error && (
-        <Alert className="mb-6 bg-red-900/20 border-red-500/30">
-          <AlertCircle className="h-4 w-4 text-red-400" />
-          <AlertDescription className="text-red-300">{error}</AlertDescription>
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4 text-destructive" />
+          <AlertDescription className="text-destructive">{error}</AlertDescription>
         </Alert>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Tags List */}
         <div className="lg:col-span-2">
-          <Card className="border-purple-500/30 bg-cyberpunk-darker shadow-lg">
-            <CardHeader className="border-b border-purple-500/20 pb-3">
+          <Card>
+            <CardHeader className="pb-3">
               <div className="flex justify-between items-center">
-                <CardTitle className="text-xl text-purple-300 font-cyber">
+                <CardTitle className="text-lg font-semibold text-primary">
                   Tags
                 </CardTitle>
                 <Button
@@ -154,7 +154,7 @@ const AdminTagsPage = () => {
                     setIsAdding(true);
                   }}
                   size="sm"
-                  className="bg-purple-600 hover:bg-purple-700"
+                  variant="default"
                 >
                   <Plus className="mr-1 h-4 w-4" /> Add Tag
                 </Button>
@@ -164,24 +164,24 @@ const AdminTagsPage = () => {
               {loading ? (
                 <div className="text-center py-4">
                   <div className="spinner mx-auto"></div>
-                  <p className="mt-2 text-gray-400">Loading tags...</p>
+                  <p className="mt-2 text-muted-foreground">Loading tags...</p>
                 </div>
               ) : tags.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
+                <div className="text-center py-8 text-muted-foreground">
                   <p>No tags found. Create your first tag!</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="text-left border-b border-purple-500/20">
-                        <th className="py-2 px-2 font-cyber text-purple-300">
+                      <tr className="text-left border-b border-[hsl(var(--border))]">
+                        <th className="py-3 px-4 text-left font-medium text-muted-foreground uppercase tracking-wider">
                           Name
                         </th>
-                        <th className="py-2 px-2 font-cyber text-purple-300">
+                        <th className="py-3 px-4 text-left font-medium text-muted-foreground uppercase tracking-wider">
                           Color
                         </th>
-                        <th className="py-2 px-2 font-cyber text-purple-300 text-right">
+                        <th className="py-3 px-4 text-left font-medium text-muted-foreground uppercase tracking-wider text-right">
                           Actions
                         </th>
                       </tr>
@@ -190,34 +190,34 @@ const AdminTagsPage = () => {
                       {tags.map((tag) => (
                         <tr
                           key={tag.id}
-                          className="border-b border-gray-800 hover:bg-purple-900/10"
+                          className="border-b border-[hsl(var(--border))] hover:bg-muted/50 transition-colors"
                         >
-                          <td className="py-3 px-2 font-medium text-gray-200">
+                          <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-foreground">
                             <div className="flex items-center gap-2">
                               <span
                                 className="inline-block w-3 h-3 rounded-full"
                                 style={{
-                                  backgroundColor: tag.color || "#8b5cf6",
+                                  backgroundColor: tag.color || "#8b5cf6", // Default color if none
                                 }}
                               ></span>
                               {tag.name}
                             </div>
                           </td>
-                          <td className="py-3 px-2">
+                          <td className="px-4 py-3 whitespace-nowrap">
                             <div
                               className="w-6 h-6 rounded"
                               style={{
-                                backgroundColor: tag.color || "#8b5cf6",
+                                backgroundColor: tag.color || "#8b5cf6", // Default color if none
                               }}
                             ></div>
                           </td>
-                          <td className="py-3 px-2 text-right">
+                          <td className="py-3 px-4 text-right">
                             <div className="flex justify-end gap-2">
                               <Button
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleEdit(tag)}
-                                className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                                className="h-8 w-8 p-0 text-primary hover:text-primary/90"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -225,7 +225,7 @@ const AdminTagsPage = () => {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleDelete(tag.id, tag.name)}
-                                className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                className="h-8 w-8 p-0 text-destructive hover:text-destructive/90"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -244,17 +244,17 @@ const AdminTagsPage = () => {
         {/* Add/Edit Form */}
         {isAdding && (
           <div className="lg:col-span-1">
-            <Card className="border-purple-500/30 bg-cyberpunk-darker shadow-lg">
-              <CardHeader className="border-b border-purple-500/20 pb-3">
+            <Card>
+              <CardHeader className="pb-3">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl text-purple-300 font-cyber">
+                  <CardTitle className="text-lg font-semibold text-primary">
                     {isEditing ? "Edit Tag" : "New Tag"}
                   </CardTitle>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={resetForm}
-                    className="h-8 w-8 p-0 text-gray-400 hover:text-gray-300"
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -263,7 +263,7 @@ const AdminTagsPage = () => {
               <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4 pt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-gray-300">
+                    <Label htmlFor="name" className="block text-sm font-medium text-foreground">
                       Name
                     </Label>
                     <Input
@@ -273,12 +273,12 @@ const AdminTagsPage = () => {
                       onChange={handleChange}
                       placeholder="Enter tag name"
                       required
-                      className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60"
+                      // Removed cyberpunk className
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="color" className="text-gray-300">
+                    <Label htmlFor="color" className="block text-sm font-medium text-foreground">
                       Color
                     </Label>
                     <div className="flex gap-3 items-center">
@@ -288,17 +288,18 @@ const AdminTagsPage = () => {
                         type="color"
                         value={formData.color}
                         onChange={handleChange}
-                        className="w-12 h-10 p-1 bg-cyberpunk-darker/50 border-purple-500/30"
+                        // Removed cyberpunk className, allowing default browser/theme styling for color input
                       />
                       <div className="flex-1">
                         <Input
-                          id="colorText"
+                          id="colorText" // This ID was not in the original, but makes sense for a text input for color
+                          name="color" // Ensure name is 'color' if it's meant to update the same formData field directly
                           value={formData.color}
                           onChange={(e) =>
                             setFormData({ ...formData, color: e.target.value })
                           }
-                          className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60"
-                          placeholder="#000000"
+                          placeholder="#RRGGBB"
+                          // Removed cyberpunk className
                         />
                       </div>
                     </div>
@@ -307,7 +308,8 @@ const AdminTagsPage = () => {
                 <CardFooter className="pt-2 pb-4">
                   <Button
                     type="submit"
-                    className="w-full bg-purple-600 hover:bg-purple-700"
+                    className="w-full"
+                    variant="default"
                   >
                     {isEditing ? (
                       <>
