@@ -9,7 +9,7 @@ const Button = React.forwardRef(
     return (
       <button
         className={cn(
-          "inline-flex items-center justify-center whitespace-nowrap rounded-none font-medium transition-colors",
+          "inline-flex items-center justify-center whitespace-nowrap rounded-none font-medium transition-all duration-200 ease-out hover:-translate-y-px",
           "focus-visible:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[hsl(var(--primary))]",
           "disabled:pointer-events-none disabled:opacity-50",
           {

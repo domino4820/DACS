@@ -7,7 +7,7 @@ const Badge = React.forwardRef(
       <div
         ref={ref}
         className={cn(
-          "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors",
+          "inline-flex items-center rounded-sm border px-2.5 py-0.5 text-xs font-semibold transition-colors", // Changed rounded-full to rounded-sm
           {
             "bg-primary text-primary-foreground hover:bg-primary/80":
               variant === "default",
@@ -15,7 +15,7 @@ const Badge = React.forwardRef(
               variant === "secondary",
             "bg-destructive text-destructive-foreground hover:bg-destructive/80":
               variant === "destructive",
-            "bg-muted text-muted-foreground hover:bg-muted/80":
+            "text-muted-foreground border-[hsl(var(--border))] bg-transparent hover:bg-muted/80": // Updated outline variant
               variant === "outline",
           },
           className

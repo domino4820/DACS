@@ -126,18 +126,18 @@ export function RoadmapsList({ limit, showActions = true, filter }: RoadmapsList
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {roadmaps.map((roadmap) => (
-        <Card key={roadmap.id} className="overflow-hidden border-border/60 hover:border-primary/60 transition-colors">
+        <Card key={roadmap.id}> {/* Removed className */}
           <CardHeader className="pb-2">
             <div className="flex justify-between items-start">
               <Badge
-                className="mb-2 text-white"
+                className="mb-2" // Removed text-white
                 style={{
                   backgroundColor: categories.find((c) => c.id === roadmap.category)?.color || "#6b7280",
                 }}
               >
                 {categories.find((c) => c.id === roadmap.category)?.name || "Uncategorized"}
               </Badge>
-              <Badge variant="outline" className="bg-background">
+              <Badge variant="outline"> {/* Removed className="bg-background" */}
                 {roadmap.courseCount || 0} courses
               </Badge>
             </div>
@@ -195,7 +195,7 @@ export function RoadmapsList({ limit, showActions = true, filter }: RoadmapsList
               </div>
             )}
           </CardFooter>
-          <div className="h-1 bg-gradient-to-r from-primary to-primary/20 w-full absolute bottom-0 left-0"></div>
+          {/* Removed gradient line div */}
         </Card>
       ))}
     </div>
