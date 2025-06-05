@@ -133,13 +133,13 @@ export default function AddCourseDialog({ open, onClose, onAdd }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] bg-cyberpunk-darker border-purple-500/30 text-gray-300">
+      <DialogContent className="sm:max-w-[500px]"> {/* Removed cyberpunk classes */}
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle className="text-xl font-cyber text-purple-300">
+            <DialogTitle> {/* Removed cyberpunk classes, default will apply */}
               Add Course Node
             </DialogTitle>
-            <DialogDescription className="font-mono-cyber text-gray-400">
+            <DialogDescription> {/* Removed cyberpunk classes, default will apply */}
               Add a new course to your roadmap. Fill in the details below.
             </DialogDescription>
           </DialogHeader>
@@ -147,15 +147,15 @@ export default function AddCourseDialog({ open, onClose, onAdd }) {
           <div className="grid gap-4 py-4">
             {/* Course Title */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="label" className="text-right font-cyber">
-                Title <span className="text-red-500">*</span>
+              <Label htmlFor="label" className="text-right"> {/* Removed font-cyber */}
+                Title <span className="text-destructive">*</span> {/* Updated asterisk color */}
               </Label>
               <Input
                 id="label"
                 name="label"
                 value={courseData.label}
                 onChange={handleChange}
-                className="col-span-3 bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                className="col-span-3" // Removed cyberpunk classes
                 placeholder="e.g. Introduction to React"
                 required
               />
@@ -163,15 +163,15 @@ export default function AddCourseDialog({ open, onClose, onAdd }) {
 
             {/* Course Code */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="code" className="text-right font-cyber">
-                Code <span className="text-red-500">*</span>
+              <Label htmlFor="code" className="text-right"> {/* Removed font-cyber */}
+                Code <span className="text-destructive">*</span> {/* Updated asterisk color */}
               </Label>
               <Input
                 id="code"
                 name="code"
                 value={courseData.code}
                 onChange={handleChange}
-                className="col-span-3 bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                className="col-span-3" // Removed cyberpunk classes
                 placeholder="e.g. CS101"
                 required
               />
@@ -179,7 +179,7 @@ export default function AddCourseDialog({ open, onClose, onAdd }) {
 
             {/* Description */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right font-cyber">
+              <Label htmlFor="description" className="text-right"> {/* Removed font-cyber */}
                 Description
               </Label>
               <Textarea
@@ -187,7 +187,7 @@ export default function AddCourseDialog({ open, onClose, onAdd }) {
                 name="description"
                 value={courseData.description}
                 onChange={handleChange}
-                className="col-span-3 bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                className="col-span-3" // Removed cyberpunk classes
                 placeholder="Brief description of the course"
                 rows={3}
               />
@@ -198,7 +198,7 @@ export default function AddCourseDialog({ open, onClose, onAdd }) {
 
             {/* Credits */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="credits" className="text-right font-cyber">
+              <Label htmlFor="credits" className="text-right"> {/* Removed font-cyber */}
                 Credits
               </Label>
               <Input
@@ -209,13 +209,13 @@ export default function AddCourseDialog({ open, onClose, onAdd }) {
                 max="10"
                 value={courseData.credits}
                 onChange={handleChange}
-                className="col-span-3 bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                className="col-span-3" // Removed cyberpunk classes
               />
             </div>
 
             {/* Difficulty */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right font-cyber">Difficulty</Label>
+              <Label className="text-right">Difficulty</Label> {/* Removed font-cyber */}
               <Select
                 value={courseData.difficulty}
                 onValueChange={(value) =>
@@ -223,13 +223,13 @@ export default function AddCourseDialog({ open, onClose, onAdd }) {
                 }
                 className="col-span-3"
               >
-                <SelectTrigger className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white">
+                <SelectTrigger className="col-span-3"> {/* Removed cyberpunk classes */}
                   <SelectValue>
                     {courseData.difficulty.charAt(0).toUpperCase() +
                       courseData.difficulty.slice(1)}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-cyberpunk-dark border-purple-500/30">
+                <SelectContent> {/* Removed cyberpunk classes */}
                   <SelectItem value="beginner">Beginner</SelectItem>
                   <SelectItem value="intermediate">Intermediate</SelectItem>
                   <SelectItem value="advanced">Advanced</SelectItem>
@@ -239,7 +239,7 @@ export default function AddCourseDialog({ open, onClose, onAdd }) {
 
             {/* Prerequisites */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="prerequisites" className="text-right font-cyber">
+              <Label htmlFor="prerequisites" className="text-right"> {/* Removed font-cyber */}
                 Prerequisites
               </Label>
               <Input
@@ -247,14 +247,14 @@ export default function AddCourseDialog({ open, onClose, onAdd }) {
                 name="prerequisites"
                 value={courseData.prerequisites}
                 onChange={handleChange}
-                className="col-span-3 bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                className="col-span-3" // Removed cyberpunk classes
                 placeholder="e.g. JavaScript basics"
               />
             </div>
 
             {/* Documentation Link */}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="documentation" className="text-right font-cyber">
+              <Label htmlFor="documentation" className="text-right"> {/* Removed font-cyber */}
                 Documentation
               </Label>
               <Input
@@ -262,24 +262,25 @@ export default function AddCourseDialog({ open, onClose, onAdd }) {
                 name="documentation"
                 value={courseData.documentation}
                 onChange={handleChange}
-                className="col-span-3 bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                className="col-span-3" // Removed cyberpunk classes
                 placeholder="Link to course materials or docs"
               />
             </div>
           </div>
 
-          <DialogFooter className="border-t border-purple-500/20 pt-4">
+          <DialogFooter className="pt-4"> {/* Removed border class */}
             <Button
               type="button"
-              variant="outline"
+              variant="outline" // Applied variant
               onClick={onClose}
-              className="border-purple-500/30 bg-transparent hover:bg-purple-900/20 hover:border-purple-500/50 text-gray-300"
+              // Removed cyberpunk classes
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              variant="default" // Applied variant
+              // Removed cyberpunk classes
             >
               Add Node
             </Button>

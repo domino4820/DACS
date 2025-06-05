@@ -187,7 +187,7 @@ function RoadmapViewInner({
             id: edgeId,
             type: edge.type || "smoothstep",
             animated: edge.animated !== undefined ? edge.animated : true,
-            style: edge.style || { stroke: "#6d28d9" },
+            style: edge.style || { stroke: "hsl(var(--muted-foreground))" },
             // Ensure handle positions are preserved
             sourceHandle: sourceHandle,
             targetHandle: targetHandle,
@@ -215,7 +215,7 @@ function RoadmapViewInner({
                   type: MarkerType.ArrowClosed,
                   width: 20,
                   height: 20,
-                  color: "#6d28d9",
+                  color: "hsl(var(--primary))",
                 },
               }),
           };
@@ -284,7 +284,7 @@ function RoadmapViewInner({
         id: edgeId,
         type: "smoothstep",
         animated: true,
-        style: { stroke: "#6d28d9" },
+        style: { stroke: "hsl(var(--muted-foreground))" },
         // Store handle positions explicitly
         sourceHandle: params.sourceHandle,
         targetHandle: params.targetHandle,
@@ -298,7 +298,7 @@ function RoadmapViewInner({
             type: MarkerType.ArrowClosed,
             width: 20,
             height: 20,
-            color: "#6d28d9",
+            color: "hsl(var(--primary))",
           },
         }),
         data: {
@@ -373,13 +373,13 @@ function RoadmapViewInner({
             target: node.id,
             type: "smoothstep",
             animated: true,
-            style: { stroke: "#6d28d9" },
+            style: { stroke: "hsl(var(--muted-foreground))" },
             ...(connectionType === "arrow" && {
               markerEnd: {
                 type: MarkerType.ArrowClosed,
                 width: 20,
                 height: 20,
-                color: "#6d28d9",
+                color: "hsl(var(--primary))",
               },
             }),
             data: {
@@ -546,7 +546,7 @@ function RoadmapViewInner({
                   type: MarkerType.ArrowClosed,
                   width: 20,
                   height: 20,
-                  color: "#6d28d9",
+                  color: "hsl(var(--primary))",
                 },
               }),
           };
@@ -1009,12 +1009,12 @@ function RoadmapViewInner({
       {isEditing && (
         <Panel
           position="top-right"
-          className="bg-cyberpunk-darker/90 p-3 rounded-md border border-purple-500/30 mb-4 shadow-lg mr-[300px]"
+          className="bg-card p-3 rounded-sm border border-[hsl(var(--border))] shadow-md mb-4" // Updated Panel classes, kept mr-[300px] for now
         >
           <div className="flex gap-2 justify-end">
             <Button
               size="sm"
-              className="bg-cyberpunk-darker border border-purple-500/30 text-purple-300 hover:bg-purple-900/20"
+              variant="outline" // Changed to variant
               onClick={handleUndo}
               disabled={undoStack.length === 0}
             >
@@ -1022,14 +1022,14 @@ function RoadmapViewInner({
             </Button>
             <Button
               size="sm"
-              className="bg-cyberpunk-darker border border-purple-500/30 text-purple-300 hover:bg-purple-900/20"
+              variant="outline" // Changed to variant
               onClick={handleRedo}
               disabled={redoStack.length === 0}
             >
               Redo
             </Button>
             <Button
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              variant="default" // Changed to variant
               size="sm"
               onClick={handleSaveRoadmap}
             >
@@ -1057,14 +1057,14 @@ function RoadmapViewInner({
           elementsSelectable={!readOnly}
           defaultEdgeOptions={{
             type: "smoothstep",
-            style: { stroke: "#6d28d9" },
+            style: { stroke: "hsl(var(--muted-foreground))" }, // Updated stroke color
             animated: true,
             ...(connectionType === "arrow" && {
               markerEnd: {
                 type: MarkerType.ArrowClosed,
                 width: 20,
                 height: 20,
-                color: "#6d28d9",
+                color: "hsl(var(--primary))", // Updated marker color
               },
             }),
             data: {
@@ -1142,7 +1142,7 @@ function RoadmapViewInner({
         >
           <Controls />
           <MiniMap nodeStrokeWidth={3} zoomable pannable />
-          <Background variant="dots" gap={12} size={1} color="#6d28d9" />
+          <Background variant="dots" gap={12} size={1} color="hsl(var(--border))" /> {/* Updated Background color */}
 
           {/* Add custom edge styles for colored connections */}
           {edges.map((edge) => (

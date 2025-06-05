@@ -82,9 +82,9 @@ export default function RoadmapEditorPanel({
   };
 
   return (
-    <Card className="border-purple-500/30 bg-gradient-to-br from-cyberpunk-darker to-cyberpunk-dark shadow-md w-full">
-      <CardHeader className="pb-2 border-b border-purple-500/20">
-        <CardTitle className="text-lg font-cyber text-purple-300">
+    <Card className="w-full"> {/* Removed cyberpunk classes, default Card styling applies */}
+      <CardHeader className="pb-2"> {/* Removed border */}
+        <CardTitle className="text-lg font-semibold text-primary"> {/* Updated classes */}
           Editor Tools
         </CardTitle>
       </CardHeader>
@@ -94,28 +94,28 @@ export default function RoadmapEditorPanel({
           value={activeTab}
           onValueChange={setActiveTab}
         >
-          <TabsList className="w-full mb-4 bg-cyberpunk-darker border border-purple-500/30">
+          <TabsList className="w-full mb-4"> {/* Removed cyberpunk classes, default TabsList styling applies */}
             <TabsTrigger
               value="edit"
-              className="flex-1 data-[state=active]:bg-purple-900/30 data-[state=active]:text-purple-300"
+              className="flex-1" // Removed data-[state=active] specific cyberpunk classes
             >
               <Edit className="h-4 w-4 mr-1" /> Edit Tools
             </TabsTrigger>
             <TabsTrigger
               value="style"
-              className="flex-1 data-[state=active]:bg-purple-900/30 data-[state=active]:text-purple-300"
+              className="flex-1" // Removed data-[state=active] specific cyberpunk classes
             >
               <Paintbrush className="h-4 w-4 mr-1" /> Style
             </TabsTrigger>
             <TabsTrigger
               value="grid"
-              className="flex-1 data-[state=active]:bg-purple-900/30 data-[state=active]:text-purple-300"
+              className="flex-1" // Removed data-[state=active] specific cyberpunk classes
             >
               <Grid className="h-4 w-4 mr-1" /> Layout
             </TabsTrigger>
             <TabsTrigger
               value="settings"
-              className="flex-1 data-[state=active]:bg-purple-900/30 data-[state=active]:text-purple-300"
+              className="flex-1" // Removed data-[state=active] specific cyberpunk classes
             >
               <Settings2 className="h-4 w-4 mr-1" /> Settings
             </TabsTrigger>
@@ -124,17 +124,13 @@ export default function RoadmapEditorPanel({
           {activeTab === "edit" && (
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium text-gray-300 mb-2">
+                <h3 className="text-sm font-medium text-foreground mb-2"> {/* Updated classes */}
                   Edit Mode
                 </h3>
                 <div className="flex gap-2 flex-wrap">
                   <Button
                     size="sm"
-                    className={`${
-                      editMode === "select"
-                        ? "bg-purple-600 hover:bg-purple-700 text-white"
-                        : "bg-cyberpunk-darker border border-purple-500/30 text-purple-300 hover:bg-purple-900/20"
-                    }`}
+                    variant={editMode === 'select' ? 'default' : 'outline'} // Updated variant logic
                     onClick={() =>
                       onEditModeChange && onEditModeChange("select")
                     }
@@ -143,11 +139,8 @@ export default function RoadmapEditorPanel({
                   </Button>
                   <Button
                     size="sm"
-                    className={`${
-                      editMode === "connect"
-                        ? "bg-blue-600 hover:bg-blue-700 text-white"
-                        : "bg-cyberpunk-darker border border-purple-500/30 text-blue-300 hover:bg-blue-900/20"
-                    }`}
+                    variant={editMode === 'connect' ? 'default' : 'outline'} // Updated variant logic
+                    className={editMode === 'connect' ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' : ''} // Specific active style for connect
                     onClick={() =>
                       onEditModeChange && onEditModeChange("connect")
                     }
@@ -156,11 +149,7 @@ export default function RoadmapEditorPanel({
                   </Button>
                   <Button
                     size="sm"
-                    className={`${
-                      editMode === "delete"
-                        ? "bg-red-600 hover:bg-red-700 text-white"
-                        : "bg-cyberpunk-darker border border-red-500/30 text-red-300 hover:bg-red-900/20"
-                    }`}
+                    variant={editMode === 'delete' ? 'destructive' : 'outline'} // Updated variant logic
                     onClick={() =>
                       onEditModeChange && onEditModeChange("delete")
                     }
@@ -170,14 +159,14 @@ export default function RoadmapEditorPanel({
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-purple-500/20">
-                <h3 className="text-sm font-medium text-gray-300 mb-2">
+              <div className="pt-2 border-t border-[hsl(var(--border))]"> {/* Updated border */}
+                <h3 className="text-sm font-medium text-foreground mb-2"> {/* Updated classes */}
                   Node Actions
                 </h3>
                 <div className="flex gap-2">
                   <Button
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    variant="default" // Updated variant
                     onClick={() => onAddNodeClick && onAddNodeClick()}
                   >
                     <Plus className="h-4 w-4 mr-1" /> Add Node
@@ -190,12 +179,12 @@ export default function RoadmapEditorPanel({
           {activeTab === "style" && (
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium text-gray-300 mb-2">
+                <h3 className="text-sm font-medium text-foreground mb-2"> {/* Updated classes */}
                   Node Appearance
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <Label htmlFor="nodeColor" className="text-xs">
+                    <Label htmlFor="nodeColor"> {/* Removed text-xs */}
                       Border Color
                     </Label>
                     <Input
@@ -204,11 +193,11 @@ export default function RoadmapEditorPanel({
                       type="color"
                       value={nodeStyle.nodeColor}
                       onChange={handleNodeStyleChange}
-                      className="h-8 border-purple-500/30"
+                      className="h-8" // Removed border class
                     />
                   </div>
                   <div>
-                    <Label htmlFor="nodeBgColor" className="text-xs">
+                    <Label htmlFor="nodeBgColor"> {/* Removed text-xs */}
                       Background Color
                     </Label>
                     <Input
@@ -217,13 +206,13 @@ export default function RoadmapEditorPanel({
                       type="color"
                       value={nodeStyle.nodeBgColor}
                       onChange={handleNodeStyleChange}
-                      className="h-8 border-purple-500/30"
+                      className="h-8" // Removed border class
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-2">
                   <div>
-                    <Label htmlFor="textColor" className="text-xs">
+                    <Label htmlFor="textColor"> {/* Removed text-xs */}
                       Text Color
                     </Label>
                     <Input
@@ -232,11 +221,11 @@ export default function RoadmapEditorPanel({
                       type="color"
                       value={nodeStyle.textColor}
                       onChange={handleNodeStyleChange}
-                      className="h-8 border-purple-500/30"
+                      className="h-8" // Removed border class
                     />
                   </div>
                   <div>
-                    <Label htmlFor="fontSize" className="text-xs">
+                    <Label htmlFor="fontSize"> {/* Removed text-xs */}
                       Font Size
                     </Label>
                     <Input
@@ -245,7 +234,7 @@ export default function RoadmapEditorPanel({
                       type="number"
                       value={nodeStyle.fontSize}
                       onChange={handleNodeStyleChange}
-                      className="border-purple-500/30"
+                      // Removed border class
                       min={10}
                       max={24}
                     />
@@ -253,13 +242,13 @@ export default function RoadmapEditorPanel({
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-purple-500/20">
-                <h3 className="text-sm font-medium text-gray-300 mb-2">
+              <div className="pt-2 border-t border-[hsl(var(--border))]"> {/* Updated border */}
+                <h3 className="text-sm font-medium text-foreground mb-2"> {/* Updated classes */}
                   Connection Style
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <Label htmlFor="edgeColor" className="text-xs">
+                    <Label htmlFor="edgeColor"> {/* Removed text-xs */}
                       Line Color
                     </Label>
                     <Input
@@ -268,11 +257,11 @@ export default function RoadmapEditorPanel({
                       type="color"
                       value={edgeStyle.edgeColor}
                       onChange={handleEdgeStyleChange}
-                      className="h-8 border-purple-500/30"
+                      className="h-8" // Removed border class
                     />
                   </div>
                   <div>
-                    <Label htmlFor="edgeWidth" className="text-xs">
+                    <Label htmlFor="edgeWidth"> {/* Removed text-xs */}
                       Line Width
                     </Label>
                     <Input
@@ -281,7 +270,7 @@ export default function RoadmapEditorPanel({
                       type="number"
                       value={edgeStyle.edgeWidth}
                       onChange={handleEdgeStyleChange}
-                      className="border-purple-500/30"
+                      // Removed border class
                       min={1}
                       max={5}
                     />
@@ -289,7 +278,7 @@ export default function RoadmapEditorPanel({
                 </div>
 
                 <div className="mt-2">
-                  <Label className="text-xs mb-1 block">Connection Type</Label>
+                  <Label className="mb-1 block">Connection Type</Label> {/* Removed text-xs */}
                   <EdgeTypeSelector
                     value={activeEdgeStyle}
                     onChange={(value) => {
@@ -303,7 +292,7 @@ export default function RoadmapEditorPanel({
                     id="animated"
                     checked={edgeStyle.animated}
                     onCheckedChange={handleEdgeAnimatedChange}
-                    className="data-[state=checked]:bg-purple-600"
+                    // Removed data-[state=checked]:bg-purple-600
                   />
                   <Label htmlFor="animated">Animated connections</Label>
                 </div>
@@ -314,12 +303,12 @@ export default function RoadmapEditorPanel({
           {activeTab === "grid" && (
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium text-gray-300 mb-2">
+                <h3 className="text-sm font-medium text-foreground mb-2"> {/* Updated classes */}
                   Layout Options
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <Label htmlFor="gridSize" className="text-xs">
+                    <Label htmlFor="gridSize"> {/* Removed text-xs */}
                       Grid Size
                     </Label>
                     <Input
@@ -327,20 +316,20 @@ export default function RoadmapEditorPanel({
                       name="gridSize"
                       type="number"
                       defaultValue={20}
-                      className="border-purple-500/30"
+                      // Removed border class
                       min={10}
                       max={100}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="snapToGrid" className="text-xs">
+                    <Label htmlFor="snapToGrid"> {/* Removed text-xs */}
                       Snap to Grid
                     </Label>
                     <div className="flex items-center h-9 mt-1">
                       <Switch
                         id="snapToGrid"
                         defaultChecked
-                        className="data-[state=checked]:bg-purple-600"
+                        // Removed data-[state=checked]:bg-purple-600
                       />
                     </div>
                   </div>
@@ -348,7 +337,8 @@ export default function RoadmapEditorPanel({
                 <div className="mt-3">
                   <Button
                     size="sm"
-                    className="bg-purple-600 hover:bg-purple-700 text-white w-full"
+                    variant="default" // Updated variant
+                    className="w-full" // Added w-full for consistency if needed
                   >
                     Auto Layout Nodes
                   </Button>
@@ -360,7 +350,7 @@ export default function RoadmapEditorPanel({
           {activeTab === "settings" && (
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium text-gray-300 mb-2">
+                <h3 className="text-sm font-medium text-foreground mb-2"> {/* Updated classes */}
                   Editor Settings
                 </h3>
                 <div className="space-y-2">
@@ -369,7 +359,7 @@ export default function RoadmapEditorPanel({
                     <Switch
                       id="showMinimap"
                       defaultChecked
-                      className="data-[state=checked]:bg-purple-600"
+                      // Removed data-[state=checked]:bg-purple-600
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -377,7 +367,7 @@ export default function RoadmapEditorPanel({
                     <Switch
                       id="showControls"
                       defaultChecked
-                      className="data-[state=checked]:bg-purple-600"
+                      // Removed data-[state=checked]:bg-purple-600
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -385,7 +375,7 @@ export default function RoadmapEditorPanel({
                     <Switch
                       id="fitViewOnLoad"
                       defaultChecked
-                      className="data-[state=checked]:bg-purple-600"
+                      // Removed data-[state=checked]:bg-purple-600
                     />
                   </div>
                 </div>

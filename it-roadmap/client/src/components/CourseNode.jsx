@@ -56,9 +56,9 @@ const CourseNode = memo(({ data, isConnectable, selected }) => {
   return (
     <div
       className={cn(
-        "px-4 py-2 shadow-md rounded-md border w-48 bg-card transition-colors duration-300",
-        completed && "ring-2 ring-primary ring-offset-2",
-        selected && "ring-2 ring-primary ring-offset-2"
+        "px-4 py-2 shadow-md rounded-none border w-48 bg-card transition-colors duration-300", // Changed rounded-md to rounded-none
+        completed && "ring-2 ring-primary ring-offset-background", // Changed ring-offset-2 to ring-offset-background
+        selected && "ring-2 ring-primary ring-offset-background" // Changed ring-offset-2 to ring-offset-background
       )}
       style={{
         borderLeftColor: borderColor,
@@ -132,7 +132,7 @@ const CourseNode = memo(({ data, isConnectable, selected }) => {
           <button
             onClick={handleQuickToggleClick}
             className={cn(
-              "text-xs px-2 py-0.5 rounded transition-colors",
+              "text-xs px-2 py-0.5 rounded-sm transition-colors", // Changed rounded to rounded-sm
               completed
                 ? "bg-primary/20 text-primary hover:bg-primary/30"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"

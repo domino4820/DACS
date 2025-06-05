@@ -166,11 +166,11 @@ export default function CourseInfoPanel({
   if (!node) return null;
 
   return (
-    <div className="fixed right-0 top-0 h-full w-[350px] bg-cyberpunk-darker border-l border-purple-500/30 shadow-xl z-50 overflow-hidden">
-      <div className="flex items-center justify-between p-4 border-b border-purple-500/20">
+    <div className="fixed right-0 top-0 h-full w-[350px] bg-card border-l border-[hsl(var(--border))] shadow-xl z-50 overflow-hidden"> {/* Updated container */}
+      <div className="flex items-center justify-between p-4 border-b border-[hsl(var(--border))]"> {/* Updated header border */}
         <div>
-          <h3 className="text-lg font-cyber text-purple-300">Course Details</h3>
-          <p className="text-xs text-gray-400 font-mono-cyber">
+          <h3 className="text-lg font-semibold text-primary">Course Details</h3> {/* Updated title */}
+          <p className="text-xs text-muted-foreground"> {/* Updated subtitle */}
             {isEditing ? "Edit mode" : node.data.code}
           </p>
         </div>
@@ -180,11 +180,7 @@ export default function CourseInfoPanel({
               <Button
                 size="icon"
                 variant="ghost"
-                className={`h-8 w-8 ${
-                  isEditing
-                    ? "bg-green-600 hover:bg-green-700"
-                    : "hover:bg-purple-900/20"
-                }`}
+                className={`h-8 w-8 ${isEditing ? "text-green-600 hover:bg-green-600/10" : "text-primary hover:bg-primary/10"}`} // Updated Edit/Save button
                 onClick={handleEditSave}
               >
                 {isEditing ? (
@@ -197,7 +193,7 @@ export default function CourseInfoPanel({
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="h-8 w-8 hover:bg-red-900/20 hover:text-red-400"
+                  className="h-8 w-8 text-destructive hover:bg-destructive/10" // Updated Delete button
                   onClick={handleDelete}
                 >
                   <Trash className="h-4 w-4" />
@@ -208,7 +204,7 @@ export default function CourseInfoPanel({
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 hover:bg-gray-900/20"
+            className="h-8 w-8 text-muted-foreground hover:bg-muted/50" // Updated Close button
             onClick={onClose}
           >
             <X className="h-4 w-4" />
@@ -220,38 +216,38 @@ export default function CourseInfoPanel({
         {isEditing ? (
           <div className="space-y-4">
             <div>
-              <Label htmlFor="code">Course Code</Label>
+              <Label htmlFor="code">Course Code</Label> {/* Default Label styling applies */}
               <Input
                 id="code"
                 name="code"
                 value={editedNode.code}
                 onChange={handleInputChange}
-                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                // Removed cyberpunk className
               />
             </div>
             <div>
-              <Label htmlFor="label">Course Name</Label>
+              <Label htmlFor="label">Course Name</Label> {/* Default Label styling applies */}
               <Input
                 id="label"
                 name="label"
                 value={editedNode.label}
                 onChange={handleInputChange}
-                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                // Removed cyberpunk className
               />
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Description</Label> {/* Default Label styling applies */}
               <Textarea
                 id="description"
                 name="description"
                 value={editedNode.description}
                 onChange={handleInputChange}
                 rows={3}
-                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                // Removed cyberpunk className
               />
             </div>
             <div>
-              <Label htmlFor="credits">Credits</Label>
+              <Label htmlFor="credits">Credits</Label> {/* Default Label styling applies */}
               <Input
                 id="credits"
                 name="credits"
@@ -260,40 +256,40 @@ export default function CourseInfoPanel({
                 max="10"
                 value={editedNode.credits}
                 onChange={handleInputChange}
-                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                // Removed cyberpunk className
               />
             </div>
             <div>
-              <Label htmlFor="prerequisites">Prerequisites</Label>
+              <Label htmlFor="prerequisites">Prerequisites</Label> {/* Default Label styling applies */}
               <Input
                 id="prerequisites"
                 name="prerequisites"
                 value={editedNode.prerequisites || ""}
                 onChange={handleInputChange}
-                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                // Removed cyberpunk className
               />
             </div>
             <div>
-              <Label htmlFor="documentation">Documentation URL</Label>
+              <Label htmlFor="documentation">Documentation URL</Label> {/* Default Label styling applies */}
               <Input
                 id="documentation"
                 name="documentation"
                 value={editedNode.documentation || ""}
                 onChange={handleInputChange}
-                className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                // Removed cyberpunk className
               />
             </div>
 
             <div>
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">Category</Label> {/* Default Label styling applies */}
               <Select
                 value={editedNode.category || "general"}
                 onValueChange={(value) => handleSelectChange("category", value)}
               >
-                <SelectTrigger className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white">
+                <SelectTrigger /* Removed cyberpunk className */ >
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent className="bg-cyberpunk-dark border-purple-500/30">
+                <SelectContent /* Removed cyberpunk className */ >
                   <SelectItem value="general">General</SelectItem>
                   <SelectItem value="frontend">Frontend</SelectItem>
                   <SelectItem value="backend">Backend</SelectItem>
@@ -305,17 +301,17 @@ export default function CourseInfoPanel({
             </div>
 
             <div>
-              <Label htmlFor="difficulty">Difficulty</Label>
+              <Label htmlFor="difficulty">Difficulty</Label> {/* Default Label styling applies */}
               <Select
                 value={editedNode.difficulty || "beginner"}
                 onValueChange={(value) =>
                   handleSelectChange("difficulty", value)
                 }
               >
-                <SelectTrigger className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white">
+                <SelectTrigger /* Removed cyberpunk className */ >
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
-                <SelectContent className="bg-cyberpunk-dark border-purple-500/30">
+                <SelectContent /* Removed cyberpunk className */ >
                   <SelectItem value="beginner">Beginner</SelectItem>
                   <SelectItem value="intermediate">Intermediate</SelectItem>
                   <SelectItem value="advanced">Advanced</SelectItem>
@@ -324,47 +320,47 @@ export default function CourseInfoPanel({
             </div>
 
             <div>
-              <h3 className="text-sm font-cyber text-gray-300 mb-2">
+              <h3 className="text-sm font-medium text-foreground mb-2"> {/* Updated classes */}
                 Appearance
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="nodeColor">Border Color</Label>
+                  <Label htmlFor="nodeColor">Border Color</Label> {/* Default Label styling applies */}
                   <Input
                     id="nodeColor"
                     name="nodeColor"
                     type="color"
-                    value={editedNode.nodeColor || "#6d28d9"}
+                    value={editedNode.nodeColor || "#6d28d9"} // Default color might need update
                     onChange={handleInputChange}
-                    className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white h-8"
+                    className="h-8" // Retained h-8, removed other cyberpunk classes
                   />
                 </div>
                 <div>
-                  <Label htmlFor="nodeBgColor">Background Color</Label>
+                  <Label htmlFor="nodeBgColor">Background Color</Label> {/* Default Label styling applies */}
                   <Input
                     id="nodeBgColor"
                     name="nodeBgColor"
                     type="color"
-                    value={editedNode.nodeBgColor || "#1e1b4b"}
+                    value={editedNode.nodeBgColor || "#1e1b4b"} // Default color might need update
                     onChange={handleInputChange}
-                    className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white h-8"
+                    className="h-8" // Retained h-8, removed other cyberpunk classes
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <div>
-                  <Label htmlFor="textColor">Text Color</Label>
+                  <Label htmlFor="textColor">Text Color</Label> {/* Default Label styling applies */}
                   <Input
                     id="textColor"
                     name="textColor"
                     type="color"
-                    value={editedNode.textColor || "#ffffff"}
+                    value={editedNode.textColor || "#ffffff"} // Default color might need update
                     onChange={handleInputChange}
-                    className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white h-8"
+                    className="h-8" // Retained h-8, removed other cyberpunk classes
                   />
                 </div>
                 <div>
-                  <Label htmlFor="fontSize">Font Size (px)</Label>
+                  <Label htmlFor="fontSize">Font Size (px)</Label> {/* Default Label styling applies */}
                   <Input
                     id="fontSize"
                     name="fontSize"
@@ -373,7 +369,7 @@ export default function CourseInfoPanel({
                     max="24"
                     value={editedNode.fontSize || 14}
                     onChange={handleInputChange}
-                    className="bg-cyberpunk-darker/50 border-purple-500/30 focus:border-purple-500/60 text-white"
+                    // Removed cyberpunk className
                   />
                 </div>
               </div>
@@ -382,45 +378,20 @@ export default function CourseInfoPanel({
         ) : (
           <div className="space-y-4">
             <div>
-              <h2 className="text-xl font-cyber text-purple-300">
+              <h2 className="text-xl font-semibold text-primary"> {/* Updated classes */}
                 {node.data.label}
               </h2>
               <div className="flex gap-2 mt-1">
-                <Badge
-                  variant="outline"
-                  className="bg-purple-900/20 text-purple-300 border-purple-500/30"
-                >
+                <Badge variant="outline"> {/* Removed specific classes */}
                   {node.data.code}
                 </Badge>
                 {node.data.category && (
-                  <Badge
-                    variant="outline"
-                    className="bg-blue-900/20 text-blue-300 border-blue-500/30"
-                  >
+                  <Badge variant="outline"> {/* Removed specific classes */}
                     {node.data.category}
                   </Badge>
                 )}
                 {node.data.difficulty && (
-                  <Badge
-                    variant="outline"
-                    className={`
-                      ${
-                        node.data.difficulty === "beginner"
-                          ? "bg-green-900/20 text-green-300 border-green-500/30"
-                          : ""
-                      }
-                      ${
-                        node.data.difficulty === "intermediate"
-                          ? "bg-yellow-900/20 text-yellow-300 border-yellow-500/30"
-                          : ""
-                      }
-                      ${
-                        node.data.difficulty === "advanced"
-                          ? "bg-red-900/20 text-red-300 border-red-500/30"
-                          : ""
-                      }
-                    `}
-                  >
+                  <Badge variant="outline"> {/* Removed specific classes */}
                     {node.data.difficulty}
                   </Badge>
                 )}
@@ -428,62 +399,60 @@ export default function CourseInfoPanel({
             </div>
 
             <div>
-              <p className="text-gray-400 font-mono-cyber text-sm">
+              <p className="text-sm text-foreground"> {/* Updated classes */}
                 {node.data.description}
               </p>
             </div>
 
-            <Separator className="border-purple-500/20" />
+            <Separator /> {/* Default Separator styling will apply */}
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs text-gray-500 font-mono-cyber">Credits</p>
-                <p className="text-white">{node.data.credits}</p>
+                <p className="text-xs text-muted-foreground">Credits</p> {/* Updated classes */}
+                <p className="text-sm text-foreground">{node.data.credits}</p> {/* Updated classes */}
               </div>
               {node.data.prerequisites && (
                 <div>
-                  <p className="text-xs text-gray-500 font-mono-cyber">
+                  <p className="text-xs text-muted-foreground"> {/* Updated classes */}
                     Prerequisites
                   </p>
-                  <p className="text-white">{node.data.prerequisites}</p>
+                  <p className="text-sm text-foreground">{node.data.prerequisites}</p> {/* Updated classes */}
                 </div>
               )}
             </div>
 
             {node.data.documentation && (
               <div>
-                <p className="text-xs text-gray-500 font-mono-cyber">
+                <p className="text-xs text-muted-foreground"> {/* Updated classes */}
                   Documentation
                 </p>
                 <a
                   href={node.data.documentation}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-purple-400 hover:underline break-all"
+                  className="text-primary hover:underline break-all" // Updated classes
                 >
                   {node.data.documentation}
                 </a>
               </div>
             )}
 
-            <Separator className="border-purple-500/20" />
+            <Separator /> {/* Default Separator styling will apply */}
 
             <div>
-              <p className="text-xs text-gray-500 font-mono-cyber mb-2">
+              <p className="text-xs text-muted-foreground mb-2"> {/* Updated classes */}
                 Completed Status
               </p>
               <div className="flex items-center justify-between">
                 <div>
                   <Badge
                     variant={node.data.completed ? "default" : "outline"}
-                    className={
-                      node.data.completed ? "bg-green-600" : "text-gray-400"
-                    }
+                    className={node.data.completed ? "bg-green-600 border-green-600 text-white hover:bg-green-700" : ""} // Updated classes for completed state
                   >
                     {node.data.completed ? "Completed" : "Not Completed"}
                   </Badge>
                   {node.data.completedAt && (
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1"> {/* Updated text color */}
                       {formatDate(node.data.completedAt)}
                     </p>
                   )}
@@ -494,11 +463,11 @@ export default function CourseInfoPanel({
                       id={`complete-toggle-${node.id}`}
                       checked={node.data.completed || false}
                       onCheckedChange={handleCompleteToggle}
-                      className="data-[state=checked]:bg-green-600"
+                      // Removed data-[state=checked]:bg-green-600, relies on Switch component's theme
                     />
                     <Label
                       htmlFor={`complete-toggle-${node.id}`}
-                      className="text-sm text-gray-300"
+                      className="text-sm text-foreground" // Updated classes
                     >
                       Mark Complete
                     </Label>
@@ -511,10 +480,10 @@ export default function CourseInfoPanel({
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h3 className="font-medium">Course Documents</h3>
+                <h3 className="font-medium text-foreground">Course Documents</h3> {/* Ensured text-foreground */}
                 {!readOnly && isAdmin && (
                   <Button
-                    variant="ghost"
+                    variant="outline" // Changed from ghost
                     size="sm"
                     onClick={() => setIsAddDocumentOpen(true)}
                   >
@@ -524,19 +493,19 @@ export default function CourseInfoPanel({
               </div>
 
               {node.data.documents && node.data.documents.length > 0 ? (
-                <Table>
+                <Table> {/* Assuming Table component itself is themed */}
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Document</TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
+                    <TableRow> {/* Assuming TableRow is themed or transparent */}
+                      <TableHead>Document</TableHead> {/* Assuming TableHead is themed */}
+                      <TableHead className="w-[100px]">Actions</TableHead> {/* Assuming TableHead is themed */}
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
+                  <TableBody> {/* Assuming TableBody is themed */}
                     {node.data.documents.map((doc) => (
-                      <TableRow key={doc.id}>
-                        <TableCell>
+                      <TableRow key={doc.id}> {/* Assuming TableRow is themed */}
+                        <TableCell> {/* Assuming TableCell is themed */}
                           <div className="flex flex-col">
-                            <span className="font-medium">{doc.title}</span>
+                            <span className="font-medium text-foreground">{doc.title}</span> {/* Ensured text-foreground */}
                             {doc.description && (
                               <span className="text-xs text-muted-foreground">
                                 {doc.description}
@@ -544,7 +513,7 @@ export default function CourseInfoPanel({
                             )}
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell> {/* Assuming TableCell is themed */}
                           <div className="flex items-center gap-1">
                             <Button variant="ghost" size="icon" asChild>
                               <a
@@ -552,7 +521,7 @@ export default function CourseInfoPanel({
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                <ExternalLink className="h-4 w-4" />
+                                <ExternalLink className="h-4 w-4 text-primary" /> {/* Icon color */}
                               </a>
                             </Button>
                             {!readOnly && isAdmin && (
@@ -565,14 +534,14 @@ export default function CourseInfoPanel({
                                     setIsEditDocumentOpen(true);
                                   }}
                                 >
-                                  <Edit className="h-4 w-4" />
+                                  <Edit className="h-4 w-4 text-primary" /> {/* Icon color */}
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => handleDeleteDocument(doc.id)}
                                 >
-                                  <Trash className="h-4 w-4" />
+                                  <Trash className="h-4 w-4 text-destructive" /> {/* Icon color */}
                                 </Button>
                               </>
                             )}
@@ -597,11 +566,11 @@ export default function CourseInfoPanel({
       <Dialog open={isAddDocumentOpen} onOpenChange={setIsAddDocumentOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Document</DialogTitle>
+            <DialogTitle>Add Document</DialogTitle> {/* Default DialogTitle styling applies */}
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Document Title</Label>
+              <Label htmlFor="title">Document Title</Label> {/* Default Label styling applies */}
               <Input
                 id="title"
                 value={newDocument.title}
@@ -609,10 +578,11 @@ export default function CourseInfoPanel({
                   setNewDocument({ ...newDocument, title: e.target.value })
                 }
                 placeholder="e.g., Official Documentation"
+                // No className needed, default Input styling applies
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="url">URL</Label>
+              <Label htmlFor="url">URL</Label> {/* Default Label styling applies */}
               <Input
                 id="url"
                 value={newDocument.url}
@@ -620,10 +590,11 @@ export default function CourseInfoPanel({
                   setNewDocument({ ...newDocument, url: e.target.value })
                 }
                 placeholder="https://example.com/docs"
+                // No className needed, default Input styling applies
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description (Optional)</Label>
+              <Label htmlFor="description">Description (Optional)</Label> {/* Default Label styling applies */}
               <Textarea
                 id="description"
                 value={newDocument.description}
@@ -635,6 +606,7 @@ export default function CourseInfoPanel({
                 }
                 placeholder="Brief description of the document"
                 rows={3}
+                // No className needed, default Textarea styling applies
               />
             </div>
           </div>
@@ -647,6 +619,7 @@ export default function CourseInfoPanel({
             </Button>
             <Button
               onClick={handleAddDocument}
+              variant="default" // Ensured variant
               disabled={!newDocument.title || !newDocument.url}
             >
               Add Document
@@ -659,12 +632,12 @@ export default function CourseInfoPanel({
       <Dialog open={isEditDocumentOpen} onOpenChange={setIsEditDocumentOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Document</DialogTitle>
+            <DialogTitle>Edit Document</DialogTitle> {/* Default DialogTitle styling applies */}
           </DialogHeader>
           {currentDocument && (
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-title">Document Title</Label>
+                <Label htmlFor="edit-title">Document Title</Label> {/* Default Label styling applies */}
                 <Input
                   id="edit-title"
                   value={currentDocument.title}
@@ -674,10 +647,11 @@ export default function CourseInfoPanel({
                       title: e.target.value,
                     })
                   }
+                  // No className needed, default Input styling applies
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-url">URL</Label>
+                <Label htmlFor="edit-url">URL</Label> {/* Default Label styling applies */}
                 <Input
                   id="edit-url"
                   value={currentDocument.url}
@@ -687,10 +661,11 @@ export default function CourseInfoPanel({
                       url: e.target.value,
                     })
                   }
+                  // No className needed, default Input styling applies
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-description">Description (Optional)</Label>
+                <Label htmlFor="edit-description">Description (Optional)</Label> {/* Default Label styling applies */}
                 <Textarea
                   id="edit-description"
                   value={currentDocument.description}
@@ -701,6 +676,7 @@ export default function CourseInfoPanel({
                     })
                   }
                   rows={3}
+                  // No className needed, default Textarea styling applies
                 />
               </div>
             </div>
@@ -714,6 +690,7 @@ export default function CourseInfoPanel({
             </Button>
             <Button
               onClick={handleEditDocument}
+              variant="default" // Ensured variant
               disabled={
                 !currentDocument ||
                 !currentDocument.title ||
