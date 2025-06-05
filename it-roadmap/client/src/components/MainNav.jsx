@@ -5,10 +5,19 @@ import { Link as RouterLink } from "react-router-dom"; // Using react-router-dom
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { useAuth } from "../context/AuthContext"; // Assuming useAuth is from AuthContext
-// import { ThemeToggle } from "./theme-toggle"; // Assuming these are present and styled
-// import { NotificationDropdown } from "./notification-dropdown"; // Assuming these are present and styled
-import { Menu } from "lucide-react";
+import { ThemeToggle } from "./theme-toggle"; // Uncommented
+import { NotificationDropdown } from "./notification-dropdown"; // Uncommented
+import { Menu, Search } from "lucide-react"; // Added Search
 import AppSidebar from './AppSidebar.tsx'; // Path to the .tsx sidebar
+import { Input } from "./ui/input.jsx"; // Added Input
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel
+} from "./ui/dropdown-menu.jsx"; // Added DropdownMenu components
 
 export function MainNav() {
   // const pathname = usePathname(); // For Next.js, not react-router-dom
@@ -41,11 +50,67 @@ export function MainNav() {
           </RouterLink>
         </div>
 
+        {/* Center: Navigation Dropdowns and Search Bar - This section is NEW */}
+        <div className="hidden md:flex flex-1 items-center justify-center space-x-4">
+          {/* Dropdown for "Thể loại" (Category Type) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-primary hover:bg-muted">Thể loại</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuLabel>Chọn Thể loại</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Web Development</DropdownMenuItem>
+              <DropdownMenuItem>Data Science</DropdownMenuItem>
+              <DropdownMenuItem>Mobile Development</DropdownMenuItem>
+              <DropdownMenuItem>Cybersecurity</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Dropdown for "Kỹ năng" (Skills) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-primary hover:bg-muted">Kỹ năng</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuLabel>Chọn Kỹ năng</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>JavaScript</DropdownMenuItem>
+              <DropdownMenuItem>Python</DropdownMenuItem>
+              <DropdownMenuItem>React</DropdownMenuItem>
+              <DropdownMenuItem>Node.js</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Dropdown for "Công nghệ" (Technologies) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-primary hover:bg-muted">Công nghệ</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuLabel>Chọn Công nghệ</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>AWS</DropdownMenuItem>
+              <DropdownMenuItem>Docker</DropdownMenuItem>
+              <DropdownMenuItem>Kubernetes</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Search Bar */}
+          <div className="relative ml-4">
+            <Input
+              type="search"
+              placeholder="Tìm kiếm lộ trình..."
+              className="h-9 w-full md:w-64 pl-8 bg-muted border-transparent focus:bg-background focus:border-input"
+            />
+            <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          </div>
+        </div>
+
         {/* Right side: User Controls */}
         <div className="flex items-center space-x-2">
-          {/* Placeholder for ThemeToggle and NotificationDropdown if they are to be used */}
-          {/* <ThemeToggle /> */}
-          {/* <NotificationDropdown /> */}
+          <NotificationDropdown /> {/* Uncommented */}
+          <ThemeToggle /> {/* Uncommented */}
           {user ? (
             <>
               <RouterLink to="/profile" className="hidden md:block text-sm font-medium text-foreground hover:text-primary transition-colors">

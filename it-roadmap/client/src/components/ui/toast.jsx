@@ -53,17 +53,28 @@ export function Toaster() {
         <div
           key={toast.id}
           className={cn(
-            "bg-white dark:bg-gray-800 border rounded-md shadow-lg p-4 flex items-start gap-3",
-            toast.variant === "destructive" && "border-red-500 dark:border-red-400",
+            "bg-card border rounded-md shadow-md p-4 flex items-start gap-3", // Base styles
+            { // Variant styles
+              "border-[hsl(var(--border))]": !toast.variant || toast.variant === "default",
+              "border-destructive/50 bg-destructive/5 text-destructive": toast.variant === "destructive",
+            },
+            // toast.className // Allow passing custom classes
           )}
         >
           <div className="flex-1">
-            {toast.title && <div className="font-medium">{toast.title}</div>}
-            {toast.description && <div className="text-sm text-gray-500 dark:text-gray-400">{toast.description}</div>}
+            {toast.title && <div className="font-medium">{toast.title}</div>} {/* Title inherits color */}
+            {toast.description && (
+              <div className={cn(
+                "text-sm",
+                toast.variant === "destructive" ? "text-destructive/90" : "text-muted-foreground"
+              )}>
+                {toast.description}
+              </div>
+            )}
           </div>
           <button
             onClick={() => removeToast(toast.id)}
-            className="text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400"
+            className="text-muted-foreground hover:text-foreground focus-visible:outline focus-visible:outline-1 focus-visible:outline-ring rounded-sm" // Updated close button
           >
             ×
           </button>

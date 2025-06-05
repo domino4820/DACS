@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getRoadmaps } from "../services/roadmapService";
 import { useEffect } from "react";
 import { typeText } from "../lib/animations";
+import { TrendingUp, Clock, CheckCircle2 } from "lucide-react"; // Added icons
 
 export default function Home() {
   // Uncomment to use actual roadmaps data
@@ -44,7 +45,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="py-16 text-center mb-16">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight hero-title text-foreground mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight hero-title text-foreground mb-6 font-heading"> {/* Added font-heading */}
             CyberPath
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
@@ -73,7 +74,8 @@ export default function Home() {
           {/* Day Streak Card */}
           <Card>
             <CardContent className="flex flex-col items-center justify-center p-6">
-              <div className="text-4xl font-bold text-accent mb-2">1</div>
+              <TrendingUp className="h-8 w-8 text-accent mb-3" />
+              <div className="text-4xl font-bold text-foreground mb-1">1</div> {/* text-accent to text-foreground */}
               <div className="text-sm text-muted-foreground">
                 Day Streak
               </div>
@@ -83,7 +85,8 @@ export default function Home() {
           {/* Today Card */}
           <Card>
             <CardContent className="flex flex-col items-center justify-center p-6">
-              <div className="text-4xl font-bold text-accent mb-2">0</div>
+              <Clock className="h-8 w-8 text-accent mb-3" />
+              <div className="text-4xl font-bold text-foreground mb-1">0</div> {/* text-accent to text-foreground */}
               <div className="text-sm text-muted-foreground">Today</div>
             </CardContent>
           </Card>
@@ -91,7 +94,8 @@ export default function Home() {
           {/* Completed Card */}
           <Card>
             <CardContent className="flex flex-col items-center justify-center p-6">
-              <div className="text-4xl font-bold text-accent mb-2">5</div>
+              <CheckCircle2 className="h-8 w-8 text-accent mb-3" />
+              <div className="text-4xl font-bold text-foreground mb-1">5</div> {/* text-accent to text-foreground */}
               <div className="text-sm text-muted-foreground">
                 Completed
               </div>
@@ -182,8 +186,8 @@ export default function Home() {
         </div>
       </div>
 
-      <footer className="mt-16 pt-8 text-center text-sm text-gray-500 font-mono-cyber border-t border-purple-900/20">
-        <p>© 2023 CyberPath. All rights reserved.</p>
+      <footer className="mt-16 pt-8 text-center text-sm text-muted-foreground border-t border-[hsl(var(--border))]"> {/* Updated classes */}
+        <p>© 2023 CyberPath. All rights reserved.</p> {/* font-mono-cyber removed by ensuring parent doesn't set it, inherits Open Sans */}
       </footer>
     </main>
   );
@@ -193,7 +197,7 @@ function RoadmapCard({ title, description, courseCount, id }) {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg text-primary">
+        <CardTitle className="text-lg font-heading text-primary"> {/* Added font-heading */}
           {title}
         </CardTitle>
         <CardDescription className="line-clamp-2 text-muted-foreground">
@@ -218,7 +222,7 @@ function SkillCard({ title, description, count }) {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-primary">{title}</CardTitle>
+        <CardTitle className="font-heading text-primary">{title}</CardTitle> {/* Added font-heading */}
         <CardDescription className="text-muted-foreground">
           {description}
         </CardDescription>

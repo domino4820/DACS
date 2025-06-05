@@ -118,7 +118,7 @@ export default function RegisterPage() {
 
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2 pb-4">
-          <CardTitle className="text-2xl font-bold text-primary register-title">
+          <CardTitle className="text-2xl font-bold font-heading text-primary register-title"> {/* Added font-heading */}
             Create Account
           </CardTitle>
           <CardDescription className="text-muted-foreground">

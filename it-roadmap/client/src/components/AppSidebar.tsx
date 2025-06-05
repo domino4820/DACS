@@ -1,10 +1,13 @@
 // it-roadmap/client/src/components/AppSidebar.tsx
 import React from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom'; // Import useLocation
-import { X, Home, LayoutGrid, BookOpen, Star, UserCircle, PlusCircle, Settings } from 'lucide-react';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { X, Home, LayoutGrid, BookOpen, Star, UserCircle, PlusCircle, Settings, ListFilter } from 'lucide-react'; // Added ListFilter
 import { cn } from '../lib/utils';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
+import { Label } from './ui/label'; // Added Label
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'; // Added Select components
+import { Checkbox } from './ui/checkbox'; // Added Checkbox
 // import { useAuth } from '../context/AuthContext';
 
 interface AppSidebarProps {
@@ -13,7 +16,7 @@ interface AppSidebarProps {
 }
 
 const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
-  const location = useLocation(); // Initialize useLocation
+  const location = useLocation();
   // const { user, isAdmin } = useAuth();
 
   if (!isOpen) {
@@ -54,10 +57,12 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
         </div>
 
         <nav className="flex-grow space-y-2">
-          {/* Search Bar Placeholder */}
+          {/* Search Bar Placeholder Removed */}
+          {/*
           <div className="mb-4">
             <Input type="search" placeholder="Search..." className="w-full" />
           </div>
+          */}
 
           {/* Main Navigation Links */}
           <RouterLink
@@ -65,7 +70,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             className={cn(linkBaseClasses, linkHoverClasses, location.pathname === "/" ? linkActiveClasses : "")}
           >
-            <Home className="h-5 w-5 text-secondary" /> {/* Icon color updated */}
+            <Home className="h-5 w-5 text-secondary" />
             <span>Homepage</span>
           </RouterLink>
           <RouterLink
@@ -73,7 +78,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             className={cn(linkBaseClasses, linkHoverClasses, location.pathname.startsWith("/roadmaps") ? linkActiveClasses : "")}
           >
-            <LayoutGrid className="h-5 w-5 text-secondary" /> {/* Icon color updated */}
+            <LayoutGrid className="h-5 w-5 text-secondary" />
             <span>Roadmaps</span>
           </RouterLink>
           <RouterLink
@@ -81,7 +86,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             className={cn(linkBaseClasses, linkHoverClasses, location.pathname.startsWith("/courses") ? linkActiveClasses : "")}
           >
-            <BookOpen className="h-5 w-5 text-secondary" /> {/* Icon color updated */}
+            <BookOpen className="h-5 w-5 text-secondary" />
             <span>Courses</span>
           </RouterLink>
           <RouterLink
@@ -89,7 +94,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             className={cn(linkBaseClasses, linkHoverClasses, location.pathname === "/favorites" ? linkActiveClasses : "")}
           >
-            <Star className="h-5 w-5 text-secondary" /> {/* Icon color updated */}
+            <Star className="h-5 w-5 text-secondary" />
             <span>Favorites</span>
           </RouterLink>
           <RouterLink
@@ -97,7 +102,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             className={cn(linkBaseClasses, linkHoverClasses, location.pathname === "/roadmaps/create" ? linkActiveClasses : "")}
           >
-            <PlusCircle className="h-5 w-5 text-secondary" /> {/* Icon color updated */}
+            <PlusCircle className="h-5 w-5 text-secondary" />
             <span>Create Roadmap</span>
           </RouterLink>
 
@@ -108,48 +113,60 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             className={cn(linkBaseClasses, linkHoverClasses, location.pathname === "/profile" ? linkActiveClasses : "")}
           >
-            <UserCircle className="h-5 w-5 text-secondary" /> {/* Icon color updated */}
+            <UserCircle className="h-5 w-5 text-secondary" />
             <span>Profile</span>
           </RouterLink>
 
-          {/* Admin Links Placeholder - requires useAuth hook from AuthContext */}
-          {/* {user && isAdmin && (
-            <>
-              <hr className="my-3 border-[hsl(var(--border))]" />
-              <h3 className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Admin</h3>
-              <RouterLink
-                to="/admin/skills"
-                onClick={onClose}
-                className={cn(linkBaseClasses, linkHoverClasses, location.pathname.startsWith("/admin/skills") ? linkActiveClasses : "")}
-              >
-                <Settings className="h-5 w-5 text-secondary" />
-                <span>Manage Skills</span>
-              </RouterLink>
-              <RouterLink
-                to="/admin/categories"
-                onClick={onClose}
-                className={cn(linkBaseClasses, linkHoverClasses, location.pathname.startsWith("/admin/categories") ? linkActiveClasses : "")}
-              >
-                <Settings className="h-5 w-5 text-secondary" />
-                <span>Manage Categories</span>
-              </RouterLink>
-               <RouterLink
-                to="/admin/tags"
-                onClick={onClose}
-                className={cn(linkBaseClasses, linkHoverClasses, location.pathname.startsWith("/admin/tags") ? linkActiveClasses : "")}
-              >
-                 <Settings className="h-5 w-5 text-secondary" />
-                 <span>Manage Tags</span>
-               </RouterLink>
-            </>
-          )} */}
+          {/* Admin Links Placeholder */}
+          {/* {user && isAdmin && ( ... )} */}
         </nav>
 
-        {/* Filter Placeholder */}
-        <div className="mt-auto pt-6">
-          <h3 className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Filters</h3>
-          <div className="p-3 text-sm text-muted-foreground">
-            Filter options will appear here.
+        {/* Filters Section */}
+        <div className="mt-auto pt-6 border-t border-[hsl(var(--border))]">
+          <h3 className="flex items-center px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <ListFilter className="h-4 w-4 mr-2 text-secondary" />
+            Filters
+          </h3>
+          <div className="p-3 space-y-4">
+            {/* Sort By Select */}
+            <div>
+              <Label htmlFor="sort-by" className="text-sm font-medium text-foreground">Sort By</Label>
+              <Select defaultValue="newest">
+                <SelectTrigger id="sort-by" className="w-full mt-1 h-9">
+                  <SelectValue placeholder="Select sorting" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Newest</SelectItem>
+                  <SelectItem value="popularity">Popularity</SelectItem>
+                  <SelectItem value="difficulty-asc">Difficulty (Low to High)</SelectItem>
+                  <SelectItem value="difficulty-desc">Difficulty (High to Low)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Difficulty Checkboxes */}
+            <div>
+              <Label className="text-sm font-medium text-foreground">Difficulty</Label>
+              <div className="mt-1 space-y-1">
+                <div className="flex items-center">
+                  <Checkbox id="diff-beginner" />
+                  <Label htmlFor="diff-beginner" className="ml-2 text-sm font-normal text-foreground">Beginner</Label>
+                </div>
+                <div className="flex items-center">
+                  <Checkbox id="diff-intermediate" />
+                  <Label htmlFor="diff-intermediate" className="ml-2 text-sm font-normal text-foreground">Intermediate</Label>
+                </div>
+                <div className="flex items-center">
+                  <Checkbox id="diff-advanced" />
+                  <Label htmlFor="diff-advanced" className="ml-2 text-sm font-normal text-foreground">Advanced</Label>
+                </div>
+              </div>
+            </div>
+
+            {/* Apply Filters Button */}
+            <Button variant="default" className="w-full mt-2">Apply Filters</Button>
+            <Button variant="outline" className="w-full mt-1">Clear Filters</Button>
+
           </div>
         </div>
       </aside>

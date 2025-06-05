@@ -26,7 +26,7 @@ const ProfilePage = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8 text-foreground profile-title">
+      <h1 className="text-3xl font-bold font-heading mb-8 text-foreground profile-title"> {/* Added font-heading */}
         My Digital Identity
       </h1>
 
@@ -68,7 +68,7 @@ const ProfilePage = () => {
 
       <Card>
         <CardHeader className="pb-4">
-          <CardTitle className="text-xl text-primary">
+          <CardTitle className="text-xl font-heading text-primary"> {/* Added font-heading */}
             User Information
           </CardTitle>
         </CardHeader>
@@ -105,7 +105,7 @@ const ProfilePage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8"> {/* Added mt-8 for spacing from User Info card */}
         <Card>
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl text-primary">
+            <CardTitle className="text-xl font-heading text-primary"> {/* Added font-heading */}
               Learning Activity
             </CardTitle>
           </CardHeader>
@@ -120,7 +120,7 @@ const ProfilePage = () => {
 
         <Card>
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl text-primary">
+            <CardTitle className="text-xl font-heading text-primary"> {/* Added font-heading */}
               Achievements
             </CardTitle>
           </CardHeader>

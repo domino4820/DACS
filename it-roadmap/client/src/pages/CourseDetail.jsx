@@ -90,7 +90,7 @@ export default function CourseDetail() {
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-foreground">{course.title}</h1> {/* Updated title color */}
+        <h1 className="text-2xl font-bold text-foreground font-heading">{course.title}</h1> {/* Added font-heading */}
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => navigate("/courses")}> {/* Ensured variant */}
             Back to Courses
@@ -124,7 +124,7 @@ export default function CourseDetail() {
                 {/* Left Column */}
                 <div className="col-span-2">
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-primary mb-2"> {/* Updated classes */}
+                    <h3 className="text-lg font-semibold text-primary mb-2 font-heading"> {/* Added font-heading */}
                       Description
                     </h3>
                     <p className="text-foreground"> {/* Updated classes */}
@@ -134,7 +134,7 @@ export default function CourseDetail() {
 
                   {course.content && (
                     <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-primary mb-2"> {/* Updated classes */}
+                      <h3 className="text-lg font-semibold text-primary mb-2 font-heading"> {/* Added font-heading */}
                         Course Content
                       </h3>
                       <ScrollArea className="h-[200px] rounded-md border border-[hsl(var(--border))] p-4"> {/* Updated border */}
@@ -148,7 +148,7 @@ export default function CourseDetail() {
 
                 {/* Right Column (Course Info) */}
                 <div className="bg-muted rounded-sm p-4"> {/* Updated classes */}
-                  <h3 className="text-lg font-semibold text-primary mb-4"> {/* Updated classes */}
+                  <h3 className="text-lg font-semibold text-primary mb-4 font-heading"> {/* Added font-heading */}
                     Course Information
                   </h3>
 
@@ -208,7 +208,7 @@ export default function CourseDetail() {
         <TabsContent value="roadmap">
           <Card> {/* Removed cyberpunk classes */}
             <CardHeader>
-              <CardTitle className="text-xl font-semibold text-primary"> {/* Updated classes */}
+              <CardTitle className="text-xl font-semibold text-primary font-heading"> {/* Added font-heading */}
                 Learning Roadmap
               </CardTitle>
               <CardDescription className="text-muted-foreground"> {/* Updated classes */}
@@ -230,7 +230,7 @@ export default function CourseDetail() {
         <TabsContent value="resources">
           <Card> {/* Removed cyberpunk classes */}
             <CardHeader>
-              <CardTitle className="text-xl font-semibold text-primary"> {/* Updated classes */}
+              <CardTitle className="text-xl font-semibold text-primary font-heading"> {/* Added font-heading */}
                 Resources & Documentation
               </CardTitle>
               <CardDescription className="text-muted-foreground"> {/* Updated classes */}
@@ -245,7 +245,7 @@ export default function CourseDetail() {
                       key={doc.id}
                       className="border-b border-[hsl(var(--border))] pb-2" // Updated border
                     >
-                      <div className="font-medium text-primary"> {/* Updated classes */}
+                      <div className="font-heading font-medium text-primary"> {/* Added font-heading */}
                         {doc.title}
                       </div>
                       {doc.description && (

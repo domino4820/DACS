@@ -66,7 +66,7 @@ export default function LoginPage() {
 
       <Card className="w-full max-w-md login-card">
         <CardHeader className="space-y-2 pb-4">
-          <CardTitle className="text-2xl font-bold text-primary login-title">
+          <CardTitle className="text-2xl font-bold font-heading text-primary login-title"> {/* Added font-heading */}
             Login
           </CardTitle>
           <CardDescription className="text-muted-foreground">

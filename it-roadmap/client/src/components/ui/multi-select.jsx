@@ -64,10 +64,10 @@ export function MultiSelect({
       <div
         className={cn(
           "flex min-h-10 w-full flex-wrap items-center rounded-md border border-input bg-background px-3 py-2 text-sm",
-          "focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2",
+          "focus-within:border-[hsl(var(--primary))] focus-within:ring-2 focus-within:ring-[hsl(var(--primary)/0.2)] focus-within:outline-none", // Updated focus-within
           "cursor-pointer",
           disabled && "opacity-50 cursor-not-allowed",
-          isOpen && "ring-2 ring-ring ring-offset-2",
+          isOpen && "border-[hsl(var(--primary))]", // Updated isOpen style, removed old ring
           className
         )}
         onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -77,9 +77,9 @@ export function MultiSelect({
             {getSelectedLabels().map((label, i) => (
               <div
                 key={i}
-                className="flex items-center gap-1 rounded-sm bg-purple-500/20 px-2 py-1"
+                className="flex items-center gap-1 rounded-sm bg-primary/10 px-2 py-1" // Updated badge background
               >
-                <span className="text-xs">{label}</span>
+                <span className="text-xs text-foreground">{label}</span> {/* Ensured text color */}
                 <X
                   className="h-3 w-3 cursor-pointer hover:text-destructive"
                   onClick={(e) => removeValue(value[i], e)}
@@ -104,7 +104,7 @@ export function MultiSelect({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onClick={(e) => e.stopPropagation()}
-              className="w-full border border-input rounded-sm px-2 py-1 text-sm focus:outline-none focus:ring-1"
+              className="w-full border border-input rounded-sm px-2 py-1 text-sm focus:border-[hsl(var(--primary))] focus:ring-1 focus:ring-[hsl(var(--primary)/0.2)] focus:outline-none" // Updated search input focus
             />
           </div>
           <ul className="max-h-60 overflow-auto p-1">
@@ -116,7 +116,7 @@ export function MultiSelect({
                     key={option.value}
                     className={cn(
                       "flex cursor-pointer items-center justify-between rounded-sm px-2 py-1.5 text-sm",
-                      isSelected ? "bg-purple-500/20" : "hover:bg-purple-500/10"
+                      isSelected ? "bg-primary/15 text-primary font-medium" : "hover:bg-muted" // Updated list item selected/hover
                     )}
                     onClick={(e) => {
                       e.stopPropagation();

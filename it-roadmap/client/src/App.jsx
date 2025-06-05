@@ -161,9 +161,9 @@ function App() {
                 </div>
                 {/* Development mode toggle - only shown in dev environment */}
                 <DevModeToggle />
-              </div>
+              </div> {/* Closes "relative flex min-h-screen..." */}
               <Toaster />
-            </div>
+            {/* Removed extra closing div here */}
           </Router>
         </ErrorBoundary>
       </AuthProvider>
