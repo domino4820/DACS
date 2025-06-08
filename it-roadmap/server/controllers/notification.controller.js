@@ -137,6 +137,120 @@ class NotificationController {
       res.status(500).json({ message: error.message });
     }
   }
+
+  async createGlobalNotification(req, res) {
+    try {
+      const { message, type = "info" } = req.body;
+
+      // Kiểm tra quyền admin
+      if (!req.user.isAdmin) {
+        return res
+          .status(403)
+          .json({ message: "Không có quyền thực hiện thao tác này" });
+      }
+
+      if (!message) {
+        return res
+          .status(400)
+          .json({ message: "Nội dung thông báo là bắt buộc" });
+      }
+
+      // Lấy danh sách tất cả người dùng
+      const allUsers = await notificationModel.getAllUserIds();
+
+      // Tạo thông báo cho mỗi người dùng
+      const notifications = [];
+      for (const userId of allUsers) {
+        const notification = await notificationModel.create({
+          userId,
+          roadmapId: null,
+          message,
+          type,
+          read: false,
+        });
+        notifications.push(notification);
+      }
+
+      res.status(201).json({
+        message: "Đã tạo thông báo cho tất cả người dùng",
+        count: notifications.length,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async createRoadmapNotification(req, res) {
+    try {
+      const { roadmapId } = req.params;
+      const { message, type = "info" } = req.body;
+
+      // Kiểm tra quyền admin
+      if (!req.user.isAdmin) {
+        return res
+          .status(403)
+          .json({ message: "Không có quyền thực hiện thao tác này" });
+      }
+
+      if (!message) {
+        return res
+          .status(400)
+          .json({ message: "Nội dung thông báo là bắt buộc" });
+      }
+
+      // Lấy danh sách người dùng của lộ trình
+      const roadmapUsers = await notificationModel.getUserIdsByRoadmap(
+        roadmapId
+      );
+
+      if (roadmapUsers.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "Không tìm thấy người dùng cho lộ trình này" });
+      }
+
+      // Tạo thông báo cho mỗi người dùng
+      const notifications = [];
+      for (const userId of roadmapUsers) {
+        const notification = await notificationModel.create({
+          userId,
+          roadmapId,
+          message,
+          type,
+          read: false,
+        });
+        notifications.push(notification);
+      }
+
+      res.status(201).json({
+        message: "Đã tạo thông báo cho người dùng của lộ trình",
+        count: notifications.length,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async getNotificationStats(req, res) {
+    try {
+      // Kiểm tra quyền admin
+      if (!req.user.isAdmin) {
+        return res.status(403).json({ message: "Không có quyền truy cập" });
+      }
+
+      const totalNotifications = await notificationModel.countAll();
+      const unreadNotifications = await notificationModel.countUnread();
+      const notificationsByType = await notificationModel.countByType();
+
+      res.status(200).json({
+        totalNotifications,
+        unreadNotifications,
+        notificationsByType,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
 }
 
 module.exports = new NotificationController();

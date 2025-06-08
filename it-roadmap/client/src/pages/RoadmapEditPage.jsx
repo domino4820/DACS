@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -58,6 +58,7 @@ export default function RoadmapEditPage() {
   });
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+  const roadmapViewRef = useRef(null);
 
   // Get roadmap data
   const {
@@ -206,31 +207,141 @@ export default function RoadmapEditPage() {
   };
 
   // Handle save of nodes and edges
-  const handleSaveRoadmap = () => {
+  const handleSaveRoadmap = async (cleanedNodes, cleanedEdges) => {
     console.log("[SAVE] RoadmapEditPage: Starting manual save process");
     console.log("[SAVE] Current nodes in state:", nodes.length);
     console.log("[SAVE] Current edges in state:", edges.length);
 
-    if (nodes.length === 0) {
-      console.warn(
-        "[SAVE] Warning: No nodes found in state! Not saving empty nodes."
-      );
+    // Kiểm tra và đảm bảo dữ liệu là mảng hợp lệ
+    console.log(
+      "[SAVE] Received cleanedNodes type:",
+      Array.isArray(cleanedNodes) ? "Array" : typeof cleanedNodes
+    );
+    console.log(
+      "[SAVE] Received cleanedEdges type:",
+      Array.isArray(cleanedEdges) ? "Array" : typeof cleanedEdges
+    );
+
+    // Đảm bảo nodesToSave và edgesToSave luôn là mảng
+    const nodesToSave = Array.isArray(cleanedNodes)
+      ? cleanedNodes
+      : Array.isArray(nodes)
+      ? nodes
+      : [];
+    const edgesToSave = Array.isArray(cleanedEdges)
+      ? cleanedEdges
+      : Array.isArray(edges)
+      ? edges
+      : [];
+
+    console.log("[SAVE] Final nodesToSave length:", nodesToSave.length);
+    console.log("[SAVE] Final edgesToSave length:", edgesToSave.length);
+
+    // Debug - in chi tiết cơ bản của nodes và edges (tránh circular references)
+    try {
+      console.log("[SAVE] NODES count:", nodesToSave?.length);
+      // Log thông tin an toàn về nodes
+      if (nodesToSave && nodesToSave.length > 0) {
+        console.log("[SAVE] First node sample:", {
+          id: nodesToSave[0]?.id,
+          type: nodesToSave[0]?.type,
+          position: nodesToSave[0]?.position,
+          dataLabel: nodesToSave[0]?.data?.label,
+        });
+      }
+
+      console.log("[SAVE] EDGES count:", edgesToSave?.length);
+      // Log thông tin an toàn về edges
+      if (edgesToSave && edgesToSave.length > 0) {
+        console.log("[SAVE] First edge sample:", {
+          id: edgesToSave[0]?.id,
+          source: edgesToSave[0]?.source,
+          target: edgesToSave[0]?.target,
+        });
+      }
+    } catch (logError) {
+      console.error("[SAVE] Error logging node/edge details:", logError);
     }
 
-    // Update form data first
-    updateRoadmapMutation.mutate(formData);
+    console.log("[SAVE] Using cleaned data:", !!cleanedNodes);
 
-    // Always save nodes and edges, even if empty arrays
-    // This ensures we're explicitly sending the current state
-    updateNodesMutation.mutate(nodes);
-    updateEdgesMutation.mutate(edges);
-
-    // Add a confirmation toast with count
+    // Hiển thị thông báo đang lưu
     toast({
-      title: "Roadmap saved",
-      description: `Saved ${nodes.length} nodes and ${edges.length} edges`,
-      variant: "default",
+      title: "Đang lưu...",
+      description: "Đang lưu thông tin roadmap, vui lòng đợi",
     });
+
+    try {
+      // Sử dụng Promise.all để đợi tất cả các thao tác hoàn thành
+      // 1. Cập nhật thông tin roadmap cơ bản
+      const roadmapPromise = new Promise((resolve, reject) => {
+        updateRoadmapMutation.mutate(formData, {
+          onSuccess: (data) => {
+            console.log("[SAVE] Roadmap info updated successfully");
+            resolve(data);
+          },
+          onError: (error) => {
+            console.error("[SAVE] Error updating roadmap info:", error);
+            reject(error);
+          },
+        });
+      });
+
+      // 2. Cập nhật nodes
+      const nodesPromise = new Promise((resolve, reject) => {
+        updateNodesMutation.mutate(nodesToSave, {
+          onSuccess: (data) => {
+            console.log("[SAVE] Nodes updated successfully:", data);
+            resolve(data);
+          },
+          onError: (error) => {
+            console.error("[SAVE] Error updating nodes:", error);
+            reject(error);
+          },
+        });
+      });
+
+      // 3. Cập nhật edges
+      const edgesPromise = new Promise((resolve, reject) => {
+        updateEdgesMutation.mutate(edgesToSave, {
+          onSuccess: (data) => {
+            console.log("[SAVE] Edges updated successfully:", data);
+            resolve(data);
+          },
+          onError: (error) => {
+            console.error("[SAVE] Error updating edges:", error);
+            reject(error);
+          },
+        });
+      });
+
+      // Đợi tất cả các thao tác hoàn thành
+      await Promise.all([roadmapPromise, nodesPromise, edgesPromise]);
+
+      // Cập nhật state nếu dữ liệu đã được làm sạch
+      if (cleanedNodes) setNodes(cleanedNodes);
+      if (cleanedEdges) setEdges(cleanedEdges);
+
+      // Hiển thị thông báo thành công
+      toast({
+        title: "Lưu thành công",
+        description: `Đã lưu ${nodesToSave.length} nodes và ${edgesToSave.length} edges`,
+        variant: "default",
+      });
+
+      // Làm mới dữ liệu từ server
+      queryClient.invalidateQueries({ queryKey: ["roadmap", id] });
+      queryClient.invalidateQueries({ queryKey: ["roadmap-nodes", id] });
+      queryClient.invalidateQueries({ queryKey: ["roadmap-edges", id] });
+    } catch (error) {
+      // Hiển thị thông báo lỗi
+      console.error("[SAVE] Error during save process:", error);
+      toast({
+        title: "Lỗi khi lưu",
+        description: error.message || "Có lỗi xảy ra khi lưu roadmap",
+        variant: "destructive",
+      });
+    }
   };
 
   // Handle internal updates from ReactFlow
@@ -324,8 +435,19 @@ export default function RoadmapEditPage() {
                   type="button"
                   className="bg-purple-600 hover:bg-purple-700 text-white"
                   onClick={() => {
-                    updateRoadmapMutation.mutate(formData);
-                    handleSaveRoadmap();
+                    toast({
+                      title: "Đang lưu...",
+                      description: "Đang lưu thông tin roadmap, vui lòng đợi",
+                    });
+                    // Gọi saveChanges từ RoadmapView ref
+                    if (
+                      roadmapViewRef.current &&
+                      roadmapViewRef.current.saveChanges
+                    ) {
+                      roadmapViewRef.current.saveChanges();
+                    } else {
+                      handleSaveRoadmap();
+                    }
                   }}
                   disabled={isSubmitting}
                 >
@@ -343,6 +465,7 @@ export default function RoadmapEditPage() {
               initialEdges={edges}
               onSave={handleSaveRoadmap}
               onInternalUpdate={handleInternalUpdate}
+              ref={roadmapViewRef}
             />
           </div>
         </div>

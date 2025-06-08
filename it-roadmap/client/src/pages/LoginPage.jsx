@@ -25,7 +25,8 @@ export default function LoginPage() {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Apply typing effect to title
@@ -41,32 +42,30 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setLoading(true);
+    setError("");
 
     try {
       await login({ email, password });
       toast({
         title: "Login successful",
-        description: "You have been logged in successfully",
+        description: "You have been logged in successfully.",
       });
       navigate("/");
-    } catch (error) {
-      toast({
-        title: "Login failed",
-        description: error.message || "Invalid credentials",
-        variant: "destructive",
-      });
+    } catch (err) {
+      setError(err.message || "Failed to login");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <div className="container flex items-center justify-center min-h-[80vh] py-8">
-
       <Card className="w-full max-w-md login-card">
         <CardHeader className="space-y-2 pb-4">
-          <CardTitle className="text-2xl font-bold font-heading text-primary login-title"> {/* Added font-heading */}
+          <CardTitle className="text-2xl font-bold font-heading text-primary login-title">
+            {" "}
+            {/* Added font-heading */}
             Login
           </CardTitle>
           <CardDescription className="text-muted-foreground">
@@ -75,37 +74,34 @@ export default function LoginPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-6 pt-6">
-            {devMode && (
-              <Alert className="bg-yellow-50 border border-yellow-300 text-yellow-700">
-                <InfoIcon className="h-4 w-4 text-yellow-600" />
-                <AlertDescription className="text-yellow-700 text-xs">
-                  Development mode active. Any email/password will work.
-                  {email.includes("admin") && (
-                    <span className="block mt-1 font-bold">
-                      Using "admin" in email will create an admin account.
-                    </span>
-                  )}
-                </AlertDescription>
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
 
             <div className="space-y-3">
-              <Label htmlFor="email" className="text-sm font-medium text-foreground">
+              <Label
+                htmlFor="email"
+                className="text-sm font-medium text-foreground"
+              >
                 Email
               </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your.email@example.com"
+                placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-
               />
             </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium text-foreground">
+                <Label
+                  htmlFor="password"
+                  className="text-sm font-medium text-foreground"
+                >
                   Password
                 </Label>
                 <Link
@@ -118,10 +114,10 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-
               />
             </div>
           </CardContent>
@@ -130,9 +126,9 @@ export default function LoginPage() {
               type="submit"
               className="w-full"
               variant="default"
-              disabled={isLoading}
+              disabled={loading}
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
             <p className="mt-4 text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
@@ -145,6 +141,25 @@ export default function LoginPage() {
             </p>
           </CardFooter>
         </form>
+
+        {devMode && (
+          <div className="rounded-md bg-muted p-3 mt-4 mx-6">
+            <div className="text-sm font-medium">开发模式登录提示</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              使用包含 "admin" 的邮箱（例如
+              admin@example.com）可以登录为管理员账户。
+            </div>
+            <div
+              className="text-xs text-primary mt-1 cursor-pointer"
+              onClick={() => {
+                setEmail("admin@example.com");
+                setPassword("password123");
+              }}
+            >
+              点击此处填写管理员示例账户
+            </div>
+          </div>
+        )}
       </Card>
     </div>
   );

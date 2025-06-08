@@ -82,11 +82,14 @@ class EdgeController {
         id,
         source,
         target,
+        sourceHandle,
+        targetHandle,
         roadmapId,
         type,
         animated,
         style,
         courseId,
+        data,
       } = req.body;
 
       if (!source || !target || !roadmapId) {
@@ -94,32 +97,62 @@ class EdgeController {
         return res.status(400).json({ message: "Required fields are missing" });
       }
 
+      // 检查并获取data对象中的方向和连接点信息
+      const edgeData = data || {};
+      const sourceId = edgeData.sourceId || source;
+      const targetId = edgeData.targetId || target;
+
+      // 确保连接点信息不丢失，优先使用顶层属性，其次使用data中的属性
+      const finalSourceHandle = sourceHandle || edgeData.sourceHandle || null;
+      const finalTargetHandle = targetHandle || edgeData.targetHandle || null;
+
+      console.log("Edge direction and handles check:", {
+        source,
+        target,
+        sourceId,
+        targetId,
+        sourceHandle: finalSourceHandle,
+        targetHandle: finalTargetHandle,
+      });
+
       // Support both legacy and new format
-      const edgeData = {
+      const processedEdgeData = {
         edgeIdentifier:
           edgeIdentifier ||
           id ||
           `edge_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-        source,
-        target,
+        source: sourceId,
+        target: targetId,
+        sourceId: sourceId, // 显式保存源节点ID
+        targetId: targetId, // 显式保存目标节点ID
+        sourceHandle: finalSourceHandle, // 确保连接点信息不丢失
+        targetHandle: finalTargetHandle, // 确保连接点信息不丢失
         roadmapId: Number(roadmapId),
         courseId: courseId ? Number(courseId) : null,
         type: type || "smoothstep",
         animated: animated || false,
         style: typeof style === "object" ? JSON.stringify(style) : style,
+        data: {
+          ...edgeData,
+          // 在data中也确保连接点信息一致
+          sourceHandle: finalSourceHandle,
+          targetHandle: finalTargetHandle,
+        }, // 保存原始data对象
       };
 
       console.log("Processed edge data:", {
-        edgeIdentifier: edgeData.edgeIdentifier,
-        source: edgeData.source,
-        target: edgeData.target,
-        roadmapId: edgeData.roadmapId,
-        type: edgeData.type,
+        edgeIdentifier: processedEdgeData.edgeIdentifier,
+        source: processedEdgeData.source,
+        target: processedEdgeData.target,
+        sourceHandle: processedEdgeData.sourceHandle,
+        targetHandle: processedEdgeData.targetHandle,
+        roadmapId: processedEdgeData.roadmapId,
+        type: processedEdgeData.type,
       });
 
       // Create the edge
       try {
-        const edge = await edgeModel.create(edgeData);
+        const edge = await edgeModel.create(processedEdgeData);
         console.log("Edge created successfully:", edge.id);
         res.status(201).json(edge);
       } catch (createError) {
@@ -142,7 +175,8 @@ class EdgeController {
   async updateEdge(req, res) {
     try {
       const { id } = req.params;
-      const { source, target, type } = req.body;
+      const { source, target, sourceHandle, targetHandle, type, data } =
+        req.body;
 
       // Check if edge exists
       const existingEdge = await edgeModel.findById(id);
@@ -150,11 +184,55 @@ class EdgeController {
         return res.status(404).json({ message: "Edge not found" });
       }
 
-      const updatedEdge = await edgeModel.update(id, {
+      // 获取data对象中的方向和连接点信息
+      const edgeData = data || {};
+      const sourceId = edgeData.sourceId || source;
+      const targetId = edgeData.targetId || target;
+
+      // 确保连接点信息不丢失，优先使用请求中的值，其次使用data中的值，最后保留现有的值
+      const finalSourceHandle =
+        sourceHandle !== undefined
+          ? sourceHandle
+          : edgeData.sourceHandle !== undefined
+          ? edgeData.sourceHandle
+          : existingEdge.sourceHandle;
+
+      const finalTargetHandle =
+        targetHandle !== undefined
+          ? targetHandle
+          : edgeData.targetHandle !== undefined
+          ? edgeData.targetHandle
+          : existingEdge.targetHandle;
+
+      console.log("Edge update direction and handles check:", {
+        id,
+        currentSource: existingEdge.source,
+        newSource: sourceId,
+        currentTarget: existingEdge.target,
+        newTarget: targetId,
+        currentSourceHandle: existingEdge.sourceHandle,
+        newSourceHandle: finalSourceHandle,
+        currentTargetHandle: existingEdge.targetHandle,
+        newTargetHandle: finalTargetHandle,
+      });
+
+      const updateData = {
         source: source || existingEdge.source,
         target: target || existingEdge.target,
+        sourceId: sourceId, // 显式保存源节点ID
+        targetId: targetId, // 显式保存目标节点ID
+        sourceHandle: finalSourceHandle, // 确保连接点信息不丢失
+        targetHandle: finalTargetHandle, // 确保连接点信息不丢失
         type: type || existingEdge.type,
-      });
+        data: {
+          ...edgeData,
+          // 在data中也确保连接点信息一致
+          sourceHandle: finalSourceHandle,
+          targetHandle: finalTargetHandle,
+        }, // 保存完整的data对象
+      };
+
+      const updatedEdge = await edgeModel.update(id, updateData);
 
       res.status(200).json(updatedEdge);
     } catch (error) {

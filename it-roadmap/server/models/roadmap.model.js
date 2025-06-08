@@ -18,6 +18,24 @@ class RoadmapModel {
     });
   }
 
+  async findByCategory(categoryId) {
+    return prisma.roadmap.findMany({
+      where: { categoryId: Number(categoryId) },
+      include: {
+        category: true,
+        skill: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            isAdmin: true,
+          },
+        },
+      },
+    });
+  }
+
   async findById(id) {
     return prisma.roadmap.findUnique({
       where: { id: Number(id) },

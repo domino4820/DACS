@@ -1,18 +1,48 @@
 const express = require("express");
-const { userController } = require("../controllers");
-const { authMiddleware } = require("../middlewares/auth.middleware");
 const router = express.Router();
+const { userController } = require("../controllers");
+const { authMiddleware, adminMiddleware } = require("../middlewares");
 
-// Auth routes
+// Public routes
 router.post("/register", userController.register);
 router.post("/login", userController.login);
-router.get("/me", authMiddleware, userController.getCurrentUser);
 
-// User CRUD routes - protected
-router.get("/", authMiddleware, userController.getAllUsers);
-router.get("/:id", authMiddleware, userController.getUserById);
-router.post("/", userController.createUser);
+// Protected routes
+router.get("/current", authMiddleware, userController.getCurrentUser);
 router.put("/:id", authMiddleware, userController.updateUser);
-router.delete("/:id", authMiddleware, userController.deleteUser);
+
+// Admin routes
+router.get("/", authMiddleware, adminMiddleware, userController.getAllUsers);
+router.get(
+  "/stats",
+  authMiddleware,
+  adminMiddleware,
+  userController.getUserStats
+);
+router.get("/:id", authMiddleware, userController.getUserById);
+router.put(
+  "/:id/admin",
+  authMiddleware,
+  adminMiddleware,
+  userController.toggleAdmin
+);
+router.put(
+  "/:id/disable",
+  authMiddleware,
+  adminMiddleware,
+  userController.disableUser
+);
+router.post(
+  "/:id/reset-password",
+  authMiddleware,
+  adminMiddleware,
+  userController.resetPassword
+);
+router.delete(
+  "/:id",
+  authMiddleware,
+  adminMiddleware,
+  userController.deleteUser
+);
 
 module.exports = router;

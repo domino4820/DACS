@@ -4,8 +4,26 @@ const jwt = require("jsonwebtoken");
 class UserController {
   async getAllUsers(req, res) {
     try {
-      const users = await userModel.findAll();
-      res.status(200).json(users);
+      const { page = 1, limit = 10, search = "" } = req.query;
+      const offset = (page - 1) * limit;
+
+      const users = await userModel.findAll({
+        search,
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+      });
+
+      const total = await userModel.countAll(search);
+
+      res.status(200).json({
+        users,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -205,18 +223,157 @@ class UserController {
 
   async getCurrentUser(req, res) {
     try {
-      // User ID is available from the auth middleware
+      // 确保用户ID可用且有效
+      if (!req.user || !req.user.id) {
+        console.error("Auth middleware failed: Missing user ID in request");
+        return res.status(401).json({
+          message: "用户ID不可用，请重新登录",
+          code: "USER_ID_MISSING",
+        });
+      }
+
       const userId = req.user.id;
+      console.log("Getting current user with ID:", userId);
+
       const user = await userModel.findById(userId);
 
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        console.error(`User not found for ID: ${userId}`);
+        return res.status(404).json({
+          message: "找不到用户账户信息",
+          code: "USER_NOT_FOUND",
+        });
       }
 
       // Remove password from response
       const { password: _, ...userWithoutPassword } = user;
 
       res.status(200).json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error getting current user:", error);
+      res.status(500).json({
+        message: "获取用户信息时发生服务器错误: " + error.message,
+        code: "SERVER_ERROR",
+      });
+    }
+  }
+
+  async toggleAdmin(req, res) {
+    try {
+      const { id } = req.params;
+      const { isAdmin } = req.body;
+
+      // Kiểm tra quyền admin của người thực hiện request
+      if (!req.user.isAdmin) {
+        return res
+          .status(403)
+          .json({ message: "Không có quyền thực hiện thao tác này" });
+      }
+
+      // Kiểm tra người dùng tồn tại
+      const existingUser = await userModel.findById(id);
+      if (!existingUser) {
+        return res.status(404).json({ message: "Không tìm thấy người dùng" });
+      }
+
+      // Cập nhật quyền admin
+      const updatedUser = await userModel.update(id, { isAdmin });
+
+      // Loại bỏ mật khẩu khỏi response
+      const { password: _, ...userWithoutPassword } = updatedUser;
+
+      res.status(200).json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async disableUser(req, res) {
+    try {
+      const { id } = req.params;
+
+      // Kiểm tra quyền admin
+      if (!req.user.isAdmin) {
+        return res
+          .status(403)
+          .json({ message: "Không có quyền thực hiện thao tác này" });
+      }
+
+      // Kiểm tra người dùng tồn tại
+      const existingUser = await userModel.findById(id);
+      if (!existingUser) {
+        return res.status(404).json({ message: "Không tìm thấy người dùng" });
+      }
+
+      // Không cho phép vô hiệu hóa tài khoản admin khác
+      if (existingUser.isAdmin && existingUser.id !== req.user.id) {
+        return res
+          .status(403)
+          .json({ message: "Không thể vô hiệu hóa tài khoản admin khác" });
+      }
+
+      // Cập nhật trạng thái tài khoản
+      const updatedUser = await userModel.update(id, { isDisabled: true });
+
+      // Loại bỏ mật khẩu khỏi response
+      const { password: _, ...userWithoutPassword } = updatedUser;
+
+      res.status(200).json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async resetPassword(req, res) {
+    try {
+      const { id } = req.params;
+
+      // Kiểm tra quyền admin
+      if (!req.user.isAdmin) {
+        return res
+          .status(403)
+          .json({ message: "Không có quyền thực hiện thao tác này" });
+      }
+
+      // Kiểm tra người dùng tồn tại
+      const existingUser = await userModel.findById(id);
+      if (!existingUser) {
+        return res.status(404).json({ message: "Không tìm thấy người dùng" });
+      }
+
+      // Tạo mật khẩu tạm thời
+      const tempPassword =
+        Math.random().toString(36).slice(-8) + Math.floor(Math.random() * 10);
+
+      // Cập nhật mật khẩu mới
+      await userModel.resetPassword(id, tempPassword);
+
+      res.status(200).json({
+        success: true,
+        message: "Đã đặt lại mật khẩu thành công",
+        tempPassword,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async getUserStats(req, res) {
+    try {
+      // Kiểm tra quyền admin
+      if (!req.user.isAdmin) {
+        return res.status(403).json({ message: "Không có quyền truy cập" });
+      }
+
+      const totalUsers = await userModel.countAll();
+      const adminUsers = await userModel.countAdmin();
+      const newUsersThisMonth = await userModel.countNewUsers();
+
+      res.status(200).json({
+        totalUsers,
+        adminUsers,
+        newUsersThisMonth,
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

@@ -9,6 +9,11 @@ export default function DevModeToggle() {
     return null;
   }
 
+  const handleToggleDevMode = () => {
+    console.log(`Toggling dev mode from ${devMode} to ${!devMode}`);
+    toggleDevMode();
+  };
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <div className="bg-cyberpunk-darker border border-purple-500/30 rounded-md p-2 shadow-lg">
@@ -16,7 +21,7 @@ export default function DevModeToggle() {
           Development Mode: {devMode ? "ON" : "OFF"}
         </div>
         <Button
-          onClick={toggleDevMode}
+          onClick={handleToggleDevMode}
           size="sm"
           variant={devMode ? "destructive" : "outline"}
           className={devMode ? "bg-red-600" : "border-purple-500/30"}

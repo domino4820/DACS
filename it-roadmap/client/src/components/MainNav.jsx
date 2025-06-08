@@ -7,8 +7,8 @@ import { Button } from "./ui/button";
 import { useAuth } from "../context/AuthContext"; // Assuming useAuth is from AuthContext
 import { ThemeToggle } from "./theme-toggle"; // Uncommented
 import { NotificationDropdown } from "./notification-dropdown"; // Uncommented
-import { Menu, Search } from "lucide-react"; // Added Search
-import AppSidebar from './AppSidebar.tsx'; // Path to the .tsx sidebar
+import { Menu, Search, Settings } from "lucide-react"; // Added Search and Settings
+import AppSidebar from "./AppSidebar.tsx"; // Path to the .tsx sidebar
 import { Input } from "./ui/input.jsx"; // Added Input
 import {
   DropdownMenu,
@@ -16,13 +16,17 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuLabel
+  DropdownMenuLabel,
 } from "./ui/dropdown-menu.jsx"; // Added DropdownMenu components
 
 export function MainNav() {
   // const pathname = usePathname(); // For Next.js, not react-router-dom
-  const { user, devMode, login, logout } = useAuth(); // Added devMode assuming it's from context
+  const { user, devMode, login, logout, isAuthenticated, isAdmin } = useAuth(); // Added devMode, isAuthenticated, and isAdmin
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Debug for admin permissions
+  console.log("MainNav rendering with user:", user);
+  console.log("User is admin?", isAdmin);
 
   const handleLogout = () => {
     logout();
@@ -45,8 +49,12 @@ export function MainNav() {
             <Menu className="h-5 w-5 text-foreground" />
             <span className="sr-only">Open menu</span>
           </Button>
-          <RouterLink to="/" className="flex items-center space-x-2 hover:text-primary transition-colors">
-            <span className="font-bold text-foreground">CyberPath</span> {/* Updated text */}
+          <RouterLink
+            to="/"
+            className="flex items-center space-x-2 hover:text-primary transition-colors"
+          >
+            <span className="font-bold text-foreground">CyberPath</span>{" "}
+            {/* Updated text */}
           </RouterLink>
         </div>
 
@@ -55,7 +63,12 @@ export function MainNav() {
           {/* Dropdown for "Thể loại" (Category Type) */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-primary hover:bg-muted">Thể loại</Button>
+              <Button
+                variant="ghost"
+                className="text-sm font-medium text-foreground hover:text-primary hover:bg-muted"
+              >
+                Thể loại
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuLabel>Chọn Thể loại</DropdownMenuLabel>
@@ -70,7 +83,12 @@ export function MainNav() {
           {/* Dropdown for "Kỹ năng" (Skills) */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-primary hover:bg-muted">Kỹ năng</Button>
+              <Button
+                variant="ghost"
+                className="text-sm font-medium text-foreground hover:text-primary hover:bg-muted"
+              >
+                Kỹ năng
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuLabel>Chọn Kỹ năng</DropdownMenuLabel>
@@ -85,7 +103,12 @@ export function MainNav() {
           {/* Dropdown for "Công nghệ" (Technologies) */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-sm font-medium text-foreground hover:text-primary hover:bg-muted">Công nghệ</Button>
+              <Button
+                variant="ghost"
+                className="text-sm font-medium text-foreground hover:text-primary hover:bg-muted"
+              >
+                Công nghệ
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuLabel>Chọn Công nghệ</DropdownMenuLabel>
@@ -111,19 +134,78 @@ export function MainNav() {
         <div className="flex items-center space-x-2">
           <NotificationDropdown /> {/* Uncommented */}
           <ThemeToggle /> {/* Uncommented */}
+          {/* 添加直接的管理员按钮 */}
+          {isAdmin && (
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="hidden md:flex items-center border-purple-500/30 hover:border-purple-500/60"
+            >
+              <RouterLink to="/admin">
+                <Settings className="h-4 w-4 mr-2" />
+                <span>Quản trị</span>
+              </RouterLink>
+            </Button>
+          )}
           {user ? (
             <>
-              <RouterLink to="/profile" className="hidden md:block text-sm font-medium text-foreground hover:text-primary transition-colors">
-                {user.username || user.email} {/* Display username or email */}
-                {devMode && <span className="text-xs ml-1 text-accent">(Dev)</span>}
-              </RouterLink>
-              <Button variant="ghost" onClick={handleLogout} className="text-muted-foreground hover:text-primary">
-                Logout
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
+                    <span className="font-medium text-sm">
+                      {user.username?.charAt(0) || user.email?.charAt(0)}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user.username || user.email}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <RouterLink to="/profile">Hồ sơ</RouterLink>
+                  </DropdownMenuItem>
+                  {}
+                  {console.log("检查管理员权限:", {
+                    isAuthenticated,
+                    isAdmin,
+                    user,
+                  })}
+                  {isAdmin ? (
+                    <DropdownMenuItem asChild>
+                      <RouterLink to="/admin">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Quản trị hệ thống</span>
+                      </RouterLink>
+                    </DropdownMenuItem>
+                  ) : (
+                    console.log("用户无管理员权限")
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Đăng xuất
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild className="text-muted-foreground hover:text-primary">
+              <Button
+                variant="ghost"
+                asChild
+                className="text-muted-foreground hover:text-primary"
+              >
                 <RouterLink to="/login">Login</RouterLink>
               </Button>
               <Button variant="default" asChild>
@@ -133,7 +215,10 @@ export function MainNav() {
           )}
         </div>
       </div>
-      <AppSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <AppSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
     </header>
   );
 }

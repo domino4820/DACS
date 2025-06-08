@@ -1,18 +1,68 @@
 const express = require("express");
-const { notificationController } = require("../controllers");
 const router = express.Router();
+const { notificationController } = require("../controllers");
+const { authMiddleware, adminMiddleware } = require("../middlewares");
 
-// Notification CRUD routes
-router.get("/", notificationController.getAllNotifications);
-router.get("/:id", notificationController.getNotificationById);
-router.post("/", notificationController.createNotification);
-router.put("/:id", notificationController.updateNotification);
-router.delete("/:id", notificationController.deleteNotification);
+// Protected routes
+router.get(
+  "/user",
+  authMiddleware,
+  notificationController.getNotificationsByUserId
+);
+router.get("/:id", authMiddleware, notificationController.getNotificationById);
+router.put("/:id/read", authMiddleware, notificationController.markAsRead);
+router.put(
+  "/:userId/read/all",
+  authMiddleware,
+  notificationController.markAllAsRead
+);
+router.delete(
+  "/:id",
+  authMiddleware,
+  notificationController.deleteNotification
+);
+router.delete(
+  "/:userId/all",
+  authMiddleware,
+  notificationController.deleteAllNotifications
+);
 
-// Additional routes
-router.get("/user/:userId", notificationController.getNotificationsByUserId);
-router.put("/:id/read", notificationController.markAsRead);
-router.put("/user/:userId/read", notificationController.markAllAsRead);
-router.delete("/user/:userId", notificationController.deleteAllNotifications);
+// Admin routes
+router.get(
+  "/",
+  authMiddleware,
+  adminMiddleware,
+  notificationController.getAllNotifications
+);
+router.get(
+  "/stats",
+  authMiddleware,
+  adminMiddleware,
+  notificationController.getNotificationStats
+);
+router.post(
+  "/",
+  authMiddleware,
+  adminMiddleware,
+  notificationController.createNotification
+);
+router.post(
+  "/global",
+  authMiddleware,
+  adminMiddleware,
+  notificationController.createGlobalNotification
+);
+router.post(
+  "/roadmap/:roadmapId",
+  authMiddleware,
+  adminMiddleware,
+  notificationController.createRoadmapNotification
+);
+router.put(
+  "/:id",
+  authMiddleware,
+  adminMiddleware,
+  notificationController.updateNotification
+);
 
 module.exports = router;

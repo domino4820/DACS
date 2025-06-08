@@ -3,9 +3,20 @@ const { roadmapModel, nodeModel, edgeModel } = require("../models");
 class RoadmapController {
   async getAllRoadmaps(req, res) {
     try {
+      const { categoryId } = req.query;
+
+      // 如果提供了categoryId，则按类别过滤
+      if (categoryId) {
+        console.log(`Filtering roadmaps by category ID: ${categoryId}`);
+        const roadmaps = await roadmapModel.findByCategory(categoryId);
+        return res.status(200).json(roadmaps);
+      }
+
+      // 否则获取所有路线图
       const roadmaps = await roadmapModel.findAll();
       res.status(200).json(roadmaps);
     } catch (error) {
+      console.error("Error getting roadmaps:", error);
       res.status(500).json({ message: error.message });
     }
   }
@@ -254,6 +265,8 @@ class RoadmapController {
                 edgeIdentifier: edge.edgeIdentifier || edge.id,
                 source: edge.source,
                 target: edge.target,
+                sourceHandle: edge.sourceHandle || null,
+                targetHandle: edge.targetHandle || null,
                 type: edge.type || "smoothstep",
                 animated: edge.animated || false,
                 style:
@@ -264,7 +277,9 @@ class RoadmapController {
                 courseId: edge.courseId || null,
               };
 
-              console.log(`[SERVER] Creating edge: ${edgeData.edgeIdentifier}`);
+              console.log(
+                `[SERVER] Creating edge: ${edgeData.edgeIdentifier}, Source=${edgeData.source}, Target=${edgeData.target}, SourceHandle=${edgeData.sourceHandle}, TargetHandle=${edgeData.targetHandle}`
+              );
               const createdEdge = await edgeModel.create(edgeData);
               createdEdges.push(createdEdge);
             } catch (edgeError) {

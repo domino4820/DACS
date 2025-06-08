@@ -133,19 +133,22 @@ body {
 
 /* Loading spinner */
 .spinner {
-  border: 3px solid rgba(139, 92, 246, 0.1);
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  border: 3px solid rgba(0, 0, 0, 0.1);
   border-radius: 50%;
-  border-top: 3px solid #8b5cf6;
-  width: 24px;
-  height: 24px;
-  animation: spin 1s linear infinite;
+  border-top-color: hsl(var(--primary));
+  animation: spin 1s ease-in-out infinite;
+}
+
+.dark .spinner {
+  border-color: rgba(255, 255, 255, 0.1);
+  border-top-color: hsl(var(--primary));
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
+  to {
     transform: rotate(360deg);
   }
 }
@@ -193,4 +196,143 @@ body {
   background-color: rgba(236, 72, 153, 0.1);
   color: #ec4899;
   border: 1px solid rgba(236, 72, 153, 0.2);
+}
+
+/* 自定义样式，增强亮色和暗色主题 */
+
+:root {
+  --radius: 0.5rem;
+}
+
+.dark body {
+  background-color: hsl(222 47% 11%);
+  color: hsl(210 40% 98%);
+}
+
+/* 卡片悬浮效果 */
+.roadmap-card {
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.roadmap-card:hover {
+  transform: translateY(-4px);
+}
+
+.light .roadmap-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.dark .roadmap-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 标签颜色 */
+.tag {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tag-frontend {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: rgb(37, 99, 235);
+}
+
+.dark .tag-frontend {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: rgb(96, 165, 250);
+}
+
+.tag-backend {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: rgb(217, 119, 6);
+}
+
+.dark .tag-backend {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: rgb(251, 191, 36);
+}
+
+.tag-devops {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: rgb(220, 38, 38);
+}
+
+.dark .tag-devops {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: rgb(248, 113, 113);
+}
+
+.tag-mobile {
+  background-color: rgba(236, 72, 153, 0.15);
+  color: rgb(219, 39, 119);
+}
+
+.dark .tag-mobile {
+  background-color: rgba(236, 72, 153, 0.2);
+  color: rgb(244, 114, 182);
+}
+
+.tag-database {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: rgb(5, 150, 105);
+}
+
+.dark .tag-database {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: rgb(52, 211, 153);
+}
+
+/* 顶部导航标签优化 */
+.dark .bg-muted\/50 {
+  background-color: rgba(30, 41, 59, 0.3);
+}
+
+/* 按钮圆角增强 */
+.rounded-full {
+  border-radius: 9999px;
+}
+
+/* 页面渐变过渡效果 */
+.transition-theme {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 200ms;
+}
+
+/* 按钮悬浮特效 */
+@keyframes button-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px 0 rgba(var(--primary), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px 0 rgba(var(--primary), 0.3);
+  }
+}
+
+.btn-create:hover {
+  animation: button-glow 2s infinite;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
 }

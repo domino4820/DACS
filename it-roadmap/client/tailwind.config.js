@@ -1,8 +1,9 @@
 /** @type {import('tailwindcss').Config} */
-const defaultTheme = require('tailwindcss/defaultTheme')
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -32,13 +33,22 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))", // Added ring color
+        ring: "hsl(var(--ring))",
       },
       fontFamily: {
-        sans: ['Open Sans', ...defaultTheme.fontFamily.sans], // Updated sans font
-        heading: ['Inter', ...defaultTheme.fontFamily.sans], // Added heading font
+        sans: ["Open Sans", ...defaultTheme.fontFamily.sans],
+        heading: ["Inter", ...defaultTheme.fontFamily.sans],
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
     },
   },

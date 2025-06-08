@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "./components/ui/toaster";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
+import { RoadmapProvider } from "./context/RoadmapContext";
 import { useEffect, useState } from "react";
 import { initCyberpunkAnimations } from "./lib/animations";
 
@@ -17,6 +19,9 @@ import ProfilePage from "./pages/ProfilePage";
 import AdminSkillsPage from "./pages/AdminSkillsPage";
 import AdminCategoriesPage from "./pages/AdminCategoriesPage";
 import AdminTagsPage from "./pages/AdminTagsPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
+import AdminNotificationsPage from "./pages/AdminNotificationsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import CourseDetail from "./pages/CourseDetail";
 
@@ -29,7 +34,6 @@ import DevModeToggle from "./components/DevModeToggle";
 // Create a client
 const queryClient = new QueryClient();
 
-// Error boundary component
 // Error boundary component
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
@@ -81,13 +85,17 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ErrorBoundary>
-          <Router>
-            {/* Removed animated-bg-parent-container and animated-bg-shapes-container divs */}
-            <div className="relative flex min-h-screen flex-col font-sans antialiased"> {/* This div might need adjustment if it was relying on the parent for certain layout properties, but likely fine. */}
-                <MainNav />
-                <div className="flex-1">
-                  <Routes>
+        <ThemeProvider>
+          <RoadmapProvider>
+            <ErrorBoundary>
+              <Router>
+                {/* Removed animated-bg-parent-container and animated-bg-shapes-container divs */}
+                <div className="relative flex min-h-screen flex-col font-sans antialiased">
+                  {" "}
+                  {/* This div might need adjustment if it was relying on the parent for certain layout properties, but likely fine. */}
+                  <MainNav />
+                  <div className="flex-1">
+                    <Routes>
                       <Route path="/" element={<Home />} />
                       <Route path="/login" element={<LoginPage />} />
                       <Route path="/register" element={<RegisterPage />} />
@@ -131,6 +139,14 @@ function App() {
 
                       {/* Admin routes */}
                       <Route
+                        path="/admin"
+                        element={
+                          <AdminRoute>
+                            <AdminDashboardPage />
+                          </AdminRoute>
+                        }
+                      />
+                      <Route
                         path="/admin/skills"
                         element={
                           <AdminRoute>
@@ -154,18 +170,37 @@ function App() {
                           </AdminRoute>
                         }
                       />
+                      <Route
+                        path="/admin/users"
+                        element={
+                          <AdminRoute>
+                            <AdminUsersPage />
+                          </AdminRoute>
+                        }
+                      />
+                      <Route
+                        path="/admin/notifications"
+                        element={
+                          <AdminRoute>
+                            <AdminNotificationsPage />
+                          </AdminRoute>
+                        }
+                      />
 
                       {/* 404 page */}
                       <Route path="*" element={<NotFoundPage />} />
                     </Routes>
-                </div>
-                {/* Development mode toggle - only shown in dev environment */}
-                <DevModeToggle />
-              </div> {/* Closes "relative flex min-h-screen..." */}
-              <Toaster />
-            {/* Removed extra closing div here */}
-          </Router>
-        </ErrorBoundary>
+                  </div>
+                  {/* Development mode toggle - only shown in dev environment */}
+                  <DevModeToggle />
+                </div>{" "}
+                {/* Closes "relative flex min-h-screen..." */}
+                <Toaster />
+                {/* Removed extra closing div here */}
+              </Router>
+            </ErrorBoundary>
+          </RoadmapProvider>
+        </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

@@ -60,8 +60,8 @@ model Roadmap {
   categoryId    Int?           @map("category_id")
   skillId       Int?           @map("skill_id")
   userId        Int            @map("user_id")
-  nodesData     String?        @db.Text @map("nodes_data")
-  edgesData     String?        @db.Text @map("edges_data")
+  nodesData     String?        @map("nodes_data") @db.Text
+  edgesData     String?        @map("edges_data") @db.Text
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
   category      Category?      @relation(fields: [categoryId], references: [id])
@@ -126,6 +126,8 @@ model Edge {
   edgeIdentifier String   @unique
   source         String
   target         String
+  sourceHandle   String?
+  targetHandle   String?
   type           String?
   animated       Boolean  @default(false)
   style          String?  @db.Text

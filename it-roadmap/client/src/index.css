@@ -5,41 +5,76 @@
 /* Removed @import "./styles/animated-background.css"; */
 
 @layer base {
+  /* 亮色主题变量 */
   :root {
-    --background: 255 100% 100%; /* #FFFFFF */
-    --foreground: 210 17% 15%;  /* #212529 - Dark Gray for Primary Text */
-    --card: 255 100% 100%; /* Card background - White */
-    --card-foreground: 210 17% 15%; /* Text on card */
+    --background: 0 0% 100%; /* 纯白色 */
+    --foreground: 222 47% 11%; /* 深蓝黑色文本 */
 
-    --muted: 220 13% 96%;    /* #F4F6F8 or #F8F9FA - UI Element Backgrounds / Muted Background */
-    --muted-foreground: 215 14% 47%; /* #6C757D - Secondary Text Color */
+    --card: 0 0% 100%; /* 卡片背景 - 白色 */
+    --card-foreground: 222 47% 11%; /* 卡片文本 */
 
-    --primary: 211 100% 26%;  /* #004085 - Accent Color 1 (Classic Dark Blue) */
-    --primary-foreground: 255 100% 100%; /* White text on primary */
+    --popover: 0 0% 100%; /* 弹出框背景 */
+    --popover-foreground: 222 47% 11%; /* 弹出框文本 */
 
-    --secondary: 180 25% 25%; /* #2F4F4F - Accent Color 2 (Dark Slate Gray/Teal like) */
-    --secondary-foreground: 255 100% 100%; /* White text on secondary */
+    --primary: 221 83% 53%; /* 蓝色主色调 */
+    --primary-foreground: 210 40% 98%; /* 主色调上的文本 */
 
-    --accent: 211 100% 26%; /* Using primary as default accent for now, can be different */
-    --accent-foreground: 255 100% 100%;
+    --secondary: 210 40% 96.1%; /* 淡蓝灰色次要色调 */
+    --secondary-foreground: 222 47% 11%; /* 次要色调上的文本 */
 
-    --destructive: 0 84.2% 60.2%; /* Kept from previous theme, adjust if needed */
-    --destructive-foreground: 0 0% 100%;
+    --muted: 210 40% 96.1%; /* 柔和背景色 */
+    --muted-foreground: 215.4 16.3% 46.9%; /* 柔和文本色 */
 
-    --border: 210 16% 87%;   /* #DEE2E6 - Border/Separator Color */
-    --input: 210 16% 87%;      /* Border color for inputs */
-    /* Ring color can be based on primary or accent */
-    --ring: 211 100% 26%;
+    --accent: 221 83% 53%; /* 强调色 */
+    --accent-foreground: 210 40% 98%; /* 强调色上的文本 */
+
+    --destructive: 0 84.2% 60.2%; /* 危险/错误色 */
+    --destructive-foreground: 210 40% 98%; /* 危险色上的文本 */
+
+    --border: 214.3 31.8% 91.4%; /* 边框色 */
+    --input: 214.3 31.8% 91.4%; /* 输入框边框色 */
+    --ring: 221 83% 53%; /* 聚焦环色 */
+  }
+
+  /* 暗色主题变量 */
+  .dark {
+    --background: 222 47% 11%; /* 深蓝黑色背景 */
+    --foreground: 210 40% 98%; /* 几乎白色的文本 */
+
+    --card: 222 47% 8%; /* 稍微深一点的卡片背景 */
+    --card-foreground: 210 40% 98%; /* 卡片上的文本 */
+
+    --popover: 222 47% 8%; /* 深色弹出框背景 */
+    --popover-foreground: 210 40% 98%; /* 弹出框文本 */
+
+    --primary: 221 83% 53%; /* 保持相同的蓝色主色调 */
+    --primary-foreground: 222 47% 11%; /* 主色调上的文本 */
+
+    --secondary: 217.2 32.6% 17.5%; /* 深色次要色调 */
+    --secondary-foreground: 210 40% 98%; /* 次要色调上的文本 */
+
+    --muted: 217.2 32.6% 17.5%; /* 深色柔和背景 */
+    --muted-foreground: 215 20.2% 65.1%; /* 暗色模式柔和文本 */
+
+    --accent: 217.2 32.6% 17.5%; /* 深色强调背景 */
+    --accent-foreground: 210 40% 98%; /* 强调色上的文本 */
+
+    --destructive: 0 62.8% 30.6%; /* 深色危险/错误色 */
+    --destructive-foreground: 210 40% 98%; /* 危险色上的文本 */
+
+    --border: 217.2 32.6% 17.5%; /* 深色边框 */
+    --input: 217.2 32.6% 17.5%; /* 深色输入框边框 */
+    --ring: 224.3 76.3% 48%; /* 环形颜色 */
   }
 }
 
 /* Import fonts */
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap'); /* For headings */
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap"); /* For headings */
 
 body {
   margin: 0;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   line-height: 1.6;
@@ -55,20 +90,88 @@ code {
 /* Styles for react-flow, connection handles etc. from previous theme are kept below */
 /* They use CSS variables, so they should adapt, but might need fine-tuning later */
 
+/* 主要布局组件样式 */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.roadmap-card {
+  border-radius: 0.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.roadmap-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .roadmap-card:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* 标签样式 */
+.tag {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+}
+
+.tag-frontend {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.tag-backend {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.tag-devops {
+  background-color: #ef4444;
+  color: white;
+}
+
+.tag-mobile {
+  background-color: #ec4899;
+  color: white;
+}
+
+.tag-database {
+  background-color: #10b981;
+  color: white;
+}
+
+/* 全局按钮样式增强 */
+.btn-create {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.btn-create:hover {
+  background-color: hsl(var(--primary) / 0.9);
+}
+
 /* Improve edge connections and handle interaction */
 .react-flow .react-flow__handle {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: var(--primary);
-  border: 2px solid var(--border);
+  background-color: hsl(var(--primary));
+  border: 2px solid hsl(var(--border));
   transition: all 0.2s ease;
 }
 
 .react-flow .react-flow__handle:hover {
   width: 12px;
   height: 12px;
-  background-color: var(--accent);
+  background-color: hsl(var(--accent));
   cursor: crosshair;
 }
 
@@ -81,18 +184,18 @@ code {
 }
 
 .react-flow .react-flow__edge-path {
-  stroke: var(--muted-foreground);
+  stroke: hsl(var(--muted-foreground));
   stroke-width: 2px;
 }
 
 .react-flow .react-flow__edge.selected .react-flow__edge-path {
-  stroke: var(--accent);
+  stroke: hsl(var(--accent));
   stroke-width: 3px;
 }
 
 /* Improve edge connections */
 .improved-edge-connection .react-flow__connection-path {
-  stroke: var(--primary);
+  stroke: hsl(var(--primary));
   stroke-width: 3px;
   stroke-dasharray: 5;
   animation: flowAnimation 1s infinite linear;
@@ -112,31 +215,31 @@ code {
   width: 12px !important;
   height: 12px !important;
   border-radius: 50% !important;
-  border: 2px solid var(--border) !important;
+  border: 2px solid hsl(var(--border)) !important;
 }
 
 .connection-handle-top {
   top: -6px !important;
-  background-color: var(--secondary) !important;
+  background-color: hsl(var(--secondary)) !important;
 }
 
 .connection-handle-right {
   right: -6px !important;
-  background-color: var(--primary) !important;
+  background-color: hsl(var(--primary)) !important;
 }
 
 .connection-handle-bottom {
   bottom: -6px !important;
-  background-color: var(--accent) !important;
+  background-color: hsl(var(--accent)) !important;
 }
 
 .connection-handle-left {
   left: -6px !important;
-  background-color: var(--muted-foreground) !important;
+  background-color: hsl(var(--muted-foreground)) !important;
 }
 
 .connection-handle-center {
-  background-color: var(--destructive) !important;
+  background-color: hsl(var(--destructive)) !important;
 }
 
 /* Make handles more visible on hover */
@@ -148,23 +251,23 @@ code {
 
 /* Different colors for edges based on handle types using class names */
 .react-flow__edge.source-top .react-flow__edge-path {
-  stroke: var(--secondary);
+  stroke: hsl(var(--secondary));
 }
 
 .react-flow__edge.source-right .react-flow__edge-path {
-  stroke: var(--primary);
+  stroke: hsl(var(--primary));
 }
 
 .react-flow__edge.source-bottom .react-flow__edge-path {
-  stroke: var(--accent);
+  stroke: hsl(var(--accent));
 }
 
 .react-flow__edge.source-left .react-flow__edge-path {
-  stroke: var(--muted-foreground);
+  stroke: hsl(var(--muted-foreground));
 }
 
 .react-flow__edge.source-center .react-flow__edge-path {
-  stroke: var(--destructive);
+  stroke: hsl(var(--destructive));
 }
 
 /* Thicker edges for better visibility */
@@ -181,11 +284,4 @@ code {
 .react-flow__edge.selected .react-flow__edge-path {
   stroke-width: 4px;
   filter: drop-shadow(0 0 2px hsla(var(--foreground), 0.3));
-}
-
-/* Improved edge connection indicator */
-.improved-edge-connection .react-flow__connection-path {
-  stroke-width: 3px;
-  stroke-dasharray: 5;
-  animation: flowAnimation 1s infinite linear;
 }

@@ -18,18 +18,78 @@ export const AuthProvider = ({ children }) => {
         // Check if token exists
         const token = localStorage.getItem("token");
         if (!token) {
+          console.log("No token found, user is not logged in");
           setLoading(false);
           return;
         }
 
-        // Get current user
-        const response = await api.get("/auth/me");
-        setUser(response.data);
+        // 确保授权头已设置
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+        // 添加请求超时、重试和错误处理
+        let retries = 0;
+        const maxRetries = 2;
+        let success = false;
+
+        while (retries <= maxRetries && !success) {
+          try {
+            console.log(
+              `Attempting to load user session (attempt ${retries + 1}/${
+                maxRetries + 1
+              })`
+            );
+
+            const response = await api.get("/users/current", {
+              timeout: 8000, // 8秒超时
+            });
+
+            if (response.data && response.data.id) {
+              setUser(response.data);
+              console.log("User session restored successfully");
+              success = true;
+            } else {
+              throw new Error("Invalid user data received");
+            }
+          } catch (retryErr) {
+            retries++;
+
+            if (retryErr.response?.status === 401) {
+              console.error(
+                "Authentication error:",
+                retryErr.response?.data?.message || "Token invalid or expired"
+              );
+              break; // 不重试认证错误
+            }
+
+            if (retries > maxRetries) {
+              throw retryErr; // 重试次数用完，抛出最后一个错误
+            }
+
+            // 等待一段时间后重试
+            await new Promise((resolve) => setTimeout(resolve, 1000 * retries));
+          }
+        }
       } catch (err) {
         console.error("Error loading user:", err);
         setError(err.message);
-        // Clear invalid token
+
+        // 清除无效令牌和数据
         localStorage.removeItem("token");
+        delete api.defaults.headers.common["Authorization"];
+
+        // 仅在非登录/注册页面重定向
+        const publicPaths = ["/login", "/register", "/", "/explore"];
+        const currentPath = window.location.pathname;
+
+        if (!publicPaths.some((path) => currentPath.startsWith(path))) {
+          console.log(
+            "Redirecting to login page due to authentication failure"
+          );
+          // 使用延迟防止可能的循环重定向
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 100);
+        }
       } finally {
         setLoading(false);
       }
@@ -60,8 +120,14 @@ export const AuthProvider = ({ children }) => {
         email: credentials.email,
         isAdmin: credentials.email.includes("admin"),
       };
+      console.log("Logging in with dev mode user:", mockUser);
       setUser(mockUser);
       localStorage.setItem("devModeUser", JSON.stringify(mockUser));
+      localStorage.setItem("token", "dev-mode-token"); // 确保设置token
+
+      // 设置默认授权头
+      api.defaults.headers.common["Authorization"] = `Bearer dev-mode-token`;
+
       return { user: mockUser, token: "dev-mode-token" };
     }
 
@@ -70,19 +136,29 @@ export const AuthProvider = ({ children }) => {
       // Simplify login flow - use only one endpoint
       const response = await api.post("/users/login", credentials);
 
-      // Save token to localStorage
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        // Set default authorization header for Axios
-        api.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${response.data.token}`;
+      // 验证响应包含必要的数据
+      if (!response.data || !response.data.token || !response.data.user) {
+        throw new Error("Invalid response format from server");
       }
 
+      // Save token to localStorage
+      localStorage.setItem("token", response.data.token);
+
+      // Set default authorization header for Axios
+      api.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${response.data.token}`;
+
+      console.log("Logged in user:", response.data.user);
       setUser(response.data.user);
       return response.data;
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Login failed";
+      // 移除任何可能存在的旧令牌
+      localStorage.removeItem("token");
+      delete api.defaults.headers.common["Authorization"];
+
+      const errorMessage =
+        err.response?.data?.message || err.message || "Login failed";
       setError(errorMessage);
       throw new Error(errorMessage);
     }
@@ -99,6 +175,11 @@ export const AuthProvider = ({ children }) => {
       };
       setUser(mockUser);
       localStorage.setItem("devModeUser", JSON.stringify(mockUser));
+      localStorage.setItem("token", "dev-mode-token"); // 确保设置token
+
+      // 设置默认授权头
+      api.defaults.headers.common["Authorization"] = `Bearer dev-mode-token`;
+
       return { user: mockUser, token: "dev-mode-token" };
     }
 
@@ -106,19 +187,24 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.post("/auth/register", userData);
 
-      // Save token to localStorage
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        // Set default authorization header for Axios
-        api.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${response.data.token}`;
+      // 验证响应数据
+      if (!response.data || !response.data.token || !response.data.user) {
+        throw new Error("Invalid response format from server");
       }
+
+      // Save token to localStorage
+      localStorage.setItem("token", response.data.token);
+
+      // Set default authorization header for Axios
+      api.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${response.data.token}`;
 
       setUser(response.data.user);
       return response.data;
     } catch (err) {
-      const errorMessage = err.response?.data?.message || "Registration failed";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Registration failed";
       setError(errorMessage);
       throw new Error(errorMessage);
     }
