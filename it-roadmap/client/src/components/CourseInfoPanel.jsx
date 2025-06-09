@@ -49,6 +49,9 @@ export default function CourseInfoPanel({
   onUpdateStyle,
   isAdmin = false,
   readOnly = false,
+  isAuthenticated = false,
+  onRequireAuth = () => {},
+  roadmapId = null,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedNode, setEditedNode] = useState({ ...node.data });
@@ -68,8 +71,15 @@ export default function CourseInfoPanel({
   }, [node]);
 
   const handleCompleteToggle = () => {
+    // If user is not authenticated, trigger the auth required callback
+    if (!isAuthenticated) {
+      onRequireAuth(node.id, !node.data.completed);
+      return;
+    }
+
+    // Otherwise proceed with the toggle
     if (onCompleteToggle) {
-      onCompleteToggle(node.id, !node.data.completed);
+      onCompleteToggle(node.id, !node.data.completed, roadmapId);
     }
   };
 
@@ -166,11 +176,18 @@ export default function CourseInfoPanel({
   if (!node) return null;
 
   return (
-    <div className="fixed right-0 top-0 h-full w-[350px] bg-card border-l border-[hsl(var(--border))] shadow-xl z-50 overflow-hidden"> {/* Updated container */}
-      <div className="flex items-center justify-between p-4 border-b border-[hsl(var(--border))]"> {/* Updated header border */}
+    <div className="fixed right-0 top-0 h-full w-[350px] bg-card border-l border-[hsl(var(--border))] shadow-xl z-50 overflow-hidden">
+      {" "}
+      {/* Updated container */}
+      <div className="flex items-center justify-between p-4 border-b border-[hsl(var(--border))]">
+        {" "}
+        {/* Updated header border */}
         <div>
-          <h3 className="text-lg font-semibold text-primary">Course Details</h3> {/* Updated title */}
-          <p className="text-xs text-muted-foreground"> {/* Updated subtitle */}
+          <h3 className="text-lg font-semibold text-primary">Course Details</h3>{" "}
+          {/* Updated title */}
+          <p className="text-xs text-muted-foreground">
+            {" "}
+            {/* Updated subtitle */}
             {isEditing ? "Edit mode" : node.data.code}
           </p>
         </div>
@@ -180,7 +197,11 @@ export default function CourseInfoPanel({
               <Button
                 size="icon"
                 variant="ghost"
-                className={`h-8 w-8 ${isEditing ? "text-green-600 hover:bg-green-600/10" : "text-primary hover:bg-primary/10"}`} // Updated Edit/Save button
+                className={`h-8 w-8 ${
+                  isEditing
+                    ? "text-green-600 hover:bg-green-600/10"
+                    : "text-primary hover:bg-primary/10"
+                }`} // Updated Edit/Save button
                 onClick={handleEditSave}
               >
                 {isEditing ? (
@@ -211,12 +232,12 @@ export default function CourseInfoPanel({
           </Button>
         </div>
       </div>
-
       <ScrollArea className="h-[calc(100%-60px)] p-4">
         {isEditing ? (
           <div className="space-y-4">
             <div>
-              <Label htmlFor="code">Course Code</Label> {/* Default Label styling applies */}
+              <Label htmlFor="code">Course Code</Label>{" "}
+              {/* Default Label styling applies */}
               <Input
                 id="code"
                 name="code"
@@ -226,7 +247,8 @@ export default function CourseInfoPanel({
               />
             </div>
             <div>
-              <Label htmlFor="label">Course Name</Label> {/* Default Label styling applies */}
+              <Label htmlFor="label">Course Name</Label>{" "}
+              {/* Default Label styling applies */}
               <Input
                 id="label"
                 name="label"
@@ -236,7 +258,8 @@ export default function CourseInfoPanel({
               />
             </div>
             <div>
-              <Label htmlFor="description">Description</Label> {/* Default Label styling applies */}
+              <Label htmlFor="description">Description</Label>{" "}
+              {/* Default Label styling applies */}
               <Textarea
                 id="description"
                 name="description"
@@ -247,7 +270,8 @@ export default function CourseInfoPanel({
               />
             </div>
             <div>
-              <Label htmlFor="credits">Credits</Label> {/* Default Label styling applies */}
+              <Label htmlFor="credits">Credits</Label>{" "}
+              {/* Default Label styling applies */}
               <Input
                 id="credits"
                 name="credits"
@@ -260,7 +284,8 @@ export default function CourseInfoPanel({
               />
             </div>
             <div>
-              <Label htmlFor="prerequisites">Prerequisites</Label> {/* Default Label styling applies */}
+              <Label htmlFor="prerequisites">Prerequisites</Label>{" "}
+              {/* Default Label styling applies */}
               <Input
                 id="prerequisites"
                 name="prerequisites"
@@ -270,7 +295,8 @@ export default function CourseInfoPanel({
               />
             </div>
             <div>
-              <Label htmlFor="documentation">Documentation URL</Label> {/* Default Label styling applies */}
+              <Label htmlFor="documentation">Documentation URL</Label>{" "}
+              {/* Default Label styling applies */}
               <Input
                 id="documentation"
                 name="documentation"
@@ -281,15 +307,16 @@ export default function CourseInfoPanel({
             </div>
 
             <div>
-              <Label htmlFor="category">Category</Label> {/* Default Label styling applies */}
+              <Label htmlFor="category">Category</Label>{" "}
+              {/* Default Label styling applies */}
               <Select
                 value={editedNode.category || "general"}
                 onValueChange={(value) => handleSelectChange("category", value)}
               >
-                <SelectTrigger /* Removed cyberpunk className */ >
+                <SelectTrigger /* Removed cyberpunk className */>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent /* Removed cyberpunk className */ >
+                <SelectContent /* Removed cyberpunk className */>
                   <SelectItem value="general">General</SelectItem>
                   <SelectItem value="frontend">Frontend</SelectItem>
                   <SelectItem value="backend">Backend</SelectItem>
@@ -301,17 +328,18 @@ export default function CourseInfoPanel({
             </div>
 
             <div>
-              <Label htmlFor="difficulty">Difficulty</Label> {/* Default Label styling applies */}
+              <Label htmlFor="difficulty">Difficulty</Label>{" "}
+              {/* Default Label styling applies */}
               <Select
                 value={editedNode.difficulty || "beginner"}
                 onValueChange={(value) =>
                   handleSelectChange("difficulty", value)
                 }
               >
-                <SelectTrigger /* Removed cyberpunk className */ >
+                <SelectTrigger /* Removed cyberpunk className */>
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
-                <SelectContent /* Removed cyberpunk className */ >
+                <SelectContent /* Removed cyberpunk className */>
                   <SelectItem value="beginner">Beginner</SelectItem>
                   <SelectItem value="intermediate">Intermediate</SelectItem>
                   <SelectItem value="advanced">Advanced</SelectItem>
@@ -320,12 +348,15 @@ export default function CourseInfoPanel({
             </div>
 
             <div>
-              <h3 className="text-sm font-medium text-foreground mb-2"> {/* Updated classes */}
+              <h3 className="text-sm font-medium text-foreground mb-2">
+                {" "}
+                {/* Updated classes */}
                 Appearance
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="nodeColor">Border Color</Label> {/* Default Label styling applies */}
+                  <Label htmlFor="nodeColor">Border Color</Label>{" "}
+                  {/* Default Label styling applies */}
                   <Input
                     id="nodeColor"
                     name="nodeColor"
@@ -336,7 +367,8 @@ export default function CourseInfoPanel({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="nodeBgColor">Background Color</Label> {/* Default Label styling applies */}
+                  <Label htmlFor="nodeBgColor">Background Color</Label>{" "}
+                  {/* Default Label styling applies */}
                   <Input
                     id="nodeBgColor"
                     name="nodeBgColor"
@@ -349,7 +381,8 @@ export default function CourseInfoPanel({
               </div>
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <div>
-                  <Label htmlFor="textColor">Text Color</Label> {/* Default Label styling applies */}
+                  <Label htmlFor="textColor">Text Color</Label>{" "}
+                  {/* Default Label styling applies */}
                   <Input
                     id="textColor"
                     name="textColor"
@@ -360,7 +393,8 @@ export default function CourseInfoPanel({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="fontSize">Font Size (px)</Label> {/* Default Label styling applies */}
+                  <Label htmlFor="fontSize">Font Size (px)</Label>{" "}
+                  {/* Default Label styling applies */}
                   <Input
                     id="fontSize"
                     name="fontSize"
@@ -378,52 +412,69 @@ export default function CourseInfoPanel({
         ) : (
           <div className="space-y-4">
             <div>
-              <h2 className="text-xl font-semibold text-primary"> {/* Updated classes */}
+              <h2 className="text-xl font-semibold text-primary">
+                {" "}
+                {/* Updated classes */}
                 {node.data.label}
               </h2>
               <div className="flex gap-2 mt-1">
-                <Badge variant="outline"> {/* Removed specific classes */}
+                <Badge variant="outline">
+                  {" "}
+                  {/* Removed specific classes */}
                   {node.data.code}
                 </Badge>
                 {node.data.category && (
-                  <Badge variant="outline"> {/* Removed specific classes */}
+                  <Badge variant="outline">
+                    {" "}
+                    {/* Removed specific classes */}
                     {node.data.category}
                   </Badge>
                 )}
                 {node.data.difficulty && (
-                  <Badge variant="outline"> {/* Removed specific classes */}
+                  <Badge variant="outline">
+                    {" "}
+                    {/* Removed specific classes */}
                     {node.data.difficulty}
                   </Badge>
                 )}
               </div>
             </div>
-
             <div>
-              <p className="text-sm text-foreground"> {/* Updated classes */}
+              <p className="text-sm text-foreground">
+                {" "}
+                {/* Updated classes */}
                 {node.data.description}
               </p>
             </div>
-
             <Separator /> {/* Default Separator styling will apply */}
-
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs text-muted-foreground">Credits</p> {/* Updated classes */}
-                <p className="text-sm text-foreground">{node.data.credits}</p> {/* Updated classes */}
+                <p className="text-xs text-muted-foreground">Credits</p>{" "}
+                {/* Updated classes */}
+                <p className="text-sm text-foreground">
+                  {node.data.credits}
+                </p>{" "}
+                {/* Updated classes */}
               </div>
               {node.data.prerequisites && (
                 <div>
-                  <p className="text-xs text-muted-foreground"> {/* Updated classes */}
+                  <p className="text-xs text-muted-foreground">
+                    {" "}
+                    {/* Updated classes */}
                     Prerequisites
                   </p>
-                  <p className="text-sm text-foreground">{node.data.prerequisites}</p> {/* Updated classes */}
+                  <p className="text-sm text-foreground">
+                    {node.data.prerequisites}
+                  </p>{" "}
+                  {/* Updated classes */}
                 </div>
               )}
             </div>
-
             {node.data.documentation && (
               <div>
-                <p className="text-xs text-muted-foreground"> {/* Updated classes */}
+                <p className="text-xs text-muted-foreground">
+                  {" "}
+                  {/* Updated classes */}
                   Documentation
                 </p>
                 <a
@@ -436,38 +487,41 @@ export default function CourseInfoPanel({
                 </a>
               </div>
             )}
-
             <Separator /> {/* Default Separator styling will apply */}
-
             <div>
-              <p className="text-xs text-muted-foreground mb-2"> {/* Updated classes */}
+              <p className="text-xs text-muted-foreground mb-2">
+                {" "}
+                {/* Updated classes */}
                 Completed Status
               </p>
               <div className="flex items-center justify-between">
                 <div>
                   <Badge
                     variant={node.data.completed ? "default" : "outline"}
-                    className={node.data.completed ? "bg-green-600 border-green-600 text-white hover:bg-green-700" : ""} // Updated classes for completed state
+                    className={
+                      node.data.completed
+                        ? "bg-green-600 border-green-600 text-white hover:bg-green-700"
+                        : ""
+                    }
                   >
                     {node.data.completed ? "Completed" : "Not Completed"}
                   </Badge>
                   {node.data.completedAt && (
-                    <p className="text-xs text-muted-foreground mt-1"> {/* Updated text color */}
+                    <p className="text-xs text-muted-foreground mt-1">
                       {formatDate(node.data.completedAt)}
                     </p>
                   )}
                 </div>
-                {!readOnly && onCompleteToggle && (
+                {onCompleteToggle && (
                   <div className="flex items-center space-x-2">
                     <Switch
                       id={`complete-toggle-${node.id}`}
                       checked={node.data.completed || false}
                       onCheckedChange={handleCompleteToggle}
-                      // Removed data-[state=checked]:bg-green-600, relies on Switch component's theme
                     />
                     <Label
                       htmlFor={`complete-toggle-${node.id}`}
-                      className="text-sm text-foreground" // Updated classes
+                      className="text-sm text-foreground"
                     >
                       Mark Complete
                     </Label>
@@ -475,12 +529,13 @@ export default function CourseInfoPanel({
                 )}
               </div>
             </div>
-
             <Separator />
-
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h3 className="font-medium text-foreground">Course Documents</h3> {/* Ensured text-foreground */}
+                <h3 className="font-medium text-foreground">
+                  Course Documents
+                </h3>{" "}
+                {/* Ensured text-foreground */}
                 {!readOnly && isAdmin && (
                   <Button
                     variant="outline" // Changed from ghost
@@ -493,19 +548,34 @@ export default function CourseInfoPanel({
               </div>
 
               {node.data.documents && node.data.documents.length > 0 ? (
-                <Table> {/* Assuming Table component itself is themed */}
+                <Table>
+                  {" "}
+                  {/* Assuming Table component itself is themed */}
                   <TableHeader>
-                    <TableRow> {/* Assuming TableRow is themed or transparent */}
-                      <TableHead>Document</TableHead> {/* Assuming TableHead is themed */}
-                      <TableHead className="w-[100px]">Actions</TableHead> {/* Assuming TableHead is themed */}
+                    <TableRow>
+                      {" "}
+                      {/* Assuming TableRow is themed or transparent */}
+                      <TableHead>Document</TableHead>{" "}
+                      {/* Assuming TableHead is themed */}
+                      <TableHead className="w-[100px]">Actions</TableHead>{" "}
+                      {/* Assuming TableHead is themed */}
                     </TableRow>
                   </TableHeader>
-                  <TableBody> {/* Assuming TableBody is themed */}
+                  <TableBody>
+                    {" "}
+                    {/* Assuming TableBody is themed */}
                     {node.data.documents.map((doc) => (
-                      <TableRow key={doc.id}> {/* Assuming TableRow is themed */}
-                        <TableCell> {/* Assuming TableCell is themed */}
+                      <TableRow key={doc.id}>
+                        {" "}
+                        {/* Assuming TableRow is themed */}
+                        <TableCell>
+                          {" "}
+                          {/* Assuming TableCell is themed */}
                           <div className="flex flex-col">
-                            <span className="font-medium text-foreground">{doc.title}</span> {/* Ensured text-foreground */}
+                            <span className="font-medium text-foreground">
+                              {doc.title}
+                            </span>{" "}
+                            {/* Ensured text-foreground */}
                             {doc.description && (
                               <span className="text-xs text-muted-foreground">
                                 {doc.description}
@@ -513,7 +583,9 @@ export default function CourseInfoPanel({
                             )}
                           </div>
                         </TableCell>
-                        <TableCell> {/* Assuming TableCell is themed */}
+                        <TableCell>
+                          {" "}
+                          {/* Assuming TableCell is themed */}
                           <div className="flex items-center gap-1">
                             <Button variant="ghost" size="icon" asChild>
                               <a
@@ -521,7 +593,8 @@ export default function CourseInfoPanel({
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                <ExternalLink className="h-4 w-4 text-primary" /> {/* Icon color */}
+                                <ExternalLink className="h-4 w-4 text-primary" />{" "}
+                                {/* Icon color */}
                               </a>
                             </Button>
                             {!readOnly && isAdmin && (
@@ -534,14 +607,16 @@ export default function CourseInfoPanel({
                                     setIsEditDocumentOpen(true);
                                   }}
                                 >
-                                  <Edit className="h-4 w-4 text-primary" /> {/* Icon color */}
+                                  <Edit className="h-4 w-4 text-primary" />{" "}
+                                  {/* Icon color */}
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => handleDeleteDocument(doc.id)}
                                 >
-                                  <Trash className="h-4 w-4 text-destructive" /> {/* Icon color */}
+                                  <Trash className="h-4 w-4 text-destructive" />{" "}
+                                  {/* Icon color */}
                                 </Button>
                               </>
                             )}
@@ -561,16 +636,17 @@ export default function CourseInfoPanel({
           </div>
         )}
       </ScrollArea>
-
       {/* Add Document Dialog */}
       <Dialog open={isAddDocumentOpen} onOpenChange={setIsAddDocumentOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Document</DialogTitle> {/* Default DialogTitle styling applies */}
+            <DialogTitle>Add Document</DialogTitle>{" "}
+            {/* Default DialogTitle styling applies */}
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Document Title</Label> {/* Default Label styling applies */}
+              <Label htmlFor="title">Document Title</Label>{" "}
+              {/* Default Label styling applies */}
               <Input
                 id="title"
                 value={newDocument.title}
@@ -582,7 +658,8 @@ export default function CourseInfoPanel({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="url">URL</Label> {/* Default Label styling applies */}
+              <Label htmlFor="url">URL</Label>{" "}
+              {/* Default Label styling applies */}
               <Input
                 id="url"
                 value={newDocument.url}
@@ -594,7 +671,8 @@ export default function CourseInfoPanel({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description (Optional)</Label> {/* Default Label styling applies */}
+              <Label htmlFor="description">Description (Optional)</Label>{" "}
+              {/* Default Label styling applies */}
               <Textarea
                 id="description"
                 value={newDocument.description}
@@ -627,17 +705,18 @@ export default function CourseInfoPanel({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Edit Document Dialog */}
       <Dialog open={isEditDocumentOpen} onOpenChange={setIsEditDocumentOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Document</DialogTitle> {/* Default DialogTitle styling applies */}
+            <DialogTitle>Edit Document</DialogTitle>{" "}
+            {/* Default DialogTitle styling applies */}
           </DialogHeader>
           {currentDocument && (
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-title">Document Title</Label> {/* Default Label styling applies */}
+                <Label htmlFor="edit-title">Document Title</Label>{" "}
+                {/* Default Label styling applies */}
                 <Input
                   id="edit-title"
                   value={currentDocument.title}
@@ -651,7 +730,8 @@ export default function CourseInfoPanel({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-url">URL</Label> {/* Default Label styling applies */}
+                <Label htmlFor="edit-url">URL</Label>{" "}
+                {/* Default Label styling applies */}
                 <Input
                   id="edit-url"
                   value={currentDocument.url}
@@ -665,7 +745,8 @@ export default function CourseInfoPanel({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-description">Description (Optional)</Label> {/* Default Label styling applies */}
+                <Label htmlFor="edit-description">Description (Optional)</Label>{" "}
+                {/* Default Label styling applies */}
                 <Textarea
                   id="edit-description"
                   value={currentDocument.description}

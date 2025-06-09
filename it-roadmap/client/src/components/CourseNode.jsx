@@ -66,34 +66,76 @@ const CourseNode = memo(({ data, isConnectable, selected }) => {
         backgroundColor: nodeBgColor || undefined,
       }}
     >
-      {/* Top handle - consistent ID */}
+      {/* Top handles - overlapping source and target */}
+      <Handle
+        type="source"
+        position={Position.Top}
+        isConnectable={isConnectable}
+        className="w-4 h-4 !bg-primary transition-all duration-300 hover:!w-5 hover:!h-5 connection-handle connection-handle-top"
+        id="top-source"
+        data-handle-type="top"
+        data-handle-pos="top"
+        data-connection-direction="vertical"
+        style={{ zIndex: 100 }}
+      />
       <Handle
         type="target"
         position={Position.Top}
         isConnectable={isConnectable}
-        className="w-3 h-3 !bg-primary transition-all duration-300 hover:!w-4 hover:!h-4 connection-handle connection-handle-top"
+        className="w-4 h-4 !bg-primary transition-all duration-300 hover:!w-5 hover:!h-5 connection-handle connection-handle-top"
         id="top"
         data-handle-type="top"
+        data-handle-pos="top"
+        data-connection-direction="vertical"
+        style={{ zIndex: 100 }}
       />
 
-      {/* Left handle - consistent ID */}
+      {/* Left handles - overlapping source and target */}
+      <Handle
+        type="source"
+        position={Position.Left}
+        isConnectable={isConnectable}
+        className="w-4 h-4 !bg-primary transition-all duration-300 hover:!w-5 hover:!h-5 connection-handle connection-handle-left"
+        id="left-source"
+        data-handle-type="left"
+        data-handle-pos="left"
+        data-connection-direction="horizontal"
+        style={{ zIndex: 100 }}
+      />
       <Handle
         type="target"
         position={Position.Left}
         isConnectable={isConnectable}
-        className="w-3 h-3 !bg-primary transition-all duration-300 hover:!w-4 hover:!h-4 connection-handle connection-handle-left"
+        className="w-4 h-4 !bg-primary transition-all duration-300 hover:!w-5 hover:!h-5 connection-handle connection-handle-left"
         id="left"
         data-handle-type="left"
+        data-handle-pos="left"
+        data-connection-direction="horizontal"
+        style={{ zIndex: 100 }}
       />
 
-      {/* Right handle - consistent ID */}
+      {/* Right handles - overlapping source and target */}
       <Handle
         type="source"
         position={Position.Right}
         isConnectable={isConnectable}
-        className="w-3 h-3 !bg-primary transition-all duration-300 hover:!w-4 hover:!h-4 connection-handle connection-handle-right"
-        id="right"
+        className="w-4 h-4 !bg-primary transition-all duration-300 hover:!w-5 hover:!h-5 connection-handle connection-handle-right"
+        id="right-source"
         data-handle-type="right"
+        data-handle-pos="right"
+        data-connection-direction="horizontal"
+        style={{ zIndex: 100 }}
+      />
+      <Handle
+        type="target"
+        position={Position.Right}
+        isConnectable={isConnectable}
+        className="w-4 h-4 !bg-primary transition-all duration-300 hover:!w-5 hover:!h-5 connection-handle connection-handle-right"
+        id="right-target"
+        data-handle-type="right"
+        data-handle-pos="right"
+        data-connection-direction="horizontal"
+        style={{ zIndex: 100 }}
       />
 
       <div className="flex justify-between items-start">
@@ -149,28 +191,61 @@ const CourseNode = memo(({ data, isConnectable, selected }) => {
         </div>
       )}
 
-      {/* Bottom handle - consistent ID */}
+      {/* Bottom handles - overlapping source and target */}
       <Handle
         type="source"
         position={Position.Bottom}
         isConnectable={isConnectable}
-        className="w-3 h-3 !bg-primary transition-all duration-300 hover:!w-4 hover:!h-4 connection-handle connection-handle-bottom"
-        id="bottom"
+        className="w-4 h-4 !bg-primary transition-all duration-300 hover:!w-5 hover:!h-5 connection-handle connection-handle-bottom"
+        id="bottom-source"
         data-handle-type="bottom"
+        data-handle-pos="bottom"
+        data-connection-direction="vertical"
+        style={{ zIndex: 100 }}
+      />
+      <Handle
+        type="target"
+        position={Position.Bottom}
+        isConnectable={isConnectable}
+        className="w-4 h-4 !bg-primary transition-all duration-300 hover:!w-5 hover:!h-5 connection-handle connection-handle-bottom"
+        id="bottom-target"
+        data-handle-type="bottom"
+        data-handle-pos="bottom"
+        data-connection-direction="vertical"
+        style={{ zIndex: 100, pointerEvents: "all" }}
       />
 
-      {/* Center handle for more connection options - fixed position and style */}
+      {/* Center handles - overlapping source and target */}
       <Handle
         type="source"
         position={Position.Bottom}
         isConnectable={isConnectable}
-        className="w-3 h-3 !bg-primary transition-all duration-300 hover:!w-4 hover:!h-4 connection-handle connection-handle-center"
+        className="w-4 h-4 !bg-primary transition-all duration-300 hover:!w-5 hover:!h-5 connection-handle connection-handle-center"
         id="center"
         data-handle-type="center"
+        data-handle-pos="center"
+        data-connection-direction="any"
         style={{
           bottom: "50%",
           left: "50%",
           transform: "translate(-50%, 0)",
+          zIndex: 100,
+        }}
+      />
+      <Handle
+        type="target"
+        position={Position.Bottom}
+        isConnectable={isConnectable}
+        className="w-4 h-4 !bg-primary transition-all duration-300 hover:!w-5 hover:!h-5 connection-handle connection-handle-center"
+        id="center-target"
+        data-handle-type="center"
+        data-handle-pos="center"
+        data-connection-direction="any"
+        style={{
+          bottom: "50%",
+          left: "50%",
+          transform: "translate(-50%, 0)",
+          zIndex: 100,
         }}
       />
     </div>

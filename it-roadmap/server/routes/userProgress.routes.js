@@ -24,4 +24,10 @@ router.delete(
   userProgressController.deleteUserProgressByUserAndCourse
 );
 
+// New route for completing a course and adding roadmap to favorites
+router.put(
+  "/user/:userId/course/:courseId/complete-and-favorite/:roadmapId",
+  userProgressController.completeAndAddToFavorites
+);
+
 module.exports = router;

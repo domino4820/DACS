@@ -1,0 +1,110 @@
+/* Global CSS Variables */
+:root {
+  --primary-rgb: 109, 40, 217;
+  --primary-alpha: rgba(109, 40, 217, 0.3);
+  --border-rgb: 55, 65, 81;
+  --card-rgb: 15, 23, 42;
+  --radius-lg: 0.75rem;
+}
+
+/* Global animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--primary-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0);
+  }
+}
+
+/* Apply animations to common components */
+.fadeIn {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+.slideInRight {
+  animation: slideInRight 0.3s ease-in-out forwards;
+}
+
+.pulse {
+  animation: pulse 1.5s infinite;
+}
+
+/* Dialog and input interaction fixes */
+.fixed[class*="z-"] {
+  isolation: isolate;
+  pointer-events: auto !important;
+}
+
+/* Fix for input fields in dialogs */
+input,
+textarea,
+select {
+  pointer-events: auto !important;
+  z-index: 10;
+  position: relative;
+}
+
+/* Dialog fixes */
+[role="dialog"] {
+  pointer-events: auto !important;
+}
+
+[role="dialog"] * {
+  pointer-events: auto !important;
+}
+
+.dialog-content-fix {
+  isolation: isolate;
+  pointer-events: auto !important;
+}
+
+/* ReactFlow node styles */
+.node-creating {
+  animation: fadeIn 0.3s ease-in-out forwards;
+  pointer-events: auto !important;
+  cursor: move;
+}
+
+.react-flow__node {
+  cursor: move;
+  pointer-events: auto !important;
+}
+
+.react-flow__handle {
+  pointer-events: auto !important;
+}
+
+/* Fix for select dropdowns in dialogs */
+[data-radix-popper-content-wrapper] {
+  z-index: 10001 !important;
+  pointer-events: auto !important;
+}
+
+.select-content {
+  z-index: 10001 !important;
+  pointer-events: auto !important;
+}

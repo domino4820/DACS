@@ -1,4 +1,5 @@
 import api from "./api";
+import { fixHandleId } from "../utils/reactflowUtils";
 
 // Get all roadmaps
 export const getRoadmaps = async () => {
@@ -281,19 +282,39 @@ export const getRoadmapEdges = async (id) => {
           // Parse the JSON style field
           const edgeStyle = edge.style ? JSON.parse(edge.style) : {};
 
-          console.log(
-            `[FETCH EDGES] Processing edge: ID=${edge.edgeIdentifier}, Source=${edge.source}, Target=${edge.target}`
-          );
+          // Parse data field if it exists and is a string
+          let edgeData = {};
+          if (edge.data) {
+            if (typeof edge.data === "string") {
+              try {
+                edgeData = JSON.parse(edge.data);
+              } catch (e) {
+                console.error(
+                  `Error parsing edge data for edge ${edge.edgeIdentifier}:`,
+                  e
+                );
+              }
+            } else if (typeof edge.data === "object") {
+              edgeData = edge.data;
+            }
+          }
+
+          // 确保获取正确的sourceHandle和targetHandle信息
+          // 优先从顶层属性获取，如果没有则从data中获取
+          const sourceHandle =
+            edge.sourceHandle || edgeData.sourceHandle || null;
+          const targetHandle =
+            edge.targetHandle || edgeData.targetHandle || null;
 
           return {
             id: edge.edgeIdentifier,
             source: edge.source,
             target: edge.target,
+            // 设置sourceHandle和targetHandle
+            sourceHandle: sourceHandle,
+            targetHandle: targetHandle,
             type: edge.type || "smoothstep",
             animated: edge.animated || false,
-            // 保留源句柄和目标句柄信息
-            sourceHandle: edge.sourceHandle || null,
-            targetHandle: edge.targetHandle || null,
             style: {
               stroke: edgeStyle.stroke || "#6d28d9",
               strokeWidth: edgeStyle.strokeWidth || 1,
@@ -301,7 +322,10 @@ export const getRoadmapEdges = async (id) => {
             // 确保保留连接类型和其他数据
             data: {
               connectionType: edge.connectionType || "arrow",
-              ...(edge.data || {}),
+              ...(edgeData || {}),
+              // 在data中也保存sourceHandle和targetHandle
+              sourceHandle: sourceHandle,
+              targetHandle: targetHandle,
             },
             // 如果有方向箭头信息，也需要保留
             ...(edge.connectionType === "arrow" && {
@@ -314,7 +338,10 @@ export const getRoadmapEdges = async (id) => {
             }),
           };
         } catch (error) {
-          console.error("Error parsing edge data:", error, edge);
+          console.error(
+            `Error transforming edge ${edge.edgeIdentifier}:`,
+            error
+          );
           return null;
         }
       })
@@ -342,17 +369,24 @@ export const getRoadmapEdges = async (id) => {
 export const updateRoadmapEdges = async (id, edges) => {
   try {
     console.log(`[API] Updating ${edges?.length || 0} edges for roadmap ${id}`);
-    console.log(`[API] Edges data type:`, typeof edges, Array.isArray(edges));
 
-    // 确保edges是数组
+    // Verify roadmap ID is valid
+    if (!id || isNaN(Number(id))) {
+      console.error("[API] Invalid roadmap ID:", id);
+      throw new Error("Invalid roadmap ID");
+    }
+
+    // Ensure edges is an array
     if (!edges) {
-      console.error("[API] Edges is null or undefined");
+      console.warn(
+        "[API] Edges is null or undefined, defaulting to empty array"
+      );
       edges = [];
     }
 
     if (!Array.isArray(edges)) {
       console.error("[API] Invalid edges data - not an array:", typeof edges);
-      // 尝试转换为数组
+      // Try to convert to array if possible
       try {
         if (typeof edges === "object" && edges !== null) {
           edges = Object.values(edges);
@@ -366,98 +400,206 @@ export const updateRoadmapEdges = async (id, edges) => {
       }
     }
 
-    if (edges.length === 0) {
-      console.warn("[API] Warning: Empty edges array provided");
+    // Deep validation of edge data
+    const validEdges = edges.filter((edge) => {
+      if (!edge || typeof edge !== "object") {
+        console.warn("[API] Skipping invalid edge (not an object)");
+        return false;
+      }
+
+      if (!edge.id || !edge.source || !edge.target) {
+        console.warn("[API] Skipping edge missing required properties:", edge);
+        return false;
+      }
+
+      return true;
+    });
+
+    // If no valid edges, send an empty array (valid operation)
+    if (validEdges.length === 0) {
+      console.log("[API] No valid edges to update, sending empty array");
+      const response = await api.put(`/roadmaps/${id}/edges`, {
+        edges: [],
+      });
+      return response.data;
     }
 
-    // Log每个边缘的详细信息，确保source和target正确
-    edges.forEach((edge, index) => {
-      console.log(`[API] Edge ${index}: ID=${edge.id}, Source=${edge.source}, Target=${edge.target}, 
-        SourceHandle=${edge.sourceHandle}, TargetHandle=${edge.targetHandle}`);
+    // Log each edge for debugging
+    validEdges.forEach((edge, index) => {
+      console.log(
+        `[API] Edge ${index}: ID=${edge.id}, Source=${edge.source}, Target=${edge.target}`
+      );
     });
 
-    // Transform to server format
-    const serverEdges = edges
+    // Transform to server format with extra safety measures
+    const serverEdges = validEdges
       .map((edge) => {
-        // Validate required edge properties
-        if (!edge?.id || !edge?.source || !edge?.target) {
-          console.error("[UPDATE] Edge missing required properties:", edge);
-          // Skip this edge instead of throwing an error
+        try {
+          // First, fix handle IDs using the utility function
+          const sourceHandle = edge.sourceHandle
+            ? fixHandleId(edge.sourceHandle, "source")
+            : null;
+          const targetHandle = edge.targetHandle
+            ? fixHandleId(edge.targetHandle, "target")
+            : null;
+
+          // Create a clean base edge with all required fields as strings
+          const serverEdge = {
+            edgeIdentifier: String(edge.id),
+            source: String(edge.source),
+            target: String(edge.target),
+            sourceHandle: sourceHandle,
+            targetHandle: targetHandle,
+            type: edge.type || "smoothstep",
+          };
+
+          // Set animated boolean safely
+          serverEdge.animated = !!edge.animated;
+
+          // Handle style conversion safely
+          try {
+            if (typeof edge.style === "object" && edge.style !== null) {
+              // Create a sanitized style object with only safe properties
+              const safeStyle = {};
+              Object.keys(edge.style).forEach((key) => {
+                const value = edge.style[key];
+                if (
+                  typeof value === "string" ||
+                  typeof value === "number" ||
+                  value === null
+                ) {
+                  safeStyle[key] = value;
+                }
+              });
+              serverEdge.style = JSON.stringify(safeStyle);
+            } else if (typeof edge.style === "string") {
+              // Validate existing JSON string
+              JSON.parse(edge.style); // Will throw if invalid
+              serverEdge.style = edge.style;
+            } else {
+              // Default style
+              serverEdge.style = JSON.stringify({
+                stroke: "#6d28d9",
+                strokeWidth: 2,
+              });
+            }
+          } catch (styleError) {
+            console.warn(
+              `[API] Style error for edge ${edge.id}, using default:`,
+              styleError
+            );
+            serverEdge.style = JSON.stringify({
+              stroke: "#6d28d9",
+              strokeWidth: 2,
+            });
+          }
+
+          // Process data safely
+          if (edge.data) {
+            try {
+              // Create a simplified data object with only essential properties
+              const safeData = {
+                connectionType: edge.data.connectionType || "default",
+                sourceHandle: sourceHandle,
+                targetHandle: targetHandle,
+              };
+
+              // Add a few more safe properties if they exist
+              if (edge.data.sourceId)
+                safeData.sourceId = String(edge.data.sourceId);
+              if (edge.data.targetId)
+                safeData.targetId = String(edge.data.targetId);
+              if (edge.data.createdAt)
+                safeData.createdAt = String(edge.data.createdAt);
+
+              serverEdge.data = JSON.stringify(safeData);
+            } catch (dataError) {
+              console.warn(
+                `[API] Data error for edge ${edge.id}, using minimal data:`,
+                dataError
+              );
+              serverEdge.data = JSON.stringify({
+                connectionType: "default",
+                sourceHandle: sourceHandle,
+                targetHandle: targetHandle,
+              });
+            }
+          } else {
+            // Default minimal data
+            serverEdge.data = JSON.stringify({
+              connectionType: "default",
+              sourceHandle: sourceHandle,
+              targetHandle: targetHandle,
+            });
+          }
+
+          return serverEdge;
+        } catch (edgeError) {
+          console.error(`[API] Failed to process edge ${edge.id}:`, edgeError);
           return null;
         }
-
-        // Ensure style is well-formed JSON
-        let styleString;
-        if (typeof edge.style === "object" && edge.style !== null) {
-          try {
-            styleString = JSON.stringify(edge.style);
-          } catch (e) {
-            console.error(
-              `[UPDATE] Error stringifying style for edge ${edge.id}:`,
-              e
-            );
-            styleString = JSON.stringify({ stroke: "#999" });
-          }
-        } else if (typeof edge.style === "string") {
-          // Validate that it's already valid JSON
-          try {
-            JSON.parse(edge.style); // Just testing if this works
-            styleString = edge.style;
-          } catch (e) {
-            console.error(
-              `[UPDATE] Invalid JSON style for edge ${edge.id}:`,
-              e
-            );
-            styleString = JSON.stringify({ stroke: "#999" });
-          }
-        } else {
-          styleString = JSON.stringify({ stroke: "#999" });
-        }
-
-        // 创建正确格式化的服务器边缘
-        const serverEdge = {
-          edgeIdentifier: edge.id,
-          source: edge.source,
-          target: edge.target,
-          // 保存句柄信息
-          sourceHandle: edge.sourceHandle || null,
-          targetHandle: edge.targetHandle || null,
-          type: edge.type || "smoothstep",
-          animated: edge.animated || false,
-          style: styleString,
-          // 保存连接类型
-          connectionType: edge.data?.connectionType || "arrow",
-          // 保存其他数据
-          data: edge.data ? JSON.stringify(edge.data) : null,
-        };
-
-        console.log(`[UPDATE] Transformed edge ${edge.id} for server:`, {
-          edgeIdentifier: serverEdge.edgeIdentifier,
-          source: serverEdge.source,
-          target: serverEdge.target,
-          sourceHandle: serverEdge.sourceHandle,
-          targetHandle: serverEdge.targetHandle,
-          type: serverEdge.type,
-        });
-
-        return serverEdge;
       })
-      .filter((edge) => edge !== null); // 过滤掉无效边缘
-
-    console.log(`[API] Sending ${serverEdges.length} edges to server`);
-
-    const response = await api.put(`/roadmaps/${id}/edges`, {
-      edges: serverEdges,
-    });
+      .filter(Boolean); // Remove any null values
 
     console.log(
-      `[API] Server response for edges update:`,
-      response.status,
-      response.statusText
+      `[API] Sending ${serverEdges.length} validated edges to server`
     );
-    console.log(`[API] Response data:`, response.data);
 
-    return response.data;
+    // Make multiple attempts with smaller batches if needed
+    try {
+      const response = await api.put(`/roadmaps/${id}/edges`, {
+        edges: serverEdges,
+      });
+
+      console.log(`[API] Edge update successful:`, response.status);
+      return response.data;
+    } catch (firstError) {
+      console.error(`[API] First attempt failed:`, firstError);
+
+      // If the request fails with all edges, try with a smaller batch or just one by one
+      if (serverEdges.length > 5) {
+        console.log("[API] Retrying with edges in smaller batches");
+
+        // Try to update edges in batches of 5
+        const batchSize = 5;
+        const batches = [];
+
+        for (let i = 0; i < serverEdges.length; i += batchSize) {
+          const batch = serverEdges.slice(i, i + batchSize);
+          batches.push(batch);
+        }
+
+        // Send each batch
+        let successCount = 0;
+        for (let i = 0; i < batches.length; i++) {
+          try {
+            const response = await api.put(`/roadmaps/${id}/edges`, {
+              edges: batches[i],
+            });
+            console.log(
+              `[API] Batch ${i + 1} update successful:`,
+              response.status
+            );
+            successCount++;
+          } catch (batchError) {
+            console.error(`[API] Failed to update batch ${i + 1}:`, batchError);
+          }
+        }
+
+        if (successCount > 0) {
+          console.log(
+            `[API] Successfully updated ${successCount} of ${batches.length} batches`
+          );
+          return {
+            message: `Updated ${successCount} of ${batches.length} edge batches`,
+          };
+        } else {
+          throw new Error("Failed to update edges in batches");
+        }
+      } else {
+        throw firstError; // Re-throw if we don't have enough edges to batch
+      }
+    }
   } catch (error) {
     console.error(`[API ERROR] Failed to update edges:`, error);
     if (error.response) {

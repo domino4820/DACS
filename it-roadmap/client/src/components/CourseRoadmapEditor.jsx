@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import ReactFlow, {
   addEdge,
   Background,
@@ -21,13 +27,22 @@ import {
 import CourseNodeComponent from "./CourseNodeComponent";
 import NodeColorPicker from "./NodeColorPicker";
 import NodeActions from "./NodeActions";
-
-// Define node types
-const nodeTypes = {
-  courseNode: CourseNodeComponent,
-};
+import RoadmapView from "./RoadmapView";
+import {
+  COURSE_ROADMAP_NODE_TYPES,
+  DEFAULT_EDGE_TYPES,
+  useNodeTypes,
+  useEdgeTypes,
+} from "../utils/reactflowUtils";
 
 export default function CourseRoadmapEditor({ courseId, readOnly = false }) {
+  // Memoize nodeTypes to prevent recreation
+  const nodeTypes = useNodeTypes(COURSE_ROADMAP_NODE_TYPES);
+  const edgeTypes = useEdgeTypes(DEFAULT_EDGE_TYPES);
+
+  // Reference to the RoadmapView component
+  const roadmapViewRef = useRef(null);
+
   // State for nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -92,27 +107,11 @@ export default function CourseRoadmapEditor({ courseId, readOnly = false }) {
   // Handle adding a node
   const onAddNode = useCallback(
     (nodeData) => {
-      // Create new node
-      const newNode = {
-        id: `node-${Date.now()}`,
-        type: "courseNode",
-        position: {
-          x: Math.random() * 400,
-          y: Math.random() * 400,
-        },
-        data: {
-          ...nodeData,
-          nodeBgColor: nodeData.nodeBgColor || "#1e1e2f",
-          nodeColor: nodeData.nodeColor || "#7c3aed",
-          textColor: nodeData.textColor || "#ffffff",
-        },
-      };
-
-      setNodes((nds) => nds.concat(newNode));
+      // Use the optimized onAddCourseNode function instead of the old implementation
+      onAddCourseNode(nodeData);
       setShowAddCourseDialog(false);
-      toast.success("Đã thêm node mới");
     },
-    [setNodes]
+    [setShowAddCourseDialog, onAddCourseNode]
   );
 
   // Handle connecting nodes
@@ -209,83 +208,92 @@ export default function CourseRoadmapEditor({ courseId, readOnly = false }) {
     }
 
     try {
-      // Show loading toast
-      const loadingToastId = toast.loading("Đang lưu lộ trình...");
+      // Show toast with promise
+      return toast.promise(
+        async () => {
+          console.log("Attempting to save roadmap for course:", courseId);
+          console.log("Nodes to save:", nodes);
+          console.log("Edges to save:", edges);
 
-      console.log("Attempting to save roadmap for course:", courseId);
-      console.log("Nodes to save:", nodes);
-      console.log("Edges to save:", edges);
+          // Validate nodes and edges
+          const validNodes = nodes.filter((node) => node.id && node.position);
+          if (validNodes.length < nodes.length) {
+            console.warn(
+              `Found ${
+                nodes.length - validNodes.length
+              } invalid nodes, they will be skipped`
+            );
+          }
 
-      // Validate nodes and edges
-      const validNodes = nodes.filter((node) => node.id && node.position);
-      if (validNodes.length < nodes.length) {
-        console.warn(
-          `Found ${
-            nodes.length - validNodes.length
-          } invalid nodes, they will be skipped`
-        );
-      }
+          // Ensure every edge has valid source and target
+          const validEdges = edges.filter((edge) => edge.source && edge.target);
+          if (validEdges.length < edges.length) {
+            console.warn(
+              `Found ${
+                edges.length - validEdges.length
+              } invalid edges, they will be skipped`
+            );
+          }
 
-      // Ensure every edge has valid source and target
-      const validEdges = edges.filter((edge) => edge.source && edge.target);
-      if (validEdges.length < edges.length) {
-        console.warn(
-          `Found ${
-            edges.length - validEdges.length
-          } invalid edges, they will be skipped`
-        );
-      }
+          // Save the roadmap data
+          const result = await saveCourseRoadmap(courseId, {
+            nodes: validNodes,
+            edges: validEdges,
+          });
 
-      // Save the roadmap data
-      const result = await saveCourseRoadmap(courseId, {
-        nodes: validNodes,
-        edges: validEdges,
-      });
+          console.log("Save result:", result);
 
-      console.log("Save result:", result);
+          // Update roadmap ID if needed
+          if (result.id && result.id !== roadmapId) {
+            console.log(
+              `Updating stored roadmap ID from ${roadmapId} to ${result.id}`
+            );
+            setRoadmapId(result.id);
+          }
 
-      // Update roadmap ID if needed
-      if (result.id && result.id !== roadmapId) {
-        console.log(
-          `Updating stored roadmap ID from ${roadmapId} to ${result.id}`
-        );
-        setRoadmapId(result.id);
-      }
+          // Update nodes and edges with what was returned from the server
+          if (result.nodes?.length) {
+            console.log(`Updating ${result.nodes.length} nodes after save`);
+            setNodes(result.nodes);
+          }
+          if (result.edges?.length) {
+            console.log(`Updating ${result.edges.length} edges after save`);
+            setEdges(result.edges);
+          }
 
-      // Update nodes and edges with what was returned from the server
-      if (result.nodes?.length) {
-        console.log(`Updating ${result.nodes.length} nodes after save`);
-        setNodes(result.nodes);
-      }
-      if (result.edges?.length) {
-        console.log(`Updating ${result.edges.length} edges after save`);
-        setEdges(result.edges);
-      }
-
-      // Hide loading toast and show success
-      toast.dismiss(loadingToastId);
-      toast.success("Đã lưu lộ trình thành công!");
-    } catch (error) {
-      console.error("Error saving roadmap:", error);
-
-      // Determine detailed error message
-      let errorDetails = "";
-      if (error.response) {
-        errorDetails =
-          error.response.data?.message ||
-          `Error ${error.response.status}: ${error.response.statusText}`;
-      } else if (error.message) {
-        errorDetails = error.message;
-      }
-
-      toast.dismiss();
-      toast.error(`Lỗi khi lưu lộ trình: ${errorDetails}`, {
-        duration: 5000,
-        action: {
-          label: "Thử lại",
-          onClick: () => handleSaveRoadmap(),
+          return result;
         },
-      });
+        {
+          loading: "Đang lưu lộ trình...",
+          success: "Đã lưu lộ trình thành công!",
+          error: (error) => {
+            console.error("Error saving roadmap:", error);
+
+            // Determine detailed error message
+            let errorDetails = "";
+            if (error.response) {
+              errorDetails =
+                error.response.data?.message ||
+                `Error ${error.response.status}: ${error.response.statusText}`;
+            } else if (error.message) {
+              errorDetails = error.message;
+            }
+
+            return {
+              title: "Lỗi khi lưu lộ trình",
+              description: errorDetails,
+              duration: 5000,
+              action: {
+                label: "Thử lại",
+                onClick: () => handleSaveRoadmap(),
+              },
+            };
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Unexpected error in handleSaveRoadmap:", error);
+      toast.error(`Lỗi không mong đợi: ${error.message}`);
     }
   }, [courseId, nodes, edges, roadmapId, setNodes, setEdges]);
 
@@ -298,23 +306,31 @@ export default function CourseRoadmapEditor({ courseId, readOnly = false }) {
 
     try {
       setIsLoading(true);
-      const loadingToastId = toast.loading("Đang tải lại lộ trình...");
 
-      console.log(`Reloading roadmap with ID: ${roadmapId}`);
-      const result = await getRoadmapById(roadmapId);
+      // Use toast.promise for loading state
+      await toast.promise(
+        async () => {
+          console.log(`Reloading roadmap with ID: ${roadmapId}`);
+          const result = await getRoadmapById(roadmapId);
 
-      if (result.nodes?.length) {
-        setNodes(result.nodes);
-      }
-      if (result.edges?.length) {
-        setEdges(result.edges);
-      }
+          if (result.nodes?.length) {
+            setNodes(result.nodes);
+          }
+          if (result.edges?.length) {
+            setEdges(result.edges);
+          }
 
-      toast.dismiss(loadingToastId);
-      toast.success("Đã tải lại lộ trình thành công");
-    } catch (error) {
-      console.error(`Error reloading roadmap ${roadmapId}:`, error);
-      toast.error(`Không thể tải lại lộ trình: ${error.message}`);
+          return result;
+        },
+        {
+          loading: "Đang tải lại lộ trình...",
+          success: "Đã tải lại lộ trình thành công",
+          error: (error) => {
+            console.error(`Error reloading roadmap ${roadmapId}:`, error);
+            return `Không thể tải lại lộ trình: ${error.message}`;
+          },
+        }
+      );
     } finally {
       setIsLoading(false);
     }
@@ -325,6 +341,43 @@ export default function CourseRoadmapEditor({ courseId, readOnly = false }) {
     setEditMode((prev) => !prev);
     setSelectedNode(null);
   }, []);
+
+  const onAddCourseNode = useCallback(
+    async (courseData) => {
+      // Create a toast notification when starting the process
+      toast({
+        title: "Đang tạo node mới...",
+        description: "Vui lòng chờ trong khi hệ thống khởi tạo node mới",
+      });
+
+      try {
+        // Reference to the roadmapViewRef to access the node methods
+        if (roadmapViewRef.current && roadmapViewRef.current.handleAddCourse) {
+          // Call the add course handler in RoadmapView
+          await roadmapViewRef.current.handleAddCourse(courseData);
+        } else {
+          console.error(
+            "RoadmapView reference or handleAddCourse is not available."
+          );
+          toast({
+            title: "Không thể thêm node",
+            description:
+              "Có lỗi khi truy cập chức năng thêm node. Vui lòng thử lại.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error adding course node:", error);
+        toast({
+          title: "Lỗi thêm node",
+          description:
+            "Đã xảy ra lỗi khi thêm node khóa học. Vui lòng thử lại.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast]
+  );
 
   if (isLoading) {
     return (
@@ -347,7 +400,8 @@ export default function CourseRoadmapEditor({ courseId, readOnly = false }) {
 
   return (
     <div className="h-full flex flex-col">
-      <ReactFlow
+      <RoadmapView
+        ref={roadmapViewRef}
         nodes={nodes}
         edges={edges}
         onNodesChange={editMode ? onNodesChange : undefined}
@@ -355,7 +409,10 @@ export default function CourseRoadmapEditor({ courseId, readOnly = false }) {
         onConnect={onConnect}
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
-        fitView
+        edgeTypes={edgeTypes}
+        readOnly={!editMode}
+        onSave={handleSaveRoadmap}
+        courseId={courseId}
       >
         <Background color="#4a5568" gap={16} />
         <Controls />
@@ -456,7 +513,7 @@ export default function CourseRoadmapEditor({ courseId, readOnly = false }) {
             </Card>
           </Panel>
         )}
-      </ReactFlow>
+      </RoadmapView>
 
       {/* Add Course Dialog */}
       <AddCourseDialog

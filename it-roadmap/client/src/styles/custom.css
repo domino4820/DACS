@@ -336,3 +336,31 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
+
+/* 使连接点更明显 */
+.connection-handle {
+  background-color: #8b5cf6 !important; /* 紫色连接点 */
+  border: 2px solid white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.connection-handle:hover {
+  transform: scale(1.5);
+  background-color: #6d28d9 !important; /* 悬停时深紫色 */
+  box-shadow: 0 0 10px rgba(109, 40, 217, 0.7); /* 悬停时紫色阴影 */
+}
+
+/* 优化连接拖拽线样式 */
+.react-flow__connection-path {
+  stroke: #8b5cf6;
+  stroke-width: 3;
+  stroke-dasharray: 5, 5;
+  animation: flowingDashes 1s linear infinite;
+}
+
+@keyframes flowingDashes {
+  to {
+    stroke-dashoffset: -10;
+  }
+}

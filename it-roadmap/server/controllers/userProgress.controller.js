@@ -1,4 +1,4 @@
-const { userProgressModel } = require("../models");
+const { userProgressModel, favoriteModel } = require("../models");
 
 class UserProgressController {
   async getAllUserProgress(req, res) {
@@ -177,6 +177,94 @@ class UserProgressController {
       await userProgressModel.deleteByUserIdAndCourseId(userId, courseId);
       res.status(200).json({ message: "Progress record deleted successfully" });
     } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  async completeAndAddToFavorites(req, res) {
+    try {
+      const { userId, courseId, roadmapId } = req.params;
+      const { completed, completedAt, notes } = req.body;
+
+      console.log(
+        `Processing complete and favorite: User ${userId}, Course ${courseId}, Roadmap ${roadmapId}`
+      );
+
+      // First, update or create the user progress
+      let userProgress;
+
+      // Check if progress record exists
+      const existingProgress = await userProgressModel.findByUserIdAndCourseId(
+        userId,
+        courseId
+      );
+
+      if (existingProgress) {
+        // Update existing progress
+        userProgress = await userProgressModel.updateByUserAndCourse(
+          userId,
+          courseId,
+          {
+            completed:
+              completed !== undefined ? completed : existingProgress.completed,
+            completedAt: completed
+              ? completedAt || new Date().toISOString()
+              : null,
+            progress: completed ? 100 : 0,
+            notes: notes !== undefined ? notes : existingProgress.notes,
+          }
+        );
+      } else {
+        // Create new progress
+        userProgress = await userProgressModel.create({
+          userId,
+          courseId,
+          completed: completed || false,
+          completedAt: completed
+            ? completedAt || new Date().toISOString()
+            : null,
+          progress: completed ? 100 : 0,
+          notes,
+        });
+      }
+
+      // If the course is marked as completed, add the roadmap to favorites
+      let favoriteResult = null;
+      if (completed) {
+        // Check if already in favorites
+        const existingFavorite = await favoriteModel.findByUserIdAndRoadmapId(
+          userId,
+          roadmapId
+        );
+
+        if (!existingFavorite) {
+          // Add to favorites
+          favoriteResult = await favoriteModel.create({
+            userId: Number(userId),
+            roadmapId: Number(roadmapId),
+          });
+          console.log(
+            `Added roadmap ${roadmapId} to favorites for user ${userId}`
+          );
+        } else {
+          favoriteResult = existingFavorite;
+          console.log(
+            `Roadmap ${roadmapId} already in favorites for user ${userId}`
+          );
+        }
+      }
+
+      res.status(200).json({
+        userProgress,
+        favorite: favoriteResult,
+        message: completed
+          ? `Course marked as completed${
+              favoriteResult ? " and added to favorites" : ""
+            }`
+          : "Progress updated",
+      });
+    } catch (error) {
+      console.error("Error in completeAndAddToFavorites:", error);
       res.status(500).json({ message: error.message });
     }
   }

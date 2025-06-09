@@ -1,0 +1,188 @@
+/* Editor Tools Animations and Styles */
+.editor-tools {
+  --tool-animation-duration: 0.3s;
+  --tool-hover-scale: 1.02;
+}
+
+/* Toolbar animation */
+.editor-toolbar-enter {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.editor-toolbar-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity var(--tool-animation-duration) ease-out,
+    transform var(--tool-animation-duration) ease-out;
+}
+
+.editor-toolbar-exit {
+  opacity: 1;
+}
+
+.editor-toolbar-exit-active {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity var(--tool-animation-duration) ease-in,
+    transform var(--tool-animation-duration) ease-in;
+}
+
+/* Button animations */
+.editor-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+}
+
+.editor-button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out;
+}
+
+.editor-button:hover::before {
+  width: 120%;
+  height: 120%;
+  opacity: 1;
+}
+
+.editor-button:active::before {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Node handle styling enhancements */
+.react-flow__handle {
+  transition: all 0.2s ease-in-out;
+}
+
+.react-flow__handle:hover {
+  transform: scale(1.5);
+  box-shadow: 0 0 0 3px var(--primary-alpha);
+}
+
+/* Connection line animation */
+.react-flow__connection-path {
+  stroke-dasharray: 5;
+  animation: flowingDash 1s linear infinite;
+}
+
+@keyframes flowingDash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+/* Toolbar container with glass effect */
+.editor-glass-panel {
+  background-color: rgba(var(--card-rgb), 0.85);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(var(--border-rgb), 0.3);
+  border-radius: var(--radius-lg);
+}
+
+/* Tooltip styles */
+.editor-tooltip {
+  position: absolute;
+  padding: 5px 10px;
+  background-color: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+  border-radius: var(--radius);
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  z-index: 1000;
+}
+
+.editor-button:hover .editor-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Selected node styling enhancement */
+.react-flow__node.selected {
+  box-shadow: 0 0 0 2px hsl(var(--primary)),
+    0 0 15px rgba(var(--primary-rgb), 0.4);
+}
+
+/* Edge interaction animations */
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke-width: 3px;
+  filter: drop-shadow(0 0 5px rgba(var(--primary-rgb), 0.5));
+}
+
+/* Node delete animation */
+@keyframes nodeDeleteEffect {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+}
+
+.node-deleting {
+  animation: nodeDeleteEffect 0.3s ease-out forwards;
+}
+
+/* Node create animation */
+@keyframes nodeCreateEffect {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.node-creating {
+  animation: nodeCreateEffect 0.3s ease-out forwards;
+}
+
+/* Edge animations */
+.edge-creating .react-flow__edge-path {
+  stroke-dasharray: 5;
+  animation: dashAnimation 1s linear infinite;
+}
+
+@keyframes dashAnimation {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+/* Add CSS for dashed and solid lines */
+.dashed-line {
+  stroke-dasharray: 5, 5;
+}
+
+.solid-line {
+  stroke-dasharray: none;
+}
+
+/* Custom edge styling */
+.react-flow__edge.custom-edge.dashed-line path {
+  stroke-dasharray: 5, 5;
+}
+
+.react-flow__edge.custom-edge.solid-line path {
+  stroke-dasharray: none;
+}

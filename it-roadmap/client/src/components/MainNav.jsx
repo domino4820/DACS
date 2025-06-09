@@ -7,7 +7,7 @@ import { Button } from "./ui/button";
 import { useAuth } from "../context/AuthContext"; // Assuming useAuth is from AuthContext
 import { ThemeToggle } from "./theme-toggle"; // Uncommented
 import { NotificationDropdown } from "./notification-dropdown"; // Uncommented
-import { Menu, Search, Settings } from "lucide-react"; // Added Search and Settings
+import { Menu, Search, Settings, Heart } from "lucide-react"; // Added Heart
 import AppSidebar from "./AppSidebar.tsx"; // Path to the .tsx sidebar
 import { Input } from "./ui/input.jsx"; // Added Input
 import {
@@ -23,10 +23,6 @@ export function MainNav() {
   // const pathname = usePathname(); // For Next.js, not react-router-dom
   const { user, devMode, login, logout, isAuthenticated, isAdmin } = useAuth(); // Added devMode, isAuthenticated, and isAdmin
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // Debug for admin permissions
-  console.log("MainNav rendering with user:", user);
-  console.log("User is admin?", isAdmin);
 
   const handleLogout = () => {
     logout();
@@ -176,12 +172,12 @@ export function MainNav() {
                   <DropdownMenuItem asChild>
                     <RouterLink to="/profile">Hồ sơ</RouterLink>
                   </DropdownMenuItem>
-                  {}
-                  {console.log("检查管理员权限:", {
-                    isAuthenticated,
-                    isAdmin,
-                    user,
-                  })}
+                  <DropdownMenuItem asChild>
+                    <RouterLink to="/favorites">
+                      <Heart className="mr-2 h-4 w-4" />
+                      <span>Yêu thích</span>
+                    </RouterLink>
+                  </DropdownMenuItem>
                   {isAdmin ? (
                     <DropdownMenuItem asChild>
                       <RouterLink to="/admin">
@@ -189,9 +185,7 @@ export function MainNav() {
                         <span>Quản trị hệ thống</span>
                       </RouterLink>
                     </DropdownMenuItem>
-                  ) : (
-                    console.log("用户无管理员权限")
-                  )}
+                  ) : null}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     Đăng xuất

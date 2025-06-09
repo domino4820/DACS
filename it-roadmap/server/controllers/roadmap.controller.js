@@ -256,17 +256,52 @@ class RoadmapController {
             `[SERVER] Deleted ${deletedEdgesCount} existing edges for roadmap ${id}`
           );
 
+          // Helper function to ensure consistent handle ID formatting
+          const fixHandleId = (handle, type) => {
+            if (!handle)
+              return type === "source" ? "default-source" : "default";
+
+            // Convert to string to ensure we can use string methods
+            const handleStr = String(handle);
+
+            if (type === "source") {
+              // Source handles should have -source suffix
+              if (handleStr.includes("-source")) {
+                return handleStr;
+              }
+              return `${handleStr}-source`;
+            } else {
+              // Target handles should NOT have -source suffix
+              if (handleStr.includes("-source")) {
+                return handleStr.replace("-source", "");
+              }
+              // Target handles SHOULD have -target suffix for certain positions
+              if (handleStr === "bottom" && !handleStr.includes("-target")) {
+                return "bottom-target";
+              }
+              return handleStr;
+            }
+          };
+
           // Create new edges
           const createdEdges = [];
           for (const edge of edges) {
             try {
+              // Process source and target handles first to ensure consistency
+              const sourceHandle = edge.sourceHandle
+                ? fixHandleId(edge.sourceHandle, "source")
+                : null;
+              const targetHandle = edge.targetHandle
+                ? fixHandleId(edge.targetHandle, "target")
+                : null;
+
               // Ensure edge data is properly formatted for database
               const edgeData = {
                 edgeIdentifier: edge.edgeIdentifier || edge.id,
                 source: edge.source,
                 target: edge.target,
-                sourceHandle: edge.sourceHandle || null,
-                targetHandle: edge.targetHandle || null,
+                sourceHandle: sourceHandle,
+                targetHandle: targetHandle,
                 type: edge.type || "smoothstep",
                 animated: edge.animated || false,
                 style:
@@ -275,6 +310,14 @@ class RoadmapController {
                     : edge.style,
                 roadmapId: Number(id),
                 courseId: edge.courseId || null,
+                data:
+                  typeof edge.data === "object"
+                    ? JSON.stringify({
+                        ...edge.data,
+                        sourceHandle: sourceHandle,
+                        targetHandle: targetHandle,
+                      })
+                    : edge.data,
               };
 
               console.log(

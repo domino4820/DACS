@@ -40,6 +40,7 @@ import CourseInfoPanel from "./CourseInfoPanel";
 import AddCourseDialog from "./AddCourseDialog";
 import RoadmapEditorPanel from "./RoadmapEditorPanel";
 
+// Định nghĩa nodeTypes bên ngoài component để tránh tạo lại mỗi lần render
 const nodeTypes = {
   courseNode: CourseNode,
 };

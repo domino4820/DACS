@@ -24,6 +24,7 @@ import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminNotificationsPage from "./pages/AdminNotificationsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import CourseDetail from "./pages/CourseDetail";
+import FavoritesPage from "./pages/FavoritesPage";
 
 // Components
 import MainNav from "./components/MainNav";
@@ -103,6 +104,14 @@ function App() {
                       <Route
                         path="/roadmaps/:id"
                         element={<RoadmapDetailPage />}
+                      />
+                      <Route
+                        path="/favorites"
+                        element={
+                          <ProtectedRoute>
+                            <FavoritesPage />
+                          </ProtectedRoute>
+                        }
                       />
 
                       {/* Course routes */}

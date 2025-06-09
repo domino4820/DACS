@@ -316,7 +316,12 @@ export default function RoadmapEditPage() {
       });
 
       // Đợi tất cả các thao tác hoàn thành
-      await Promise.all([roadmapPromise, nodesPromise, edgesPromise]);
+      const results = await Promise.all([
+        roadmapPromise,
+        nodesPromise,
+        edgesPromise,
+      ]);
+      console.log("[SAVE] All save operations completed successfully");
 
       // Cập nhật state nếu dữ liệu đã được làm sạch
       if (cleanedNodes) setNodes(cleanedNodes);
@@ -333,6 +338,9 @@ export default function RoadmapEditPage() {
       queryClient.invalidateQueries({ queryKey: ["roadmap", id] });
       queryClient.invalidateQueries({ queryKey: ["roadmap-nodes", id] });
       queryClient.invalidateQueries({ queryKey: ["roadmap-edges", id] });
+
+      // Return the results to make this function properly awaitable
+      return results;
     } catch (error) {
       // Hiển thị thông báo lỗi
       console.error("[SAVE] Error during save process:", error);
@@ -341,6 +349,9 @@ export default function RoadmapEditPage() {
         description: error.message || "Có lỗi xảy ra khi lưu roadmap",
         variant: "destructive",
       });
+
+      // Re-throw the error so the promise is rejected
+      throw error;
     }
   };
 

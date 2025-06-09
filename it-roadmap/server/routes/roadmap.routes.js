@@ -282,35 +282,93 @@ router.put("/:id/edges", async (req, res) => {
     await edgeModel.deleteByRoadmapId(id);
     console.log(`Deleted all existing edges for roadmap ${id}`);
 
+    // Helper function to fix handle IDs consistently
+    const fixHandleId = (handle, type) => {
+      if (!handle) return type === "source" ? "default-source" : "default";
+
+      // Convert to string to ensure we can use string methods
+      const handleStr = String(handle);
+
+      if (type === "source") {
+        // Source handles should have -source suffix
+        if (handleStr.includes("-source")) {
+          return handleStr;
+        }
+        return `${handleStr}-source`;
+      } else {
+        // Target handles should NOT have -source suffix
+        if (handleStr.includes("-source")) {
+          return handleStr.replace("-source", "");
+        }
+        // Target handles SHOULD have -target suffix for certain positions
+        if (handleStr === "bottom" && !handleStr.includes("-target")) {
+          return "bottom-target";
+        }
+        return handleStr;
+      }
+    };
+
     // Create new edges
     const createdEdges = [];
     if (edges && Array.isArray(edges) && edges.length > 0) {
       for (const edge of edges) {
+        // Process handles to ensure consistency
+        const sourceHandle = edge.sourceHandle
+          ? fixHandleId(edge.sourceHandle, "source")
+          : null;
+        const targetHandle = edge.targetHandle
+          ? fixHandleId(edge.targetHandle, "target")
+          : null;
+
         const edgeData = {
           roadmapId: Number(id),
           edgeIdentifier:
             edge.edgeIdentifier ||
             edge.id ||
             `edge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          source: edge.source,
-          target: edge.target,
+          source: String(edge.source),
+          target: String(edge.target),
+          sourceHandle,
+          targetHandle,
           type: edge.type || "smoothstep",
           animated: edge.animated || false,
           style:
             typeof edge.style === "object"
               ? JSON.stringify(edge.style)
               : edge.style,
+          data: JSON.stringify({
+            connectionType: edge.data?.connectionType || "default",
+            sourceId: edge.source,
+            targetId: edge.target,
+            sourceHandle,
+            targetHandle,
+            createdAt: edge.data?.createdAt || new Date().toISOString(),
+          }),
         };
 
-        console.log("Creating edge with data:", edgeData);
-        const createdEdge = await edgeModel.create(edgeData);
-        createdEdges.push(createdEdge);
+        console.log("Creating edge with data:", {
+          id: edgeData.edgeIdentifier,
+          source: edgeData.source,
+          target: edgeData.target,
+          sourceHandle: edgeData.sourceHandle,
+          targetHandle: edgeData.targetHandle,
+        });
+
+        try {
+          const createdEdge = await edgeModel.create(edgeData);
+          createdEdges.push(createdEdge);
+        } catch (edgeError) {
+          console.error(
+            `Error creating edge ${edgeData.edgeIdentifier}:`,
+            edgeError
+          );
+        }
       }
     }
 
     res.status(200).json({
       message: `Edges updated successfully: ${createdEdges.length} edges created`,
-      edges: edges,
+      edges: createdEdges,
     });
   } catch (error) {
     console.error("Error updating edges:", error);

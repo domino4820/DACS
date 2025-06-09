@@ -156,7 +156,7 @@ export const saveCourseRoadmap = async (courseId, roadmapData) => {
       console.log(`Created and associated new roadmap ID: ${roadmapId}`);
     }
 
-    // Step 2: Transform nodes and edges to server format
+    // Step 2: Transform nodes and edges to server format with better validation
     console.log(
       `Step 2: Transforming nodes and edges for roadmap ${roadmapId}`
     );
@@ -172,14 +172,23 @@ export const saveCourseRoadmap = async (courseId, roadmapData) => {
     });
 
     // Ensure each edge has required properties
-    const processedEdges = edges.map((edge) => {
-      if (!edge.id) {
-        edge.id = `edge_${Date.now()}_${Math.random()
-          .toString(36)
-          .substring(2, 9)}`;
-      }
-      return edge;
-    });
+    const processedEdges = edges
+      .map((edge) => {
+        if (!edge.id) {
+          edge.id = `edge_${Date.now()}_${Math.random()
+            .toString(36)
+            .substring(2, 9)}`;
+        }
+
+        // Ensure source and target are set
+        if (!edge.source || !edge.target) {
+          console.warn("Edge missing source or target:", edge);
+          return null;
+        }
+
+        return edge;
+      })
+      .filter(Boolean); // Remove any null entries
 
     const transformedNodes = transformNodesToServerFormat(processedNodes);
     const transformedEdges = transformEdgesToServerFormat(processedEdges);
@@ -205,63 +214,39 @@ export const saveCourseRoadmap = async (courseId, roadmapData) => {
       return true;
     });
 
-    // Step 3: Save nodes to the roadmap
+    // Step 3: Save nodes and edges separately for improved reliability
     console.log(
       `Step 3: Saving ${validNodes.length} nodes and ${validEdges.length} edges to roadmap ${roadmapId}`
     );
+
     try {
-      // Method 1: Save both nodes and edges at once using updateNodesAndEdges
-      console.log("Attempting to save nodes and edges in one request");
-      const response = await api.put(`/roadmaps/${roadmapId}/nodes-edges`, {
+      // Save nodes first
+      console.log(`Saving ${validNodes.length} nodes`);
+      await api.put(`/roadmaps/${roadmapId}/nodes`, {
         nodes: validNodes,
-        edges: validEdges,
       });
+      console.log(`Nodes saved successfully`);
 
-      console.log("Nodes and edges saved successfully in one request");
-      console.log("Server response:", response.status);
-
-      // Return updated data
-      return await getRoadmapById(roadmapId);
-    } catch (error) {
-      console.error("Combined update failed:", error);
-
-      // Method 2: If direct update fails, fall back to separate endpoints
-      console.warn("Trying individual updates as fallback");
-
-      try {
-        // Save nodes
-        console.log(`Saving ${validNodes.length} nodes separately`);
-        await api.put(`/roadmaps/${roadmapId}/nodes`, {
-          nodes: validNodes,
-        });
-        console.log(`Nodes saved successfully`);
-      } catch (nodeError) {
-        console.error("Error saving nodes:", nodeError);
-        throw new Error(
-          `Failed to save nodes: ${
-            nodeError.response?.data?.message || nodeError.message
-          }`
-        );
-      }
-
-      try {
-        // Save edges
-        console.log(`Saving ${validEdges.length} edges separately`);
+      // Then save edges
+      if (validEdges.length > 0) {
+        console.log(`Saving ${validEdges.length} edges`);
         await api.put(`/roadmaps/${roadmapId}/edges`, {
           edges: validEdges,
         });
         console.log(`Edges saved successfully`);
-      } catch (edgeError) {
-        console.error("Error saving edges:", edgeError);
-        throw new Error(
-          `Failed to save edges: ${
-            edgeError.response?.data?.message || edgeError.message
-          }`
-        );
+      } else {
+        console.log("No valid edges to save");
       }
 
       // Return updated data
       return await getRoadmapById(roadmapId);
+    } catch (error) {
+      console.error("Update failed:", error.response?.data || error.message);
+      throw new Error(
+        `Failed to save roadmap: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
   } catch (error) {
     console.error(`Error saving roadmap for course ${courseId}:`, error);
@@ -479,7 +464,7 @@ export const transformEdgesToClientFormat = (edges) => {
     .filter(Boolean);
 };
 
-// Transform edges from client format to server format
+// Transform edges from client format to server format - with improved validation
 export const transformEdgesToServerFormat = (edges) => {
   if (!Array.isArray(edges)) {
     console.error("Edges is not an array:", edges);
@@ -494,44 +479,130 @@ export const transformEdgesToServerFormat = (edges) => {
           return null;
         }
 
+        // Strict validation for required properties
         if (!edge.id || !edge.source || !edge.target) {
           console.warn("Edge missing required properties:", edge);
           return null;
         }
 
-        // Handle edge style
-        let styleString;
-        if (typeof edge.style === "object" && edge.style !== null) {
-          try {
-            // Make a clean copy to avoid circular references
-            const safeStyle = { ...edge.style };
-            styleString = JSON.stringify(safeStyle);
-          } catch (styleError) {
-            console.warn("Could not stringify edge style:", styleError);
-            styleString = "{}";
-          }
-        } else if (typeof edge.style === "string") {
-          styleString = edge.style;
-        } else {
-          styleString = "{}";
-        }
-
-        // Return in the format expected by the server
-        return {
+        // Create a new clean object to prevent circular references
+        const cleanEdge = {
           edgeIdentifier: edge.id,
-          source: edge.source,
-          target: edge.target,
+          source: String(edge.source),
+          target: String(edge.target),
           type: edge.type || "smoothstep",
-          animated: edge.animated || false,
-          style: styleString,
+          animated: Boolean(edge.animated),
           roadmapId: edge.roadmapId || null,
         };
+
+        // Safely process handles
+        if (edge.sourceHandle) {
+          cleanEdge.sourceHandle = String(edge.sourceHandle);
+        }
+
+        if (edge.targetHandle) {
+          cleanEdge.targetHandle = String(edge.targetHandle);
+        }
+
+        // Handle edge style safely
+        let styleString = "{}";
+        try {
+          if (typeof edge.style === "object" && edge.style !== null) {
+            // Make a clean copy without any functions or problematic values
+            const safeStyle = {};
+            Object.keys(edge.style).forEach((key) => {
+              const val = edge.style[key];
+              // Only include primitive values that can be safely serialized
+              if (
+                val === null ||
+                typeof val === "string" ||
+                typeof val === "number" ||
+                typeof val === "boolean"
+              ) {
+                safeStyle[key] = val;
+              }
+            });
+            styleString = JSON.stringify(safeStyle);
+          } else if (typeof edge.style === "string") {
+            // Validate if this is a proper JSON string
+            JSON.parse(edge.style); // Will throw if invalid
+            styleString = edge.style;
+          }
+        } catch (styleError) {
+          console.warn("Could not process edge style:", styleError);
+          styleString = "{}"; // Default to empty object
+        }
+
+        cleanEdge.style = styleString;
+
+        // Safely process edge data
+        if (edge.data) {
+          try {
+            // Create a clean data object with only safe properties
+            const safeData = {};
+
+            // Only copy primitive values and simple objects
+            if (typeof edge.data === "object" && edge.data !== null) {
+              Object.entries(edge.data).forEach(([key, value]) => {
+                // Skip functions and complex objects that might cause circular references
+                if (
+                  value === null ||
+                  typeof value === "string" ||
+                  typeof value === "number" ||
+                  typeof value === "boolean" ||
+                  (typeof value === "object" && !Array.isArray(value))
+                ) {
+                  safeData[key] = value;
+                } else if (Array.isArray(value)) {
+                  // Handle arrays specially (clone without functions)
+                  safeData[key] = value.filter(
+                    (item) =>
+                      item === null ||
+                      (typeof item !== "function" && typeof item !== "symbol")
+                  );
+                }
+              });
+            }
+
+            // Try to serialize the data - if it fails, use minimal data
+            cleanEdge.data = JSON.stringify(safeData);
+          } catch (dataError) {
+            console.warn("Could not serialize edge data:", dataError);
+            // Fall back to a minimal set of data
+            cleanEdge.data = JSON.stringify({
+              sourceId: edge.source,
+              targetId: edge.target,
+              createdAt: new Date().toISOString(),
+            });
+          }
+        } else {
+          // Create minimal default data if none exists
+          cleanEdge.data = JSON.stringify({
+            sourceId: edge.source,
+            targetId: edge.target,
+          });
+        }
+
+        // Final validation - ensure all properties are of the expected types
+        if (
+          typeof cleanEdge.edgeIdentifier !== "string" ||
+          typeof cleanEdge.source !== "string" ||
+          typeof cleanEdge.target !== "string"
+        ) {
+          console.error(
+            "Edge has invalid property types after processing:",
+            cleanEdge
+          );
+          return null;
+        }
+
+        return cleanEdge;
       } catch (error) {
         console.error("Error transforming edge to server format:", error, edge);
         return null;
       }
     })
-    .filter(Boolean);
+    .filter(Boolean); // Remove null entries
 };
 
 export default {
