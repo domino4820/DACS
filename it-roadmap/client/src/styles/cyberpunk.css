@@ -66,16 +66,8 @@ body::after {
 
 /* Scan line effect */
 body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: rgba(255, 222, 0, 0.15);
-  z-index: 101;
-  pointer-events: none;
-  animation: scan-line 4s linear infinite;
+  content: none;
+  display: none;
 }
 
 /* Cyberpunk button */
@@ -322,10 +314,10 @@ body::before {
 /* Keyframes for animations */
 @keyframes scan-line {
   0% {
-    transform: translateY(-100vh);
+    transform: translateY(0);
   }
   100% {
-    transform: translateY(100vh);
+    transform: translateY(0);
   }
 }
 

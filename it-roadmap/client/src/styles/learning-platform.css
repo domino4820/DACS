@@ -1,0 +1,810 @@
+/* Learning Platform Styles */
+:root {
+  --primary-color: #04aa6d;
+  --primary-hover: #059862;
+  --secondary-color: #282a35;
+  --light-gray: #f1f1f1;
+  --dark-gray: #616161;
+  --white: #ffffff;
+  --black: #000000;
+  --blue: #2196f3;
+  --yellow: #ffc107;
+  --red: #f44336;
+  --pink: #e91e63;
+  --purple: #9c27b0;
+  --orange: #ff9800;
+  --light-green: #8bc34a;
+  --border-color: #dddddd;
+  --box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16),
+    0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  --border-radius: 8px; /* Standardized border radius */
+  --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --card-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.learning-container {
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.learning-top-nav {
+  height: 60px;
+  z-index: 1000;
+  background-color: white;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16);
+}
+
+.learning-logo {
+  letter-spacing: -1px;
+}
+
+/* Card hover effects */
+.learning-card {
+  transition: all 0.2s ease-in-out;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+
+.learning-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-4px);
+}
+
+/* Button styles */
+.learning-btn {
+  border: none;
+  display: inline-block;
+  padding: 8px 16px;
+  vertical-align: middle;
+  overflow: hidden;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+  color: white;
+  background-color: var(--primary-color);
+  border-radius: var(--border-radius);
+}
+
+.learning-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Ghost button style */
+.learning-btn-ghost {
+  background-color: transparent;
+  border: 1px solid var(--white);
+  color: var(--white);
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease-in-out;
+}
+
+.learning-btn-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Code block styles */
+.learning-code {
+  font-family: Consolas, "courier new";
+  font-size: 15px;
+  width: auto;
+  background-color: var(--light-gray);
+  padding: 8px 12px;
+  border-left: 4px solid var(--primary-color);
+  word-wrap: break-word;
+  border-radius: var(--border-radius);
+}
+
+/* Main color palette */
+.learning-green {
+  color: white !important;
+  background-color: var(--primary-color) !important;
+}
+
+.learning-light-grey {
+  color: black !important;
+  background-color: var(--light-gray) !important;
+}
+
+.learning-dark-grey {
+  color: white !important;
+  background-color: var(--dark-gray) !important;
+}
+
+.learning-black {
+  color: white !important;
+  background-color: var(--black) !important;
+}
+
+.learning-blue {
+  color: white !important;
+  background-color: var(--blue) !important;
+}
+
+.learning-yellow {
+  color: black !important;
+  background-color: var(--yellow) !important;
+}
+
+.learning-red {
+  color: white !important;
+  background-color: var(--red) !important;
+}
+
+.learning-pink {
+  color: white !important;
+  background-color: var(--pink) !important;
+}
+
+.learning-purple {
+  color: white !important;
+  background-color: var(--purple) !important;
+}
+
+.learning-orange {
+  color: white !important;
+  background-color: var(--orange) !important;
+}
+
+/* Custom scrollbar for sidebar */
+.learning-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.learning-sidebar::-webkit-scrollbar-track {
+  background: var(--light-gray);
+}
+
+.learning-sidebar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.learning-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Example boxes */
+.learning-example {
+  padding: 8px 16px;
+  margin: 20px 0;
+  box-shadow: var(--box-shadow);
+  color: #333;
+  background-color: white;
+  border-radius: var(--border-radius);
+}
+
+.learning-example-header {
+  background-color: var(--light-gray);
+  color: #333;
+  padding: 0.01em 16px;
+  margin: -16px -16px 16px -16px;
+  box-sizing: border-box;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+/* Try it yourself button */
+.learning-try-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  display: block;
+  padding: 8px 16px;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  font-size: 17px;
+  border-radius: var(--border-radius);
+}
+
+.learning-try-button:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Top navigation links */
+.learning-top-link {
+  padding: 8px 16px;
+  float: left;
+  width: auto;
+  border: none;
+  display: block;
+  outline: 0;
+  font-weight: 500;
+}
+
+.learning-top-link:hover {
+  background-color: var(--light-gray);
+}
+
+/* Sidebar navigation */
+.learning-sidebar {
+  width: 200px;
+  background-color: #fff;
+  position: fixed;
+  height: 100%;
+  overflow: auto;
+  padding-top: 20px;
+  color: #333;
+  z-index: 10;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.learning-sidebar h2 {
+  color: #333;
+  padding-left: 15px;
+  margin-bottom: 10px;
+}
+
+.learning-sidebar-item {
+  padding: 8px 16px;
+  text-decoration: none;
+  display: block;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.learning-sidebar-item:hover {
+  background-color: var(--light-gray);
+  color: var(--primary-color);
+}
+
+/* Roadmap Cards Layout */
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+/* Updated Roadmap items with consistent design */
+.roadmap-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  border-radius: var(--border-radius);
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  padding: 20px;
+  transition: all 0.3s ease;
+  font-size: 18px;
+  background-color: #1e222a; /* Darker background */
+  box-shadow: var(--card-shadow);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top border accent colors instead of full colored backgrounds */
+.roadmap-item:nth-child(4n + 1) {
+  border-top: 4px solid var(--primary-color);
+}
+
+.roadmap-item:nth-child(4n + 2) {
+  border-top: 4px solid var(--blue);
+}
+
+.roadmap-item:nth-child(4n + 3) {
+  border-top: 4px solid var(--orange);
+}
+
+.roadmap-item:nth-child(4n + 4) {
+  border-top: 4px solid var(--purple);
+}
+
+.roadmap-item:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* Profile and admin page styles */
+.learning-main-content {
+  margin-left: 200px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.learning-section {
+  margin-bottom: 20px;
+  background-color: white;
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  color: #333;
+}
+
+.learning-section-title {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--light-gray);
+  color: #333;
+}
+
+.learning-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.learning-table th,
+.learning-table td {
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  text-align: left;
+}
+
+.learning-table th {
+  background-color: var(--light-gray);
+}
+
+.learning-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Animations */
+.learning-btn-hover {
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.learning-btn-hover:hover {
+  transform: scale(1.05);
+}
+
+.learning-card-effect {
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.learning-card-effect:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-5px);
+}
+
+.learning-nav-link {
+  position: relative;
+}
+
+.learning-nav-link::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--primary-color);
+  transform-origin: bottom right;
+  transition: transform 0.3s;
+}
+
+.learning-nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+@keyframes highlight {
+  0% {
+    background-color: rgba(4, 170, 109, 0.2);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.learning-code-highlight {
+  animation: highlight 2s ease-out;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(4, 170, 109, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(4, 170, 109, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(4, 170, 109, 0);
+  }
+}
+
+.learning-try-btn-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.learning-fade-in {
+  animation: fadeIn 0.7s ease-out;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.learning-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .roadmap-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+
+  .learning-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding-top: 0;
+  }
+
+  .learning-main-content {
+    margin-left: 0;
+  }
+}
+
+/* Top language navigation bar */
+.bg-secondary-color {
+  background-color: var(--secondary-color);
+}
+
+.bg-secondary-color a,
+.bg-secondary-color h1,
+.bg-secondary-color h2,
+.bg-secondary-color h3,
+.bg-secondary-color p {
+  color: var(--white);
+}
+
+.bg-secondary-color a:hover {
+  color: var(--primary-color);
+}
+
+/* Tab navigation styling - ensure good color contrast */
+.tab-nav {
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  overflow-x: auto;
+}
+
+.tab-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: #333;
+  font-weight: 500;
+  position: relative;
+}
+
+.tab-item:hover {
+  color: var(--primary-color);
+}
+
+.tab-item.active {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.tab-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--primary-color);
+}
+
+/* Alternative colored tabs for the top menu */
+.color-tab {
+  padding: 10px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-right: 4px;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  font-weight: 500;
+}
+
+.color-tab.all {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.color-tab.html {
+  background-color: #e44d26;
+  color: white;
+}
+
+.color-tab.css {
+  background-color: #264de4;
+  color: white;
+}
+
+.color-tab.js {
+  background-color: #f7df1e;
+  color: black;
+}
+
+.color-tab.python {
+  background-color: #306998;
+  color: white;
+}
+
+.color-tab.java {
+  background-color: #007396;
+  color: white;
+}
+
+.color-tab.php {
+  background-color: #777bb4;
+  color: white;
+}
+
+/* Top navigation bar */
+.top-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background-color: var(--secondary-color);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.25);
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  color: white;
+}
+
+.nav-logo {
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+}
+
+.nav-logo span {
+  color: var(--primary-color);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  padding: 8px 16px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  border-radius: var(--border-radius);
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.nav-link.active {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* Hero section */
+.hero-section {
+  background-color: var(--secondary-color);
+  color: var(--white);
+  padding: 70px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(4, 170, 109, 0.1), rgba(0, 0, 0, 0));
+  z-index: 0;
+}
+
+.hero-title {
+  font-size: 56px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: var(--white);
+  position: relative;
+  z-index: 1;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.hero-subtitle {
+  font-size: 22px;
+  margin-bottom: 32px;
+  color: rgba(255, 255, 255, 0.9);
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6; /* Increased line height for better readability */
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-button {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hero-button.primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.hero-button.primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.hero-button.secondary {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.hero-button.secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Learning cards grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.learning-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+
+.card-header {
+  padding: 16px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.card-content {
+  padding: 16px;
+}
+
+.card-footer {
+  padding: 16px;
+  background-color: var(--light-gray);
+  text-align: center;
+}
+
+/* Style for roadmap detail page */
+.roadmap-detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #333;
+}
+
+.roadmap-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.roadmap-description {
+  font-size: 18px;
+  margin-bottom: 32px;
+  color: #666;
+}
+
+.roadmap-section {
+  margin-bottom: 40px;
+  color: #333;
+}
+
+.roadmap-section-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+/* Platform features colors */
+.platform-features-title {
+  color: #333;
+}
+
+.platform-features-section {
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+/* Feature cards */
+.feature-card {
+  background-color: white;
+  color: #333;
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-5px);
+}
+
+.feature-card h3 {
+  color: #333;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.feature-card p {
+  color: #666;
+}
+
+/* Footer links */
+.footer-link {
+  color: white;
+  transition: color 0.2s ease-in-out;
+}
+
+.footer-link:hover {
+  color: var(--primary-color);
+}

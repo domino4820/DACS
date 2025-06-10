@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import "./styles/cyberpunk.css";
+import "./styles/learning-platform.css";
 import App from "./App";
 import { applyResizeObserverFix } from "./utils/resizeObserverFix";
 

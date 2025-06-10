@@ -89,34 +89,9 @@ export const typeText = (selector, text = null, duration = 1000) => {
  * @param {string} selector - CSS selector for target elements
  */
 export const scanLineEffect = (selector) => {
-  try {
-    const elements = document.querySelectorAll(selector);
-    if (!elements || elements.length === 0) return;
-
-    elements.forEach((el) => {
-      // Create scan line element
-      const scanLine = document.createElement("div");
-      scanLine.classList.add("cyber-scan-line");
-      scanLine.style.position = "absolute";
-      scanLine.style.top = "0";
-      scanLine.style.left = "0";
-      scanLine.style.width = "100%";
-      scanLine.style.height = "4px";
-      scanLine.style.background = "rgba(0, 246, 255, 0.3)";
-      scanLine.style.zIndex = "10";
-      scanLine.style.animation = "scan-line 2s linear infinite";
-
-      // Ensure parent has position relative
-      if (getComputedStyle(el).position === "static") {
-        el.style.position = "relative";
-      }
-      el.style.overflow = "hidden";
-
-      el.appendChild(scanLine);
-    });
-  } catch (error) {
-    console.error("Error in scanLineEffect:", error);
-  }
+  // This function has been disabled to remove the scanning line effect
+  console.log("Scan line effect has been disabled");
+  return; // Early return to prevent effect from being applied
 };
 
 /**
@@ -226,8 +201,8 @@ const applyAnimations = () => {
     // Apply mecha panel effect (CSS-based)
     setTimeout(() => mechaPanelEffect(".mecha-panel-effect"), 500);
 
-    // Apply scan line effect to cards (CSS-based)
-    setTimeout(() => scanLineEffect(".cyber-scan-effect"), 600);
+    // Scan line effect removed
+    // setTimeout(() => scanLineEffect(".cyber-scan-effect"), 600);
 
     console.log("Cyberpunk animations initialized successfully");
   } catch (error) {
@@ -247,10 +222,7 @@ const applyFallbackStyles = () => {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.8; }
       }
-      @keyframes scan-line {
-        0% { transform: translateY(0); }
-        100% { transform: translateY(100%); }
-      }
+      /* Removed scan-line animation keyframes */
       .btn-cyber {
         box-shadow: 0 0 5px #00f6ff, 0 0 10px #00f6ff;
         animation: neon-pulse 1.5s infinite alternate;

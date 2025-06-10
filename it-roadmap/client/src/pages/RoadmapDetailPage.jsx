@@ -21,17 +21,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/ui/use-toast";
-import { useEffect } from "react";
-import { typeText } from "../lib/animations";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "../components/ui/card";
-import { Skeleton } from "../components/ui/skeleton";
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import RoadmapView from "../components/RoadmapView";
 
@@ -41,6 +32,7 @@ export default function RoadmapDetailPage() {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState("roadmap");
 
   const {
     data: roadmap,
@@ -174,12 +166,23 @@ export default function RoadmapDetailPage() {
     toggleFavoriteMutation.mutate();
   };
 
-  useEffect(() => {
-    // Apply typing effect to the roadmap title
-    typeText(".roadmap-title", null, 800);
-
-    // Removed neonPulse and scanLineEffect calls
-  }, []);
+  // Top languages (similar to W3Schools top bar)
+  const topLanguages = [
+    "HTML",
+    "CSS",
+    "JAVASCRIPT",
+    "SQL",
+    "PYTHON",
+    "JAVA",
+    "PHP",
+    "HOW TO",
+    "C",
+    "C++",
+    "C#",
+    "BOOTSTRAP",
+    "REACT",
+    "MYSQL",
+  ];
 
   if (error) {
     return (
@@ -190,7 +193,10 @@ export default function RoadmapDetailPage() {
         <p className="text-muted-foreground mb-6">
           {error.message || "Failed to load roadmap details"}
         </p>
-        <Button onClick={() => navigate("/roadmaps")} variant="default">
+        <Button
+          onClick={() => navigate("/roadmaps")}
+          className="bg-green-600 hover:bg-green-700"
+        >
           Return to Roadmaps
         </Button>
       </div>
@@ -198,261 +204,234 @@ export default function RoadmapDetailPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <Button
-          variant="outline"
-          onClick={() => navigate("/roadmaps")}
-          className="mb-4" // Removed old border/bg/text classes
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Roadmaps
-        </Button>
+    <div>
+      {/* Top language navigation bar */}
+      <div className="bg-secondary-color text-white text-sm overflow-x-auto whitespace-nowrap py-3 px-4">
+        <div className="container mx-auto">
+          {topLanguages.map((lang, index) => (
+            <a
+              key={index}
+              href="#"
+              className="inline-block mx-2 hover:text-green-300 transition-colors"
+            >
+              {lang}
+            </a>
+          ))}
+        </div>
       </div>
 
       {isLoading ? (
-        <div className="space-y-6">
-          <Skeleton className="h-12 w-3/4" /> {/* Removed direct bg class */}
-          <Skeleton className="h-28 w-full" /> {/* Removed direct bg class */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Skeleton className="h-40 w-full" /> {/* Removed direct bg class */}
-            <Skeleton className="h-40 w-full" /> {/* Removed direct bg class */}
-            <Skeleton className="h-40 w-full" /> {/* Removed direct bg class */}
-          </div>
+        <div className="container mx-auto py-16 flex justify-center">
+          <div className="learning-spinner"></div>
         </div>
       ) : (
-        <>
+        <div className="roadmap-detail-container">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-foreground mb-3 roadmap-title">
-              {" "}
-              {/* Updated classes */}
-              {roadmap.title}
-            </h1>
-            <div className="flex flex-wrap gap-2 mb-4">
-              <Badge variant="outline">
-                {" "}
-                {/* Removed specific styling classes */}
-                <Tag className="h-3 w-3 mr-1 text-muted-foreground" />{" "}
-                {/* Ensured icon color */}
-                {roadmap.category?.name || roadmap.categoryName || "General"}
-              </Badge>
-              <Badge variant="outline">
-                {" "}
-                {/* Removed specific styling classes */}
-                <Award className="h-3 w-3 mr-1 text-muted-foreground" />{" "}
-                {/* Ensured icon color */}
-                {roadmap.difficulty?.charAt(0).toUpperCase() +
-                  roadmap.difficulty?.slice(1)}
-              </Badge>
-              <Badge variant="outline">
-                {" "}
-                {/* Removed specific styling classes */}
-                <Calendar className="h-3 w-3 mr-1 text-muted-foreground" />{" "}
-                Updated: {/* Ensured icon color */}
-                {roadmap.lastUpdated}
-              </Badge>
-            </div>
-            <Card>
-              {" "}
-              {/* Removed cyberpunk classes */}
-              <CardContent className="p-6">
-                <p className="text-foreground whitespace-pre-line">
-                  {" "}
-                  {/* Updated classes */}
-                  {roadmap.description}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+              <Link
+                to="/roadmaps"
+                className="flex items-center mb-4 md:mb-0 text-gray-600 hover:text-gray-900"
+              >
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back to Roadmaps
+              </Link>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Author Info Card */}
-            <Card>
-              {" "}
-              {/* Removed cyberpunk classes */}
-              <CardHeader className="pb-2">
-                {" "}
-                {/* Removed border class */}
-                <CardTitle className="text-lg font-semibold text-primary">
-                  {" "}
-                  {/* Updated classes */}
-                  Author
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 pb-2">
-                <div className="flex items-center">
-                  <User className="h-5 w-5 mr-2 text-primary" />{" "}
-                  {/* Updated icon color */}
-                  <span className="text-foreground">
-                    {" "}
-                    {/* Updated text classes */}
-                    {roadmap.user?.username || roadmap.author || "Anonymous"}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Stats Card */}
-            <Card>
-              {" "}
-              {/* Removed cyberpunk classes */}
-              <CardHeader className="pb-2">
-                {" "}
-                {/* Removed border class */}
-                <CardTitle className="text-lg font-semibold text-primary">
-                  {" "}
-                  {/* Updated classes */}
-                  Roadmap Stats
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 pb-2">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {" "}
-                      {/* Updated classes */}
-                      Courses
-                    </span>
-                    <span className="text-sm text-foreground font-medium">
-                      {" "}
-                      {/* Updated classes */}
-                      {roadmap.courseCount || 0}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {" "}
-                      {/* Updated classes */}
-                      Visibility
-                    </span>
-                    <span className="text-sm text-foreground font-medium">
-                      {" "}
-                      {/* Updated classes */}
-                      {roadmap.isPublic ? "Public" : "Private"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {" "}
-                      {/* Updated classes */}
-                      Created
-                    </span>
-                    <span className="text-sm text-foreground font-medium">
-                      {" "}
-                      {/* Updated classes */}
-                      {roadmap.createdAt}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Actions Card */}
-            <Card>
-              {" "}
-              {/* Removed cyberpunk classes */}
-              <CardHeader className="pb-2">
-                {" "}
-                {/* Removed border class */}
-                <CardTitle className="text-lg font-semibold text-primary">
-                  {" "}
-                  {/* Updated classes */}
-                  Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 pb-2">
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={handleToggleFavorite}
-                      variant={roadmap.isFavorite ? "default" : "outline"}
-                      size="sm"
-                      className={roadmap.isFavorite ? "bg-primary" : ""}
-                    >
-                      <Heart
-                        className={`h-4 w-4 mr-2 ${
-                          roadmap.isFavorite ? "fill-primary-foreground" : ""
-                        }`}
-                      />
-                      {roadmap.isFavorite ? "Favorited" : "Add to Favorites"}
-                    </Button>
-
-                    {(isAdmin || (user && roadmap.userId === user.id)) && (
-                      <Button asChild variant="outline" size="sm">
-                        <Link to={`/roadmaps/${id}/edit`}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit in Editor
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="text-sm text-muted-foreground">
-                    <User className="h-4 w-4 inline mr-1" />
-                    {roadmap.author || "Anonymous"}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Content Area */}
-          <div className="border border-border rounded-lg bg-card mb-8">
-            <div className="p-4 border-b border-border">
-              <h2 className="text-xl font-semibold text-foreground">
-                Roadmap View
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Interactive roadmap visualization (Read-only mode)
-              </p>
-            </div>
-            <div className="h-[70vh] w-full">
-              {isLoadingNodes || isLoadingEdges ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                </div>
-              ) : (
-                <RoadmapView
-                  id={id}
-                  initialNodes={nodes || []}
-                  initialEdges={edges || []}
-                  isEditing={false}
-                  readOnly={true}
-                />
-              )}
-            </div>
-          </div>
-
-          {/* Recommended Resources */}
-          <Card className="mt-8">
-            {" "}
-            {/* Added mt-8 for spacing, removed cyberpunk classes */}
-            <CardHeader>
-              {" "}
-              {/* Removed border class */}
-              <CardTitle className="text-xl font-semibold text-primary">
-                {" "}
-                {/* Updated classes */}
-                Recommended Resources
-              </CardTitle>
-              <CardDescription className="text-muted-foreground">
-                {" "}
-                {/* Updated classes */}
-                Additional learning materials to help you master these concepts
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6">
-              {/* Here we'd show a list of recommended resources, for now showing placeholder */}
-              <div className="space-y-4">
-                <p className="text-muted-foreground">
-                  {" "}
-                  {/* Updated classes */}
-                  No recommended resources have been added yet
-                </p>
+              <div className="flex gap-2">
+                {user && (
+                  <Button
+                    onClick={handleToggleFavorite}
+                    className={`${
+                      roadmap.isFavorite
+                        ? "bg-pink-600 hover:bg-pink-700"
+                        : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
+                    } transition-colors`}
+                  >
+                    <Heart
+                      className={`h-4 w-4 mr-1 ${
+                        roadmap.isFavorite ? "fill-white" : ""
+                      }`}
+                    />
+                    {roadmap.isFavorite ? "Favorited" : "Add to Favorites"}
+                  </Button>
+                )}
+                {(user?.id === roadmap.authorId || isAdmin) && (
+                  <Button asChild className="bg-green-600 hover:bg-green-700">
+                    <Link to={`/roadmaps/${id}/edit`}>
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit Roadmap
+                    </Link>
+                  </Button>
+                )}
               </div>
-            </CardContent>
-          </Card>
-        </>
+            </div>
+
+            <div>
+              <h1 className="roadmap-title text-4xl font-bold mb-3">
+                {roadmap.title}
+              </h1>
+              <p className="roadmap-description mb-4">{roadmap.description}</p>
+
+              {/* Roadmap metadata */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-gray-100 p-3 rounded flex items-center">
+                  <Tag className="h-5 w-5 mr-2 text-green-600" />
+                  <div>
+                    <div className="text-sm text-gray-500">Category</div>
+                    <div className="font-semibold">
+                      {roadmap.categoryName || roadmap.category}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-100 p-3 rounded flex items-center">
+                  <User className="h-5 w-5 mr-2 text-green-600" />
+                  <div>
+                    <div className="text-sm text-gray-500">Author</div>
+                    <div className="font-semibold">
+                      {roadmap.author || "Unknown"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-100 p-3 rounded flex items-center">
+                  <Award className="h-5 w-5 mr-2 text-green-600" />
+                  <div>
+                    <div className="text-sm text-gray-500">Difficulty</div>
+                    <div className="font-semibold capitalize">
+                      {roadmap.difficulty || "All levels"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-100 p-3 rounded flex items-center">
+                  <Calendar className="h-5 w-5 mr-2 text-green-600" />
+                  <div>
+                    <div className="text-sm text-gray-500">Updated</div>
+                    <div className="font-semibold">{roadmap.lastUpdated}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tab navigation */}
+            <div className="border-b mb-6">
+              <div className="flex">
+                <button
+                  className={`py-2 px-4 font-medium ${
+                    activeTab === "roadmap"
+                      ? "border-b-2 border-green-600 text-green-600"
+                      : "text-gray-700 hover:text-green-600"
+                  }`}
+                  onClick={() => setActiveTab("roadmap")}
+                >
+                  Roadmap View
+                </button>
+                <button
+                  className={`py-2 px-4 font-medium ${
+                    activeTab === "courses"
+                      ? "border-b-2 border-green-600 text-green-600"
+                      : "text-gray-700 hover:text-green-600"
+                  }`}
+                  onClick={() => setActiveTab("courses")}
+                >
+                  Courses
+                </button>
+                <button
+                  className={`py-2 px-4 font-medium ${
+                    activeTab === "resources"
+                      ? "border-b-2 border-green-600 text-green-600"
+                      : "text-gray-700 hover:text-green-600"
+                  }`}
+                  onClick={() => setActiveTab("resources")}
+                >
+                  Resources
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          <div className="mb-10">
+            {activeTab === "roadmap" && (
+              <div
+                className="bg-white rounded-lg border p-4"
+                style={{ height: "600px" }}
+              >
+                {isLoadingNodes || isLoadingEdges ? (
+                  <div className="h-full flex items-center justify-center">
+                    <div className="learning-spinner"></div>
+                  </div>
+                ) : (
+                  <RoadmapView nodes={nodes} edges={edges} />
+                )}
+              </div>
+            )}
+
+            {activeTab === "courses" && (
+              <div className="bg-white rounded-lg border p-4">
+                <h2 className="text-2xl font-bold mb-4">
+                  Courses in this Roadmap
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {nodes?.map((node) => (
+                    <Card key={node.id} className="learning-card-effect">
+                      <CardContent className="p-4">
+                        <div className="mb-2 text-xs bg-green-100 text-green-700 py-1 px-2 rounded-full inline-block">
+                          {node.data.code}
+                        </div>
+                        <h3 className="font-bold text-lg">{node.data.label}</h3>
+                        <p className="text-gray-600">{node.data.description}</p>
+                        <div className="flex justify-between items-center mt-4">
+                          <Badge variant="outline" className="bg-gray-100">
+                            {node.data.credits} Credits
+                          </Badge>
+                          <Button className="bg-green-600 hover:bg-green-700 text-sm">
+                            Start Learning
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === "resources" && (
+              <div className="bg-white rounded-lg border p-4">
+                <h2 className="text-2xl font-bold mb-4">
+                  Additional Resources
+                </h2>
+
+                <div className="learning-example mb-6">
+                  <div className="learning-example-header font-medium">
+                    Recommended Books
+                  </div>
+                  <ul className="pl-6 pt-4 list-disc">
+                    <li className="mb-2">
+                      Eloquent JavaScript: A Modern Introduction to Programming
+                    </li>
+                    <li className="mb-2">You Don't Know JS (book series)</li>
+                    <li className="mb-2">
+                      Learning Web Design: A Beginner's Guide
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="learning-example mb-6">
+                  <div className="learning-example-header font-medium">
+                    Online Resources
+                  </div>
+                  <ul className="pl-6 pt-4 list-disc">
+                    <li className="mb-2">MDN Web Docs</li>
+                    <li className="mb-2">FreeCodeCamp</li>
+                    <li className="mb-2">CSS-Tricks</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

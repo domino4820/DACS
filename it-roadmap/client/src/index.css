@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -28,53 +30,99 @@
     --accent: 221 83% 53%; /* 强调色 */
     --accent-foreground: 210 40% 98%; /* 强调色上的文本 */
 
-    --destructive: 0 84.2% 60.2%; /* 危险/错误色 */
+    --destructive: 0 84.2% 60.2%; /* 危险操作色 */
     --destructive-foreground: 210 40% 98%; /* 危险色上的文本 */
 
     --border: 214.3 31.8% 91.4%; /* 边框色 */
-    --input: 214.3 31.8% 91.4%; /* 输入框边框色 */
+    --input: 214.3 31.8% 91.4%; /* 输入框边框 */
     --ring: 221 83% 53%; /* 聚焦环色 */
+
+    --radius: 0.5rem; /* 圆角半径 */
+
+    /* 添加自定义颜色变量 */
+    --primary-color: #04aa6d;
+    --primary-hover: #059862;
+    --border-radius: 8px;
   }
 
   /* 暗色主题变量 */
   .dark {
     --background: 222 47% 11%; /* 深蓝黑色背景 */
-    --foreground: 210 40% 98%; /* 几乎白色的文本 */
+    --foreground: 210 40% 98%; /* 浅色文本 */
 
-    --card: 222 47% 8%; /* 稍微深一点的卡片背景 */
-    --card-foreground: 210 40% 98%; /* 卡片上的文本 */
+    --card: 222 47% 11%; /* 卡片背景 */
+    --card-foreground: 210 40% 98%; /* 卡片文本 */
 
-    --popover: 222 47% 8%; /* 深色弹出框背景 */
+    --popover: 222 47% 11%; /* 弹出框背景 */
     --popover-foreground: 210 40% 98%; /* 弹出框文本 */
 
-    --primary: 221 83% 53%; /* 保持相同的蓝色主色调 */
-    --primary-foreground: 222 47% 11%; /* 主色调上的文本 */
+    --primary: 217.2 91.2% 59.8%; /* 主色调 */
+    --primary-foreground: 222.2 47.4% 11.2%; /* 主色上的文本 */
 
-    --secondary: 217.2 32.6% 17.5%; /* 深色次要色调 */
-    --secondary-foreground: 210 40% 98%; /* 次要色调上的文本 */
+    --secondary: 217.2 32.6% 17.5%; /* 次要色调 */
+    --secondary-foreground: 210 40% 98%; /* 次要色上文本 */
 
-    --muted: 217.2 32.6% 17.5%; /* 深色柔和背景 */
-    --muted-foreground: 215 20.2% 65.1%; /* 暗色模式柔和文本 */
+    --muted: 217.2 32.6% 17.5%; /* 柔和颜色 */
+    --muted-foreground: 215 20.2% 65.1%; /* 柔和文本 */
 
-    --accent: 217.2 32.6% 17.5%; /* 深色强调背景 */
-    --accent-foreground: 210 40% 98%; /* 强调色上的文本 */
+    --accent: 217.2 32.6% 17.5%; /* 强调色 */
+    --accent-foreground: 210 40% 98%; /* 强调色上文本 */
 
-    --destructive: 0 62.8% 30.6%; /* 深色危险/错误色 */
-    --destructive-foreground: 210 40% 98%; /* 危险色上的文本 */
+    --destructive: 0 62.8% 30.6%; /* 危险操作色 */
+    --destructive-foreground: 210 40% 98%; /* 危险色上文本 */
 
-    --border: 217.2 32.6% 17.5%; /* 深色边框 */
-    --input: 217.2 32.6% 17.5%; /* 深色输入框边框 */
-    --ring: 224.3 76.3% 48%; /* 环形颜色 */
+    --border: 217.2 32.6% 17.5%; /* 边框色 */
+    --input: 217.2 32.6% 17.5%; /* 输入框边框 */
+    --ring: 224.3 76.3% 48%; /* 聚焦环 */
+
+    /* 保持自定义颜色在暗色模式下一致 */
+    --primary-color: #04aa6d;
+    --primary-hover: #059862;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  @media (min-width: 768px) {
+    h1 {
+      font-size: 2.5rem;
+      line-height: 1.2;
+    }
+
+    h2 {
+      font-size: 2rem;
+      line-height: 1.3;
+    }
   }
 }
 
 /* Import fonts */
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap"); /* For headings */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap");
 
 body {
   margin: 0;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Noto Sans", "Roboto", sans-serif;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   line-height: 1.6;
@@ -82,9 +130,36 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Noto Sans", "Roboto", sans-serif;
+  font-weight: 600;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+/* Add utility classes for primary color and hover */
+.bg-primary-color {
+  background-color: var(--primary-color);
+}
+
+.bg-primary-hover:hover {
+  background-color: var(--primary-hover);
+}
+
+.text-primary-color {
+  color: var(--primary-color);
+}
+
+.border-primary-color {
+  border-color: var(--primary-color);
 }
 
 /* Styles for react-flow, connection handles etc. from previous theme are kept below */
@@ -98,7 +173,7 @@ code {
 }
 
 .roadmap-card {
-  border-radius: 0.5rem;
+  border-radius: var(--border-radius);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -115,7 +190,7 @@ code {
 .tag {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
+  border-radius: var(--border-radius);
   font-weight: 500;
 }
 
@@ -146,16 +221,16 @@ code {
 
 /* 全局按钮样式增强 */
 .btn-create {
-  background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  border-radius: 0.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: var(--border-radius);
   padding: 0.5rem 1rem;
   font-weight: 600;
   transition: background-color 0.2s ease;
 }
 
 .btn-create:hover {
-  background-color: hsl(var(--primary) / 0.9);
+  background-color: var(--primary-hover);
 }
 
 /* Improve edge connections and handle interaction */

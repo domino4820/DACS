@@ -25,15 +25,25 @@ import AdminNotificationsPage from "./pages/AdminNotificationsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import CourseDetail from "./pages/CourseDetail";
 import FavoritesPage from "./pages/FavoritesPage";
+import AdminPage from "./pages/AdminPage";
+import AboutPage from "./pages/AboutPage";
 
 // Components
 import MainNav from "./components/MainNav";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import DevModeToggle from "./components/DevModeToggle";
+import Layout from "./components/Layout";
 
 // Create a client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // default: true
+      retry: 0,
+    },
+  },
+});
 
 // Error boundary component
 const ErrorBoundary = ({ children }) => {
@@ -90,127 +100,36 @@ function App() {
           <RoadmapProvider>
             <ErrorBoundary>
               <Router>
-                {/* Removed animated-bg-parent-container and animated-bg-shapes-container divs */}
-                <div className="relative flex min-h-screen flex-col font-sans antialiased">
-                  {" "}
-                  {/* This div might need adjustment if it was relying on the parent for certain layout properties, but likely fine. */}
-                  <MainNav />
-                  <div className="flex-1">
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/login" element={<LoginPage />} />
-                      <Route path="/register" element={<RegisterPage />} />
-                      <Route path="/roadmaps" element={<RoadmapsPage />} />
-                      <Route
-                        path="/roadmaps/:id"
-                        element={<RoadmapDetailPage />}
-                      />
-                      <Route
-                        path="/favorites"
-                        element={
-                          <ProtectedRoute>
-                            <FavoritesPage />
-                          </ProtectedRoute>
-                        }
-                      />
-
-                      {/* Course routes */}
-                      <Route
-                        path="/courses/:courseId"
-                        element={<CourseDetail />}
-                      />
-
-                      {/* Protected routes */}
-                      <Route
-                        path="/roadmaps/create"
-                        element={
-                          <ProtectedRoute>
-                            <CreateRoadmapPage />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/roadmaps/:id/edit"
-                        element={
-                          <ProtectedRoute>
-                            <RoadmapEditPage />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/profile"
-                        element={
-                          <ProtectedRoute>
-                            <ProfilePage />
-                          </ProtectedRoute>
-                        }
-                      />
-
-                      {/* Admin routes */}
-                      <Route
-                        path="/admin"
-                        element={
-                          <AdminRoute>
-                            <AdminDashboardPage />
-                          </AdminRoute>
-                        }
-                      />
-                      <Route
-                        path="/admin/skills"
-                        element={
-                          <AdminRoute>
-                            <AdminSkillsPage />
-                          </AdminRoute>
-                        }
-                      />
-                      <Route
-                        path="/admin/categories"
-                        element={
-                          <AdminRoute>
-                            <AdminCategoriesPage />
-                          </AdminRoute>
-                        }
-                      />
-                      <Route
-                        path="/admin/tags"
-                        element={
-                          <AdminRoute>
-                            <AdminTagsPage />
-                          </AdminRoute>
-                        }
-                      />
-                      <Route
-                        path="/admin/users"
-                        element={
-                          <AdminRoute>
-                            <AdminUsersPage />
-                          </AdminRoute>
-                        }
-                      />
-                      <Route
-                        path="/admin/notifications"
-                        element={
-                          <AdminRoute>
-                            <AdminNotificationsPage />
-                          </AdminRoute>
-                        }
-                      />
-
-                      {/* 404 page */}
-                      <Route path="*" element={<NotFoundPage />} />
-                    </Routes>
-                  </div>
-                  {/* Development mode toggle - only shown in dev environment */}
-                  <DevModeToggle />
-                </div>{" "}
-                {/* Closes "relative flex min-h-screen..." */}
-                <Toaster />
-                {/* Removed extra closing div here */}
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/roadmaps" element={<RoadmapsPage />} />
+                    <Route
+                      path="/roadmaps/:id"
+                      element={<RoadmapDetailPage />}
+                    />
+                    <Route
+                      path="/roadmaps/:id/edit"
+                      element={<RoadmapEditPage />}
+                    />
+                    <Route
+                      path="/roadmaps/create"
+                      element={<CreateRoadmapPage />}
+                    />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/favorites" element={<FavoritesPage />} />
+                    <Route path="/admin/*" element={<AdminPage />} />
+                    <Route path="/about" element={<AboutPage />} />
+                  </Routes>
+                </Layout>
               </Router>
             </ErrorBoundary>
           </RoadmapProvider>
         </ThemeProvider>
       </AuthProvider>
+      <Toaster />
     </QueryClientProvider>
   );
 }

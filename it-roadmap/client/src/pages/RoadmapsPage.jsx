@@ -5,16 +5,6 @@ import { PlusCircle, Trash2, Edit, Eye } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getRoadmaps, deleteRoadmap } from "../services/roadmapService";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "../components/ui/card";
-import { useEffect } from "react";
-import { typeText, scanLineEffect } from "../lib/animations";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -23,6 +13,29 @@ import {
   DialogTitle,
 } from "../components/ui/dialog";
 import { useToast } from "../components/ui/use-toast";
+
+// Language icons - these would be replaced with actual language icons in a production app
+const languageColors = {
+  html: "#E44D26",
+  css: "#264DE4",
+  javascript: "#F7DF1E",
+  python: "#306998",
+  java: "#007396",
+  csharp: "#68217A",
+  php: "#777BB4",
+  ruby: "#CC342D",
+  go: "#00ADD8",
+  swift: "#FA7343",
+  kotlin: "#7F52FF",
+  typescript: "#3178C6",
+  sql: "#00758F",
+  react: "#61DAFB",
+  angular: "#DD0031",
+  vue: "#4FC08D",
+  nodejs: "#339933",
+  mongodb: "#47A248",
+  git: "#F05032",
+};
 
 export default function RoadmapsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -99,164 +112,117 @@ export default function RoadmapsPage() {
     }
   };
 
-  useEffect(() => {
-    // Apply typing effect to page title
-    typeText(".roadmaps-title", null, 1000);
-
-  }, []);
+  // Top languages (similar to W3Schools top bar)
+  const topLanguages = [
+    "HTML",
+    "CSS",
+    "JAVASCRIPT",
+    "SQL",
+    "PYTHON",
+    "JAVA",
+    "PHP",
+    "HOW TO",
+    "C",
+    "C++",
+    "C#",
+    "BOOTSTRAP",
+    "REACT",
+    "MYSQL",
+    "JQUERY",
+    "EXCEL",
+    "XML",
+    "DJANGO",
+    "NODEJS",
+    "DSA",
+  ];
 
   return (
-    <main className="container mx-auto py-8 px-4">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h1
-            className="text-2xl font-semibold text-foreground roadmaps-title"
-            data-text="IT Learning Roadmaps" // data-text can remain if typeText uses it
-          >
-            IT Learning Roadmaps
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Browse and manage interactive learning paths for IT education
-          </p>
-        </div>
-        <Link to="/roadmaps/create">
-          <Button variant="default">
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Create New Roadmap
-          </Button>
-        </Link>
-      </div>
-
-      {isLoading ? (
-        <div className="text-center py-12 text-muted-foreground">
-          Loading roadmaps...
-        </div>
-      ) : error ? (
-        <div className="text-center py-12 text-destructive">
-          Error loading roadmaps: {error.message}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {roadmaps.map((roadmap) => (
-            <RoadmapCard
-              key={roadmap.id}
-              roadmap={roadmap}
-              onDelete={() => handleDeleteClick(roadmap)}
-            />
+    <div>
+      {/* Top language navigation bar */}
+      <div className="bg-secondary-color text-white text-sm overflow-x-auto whitespace-nowrap py-3 px-4">
+        <div className="container mx-auto">
+          {topLanguages.map((lang, index) => (
+            <a
+              key={index}
+              href="#"
+              className="inline-block mx-2 hover:text-green-300 transition-colors"
+            >
+              {lang}
+            </a>
           ))}
         </div>
-      )}
+      </div>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent> {/* Removed cyberpunk classes, default Dialog styling will apply */}
-          <DialogHeader>
-            <DialogTitle className="text-destructive"> {/* Removed font-cyber */}
-              Confirm Deletion
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground"> {/* Removed font-mono-cyber, text-gray-400 */}
-              Are you sure you want to delete the roadmap
-              <span className="text-accent font-semibold"> {/* Changed color, added font-semibold */}
-                {" "}
-                "{roadmapToDelete?.title}"
-              </span>
-              ? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="mt-6">
-            <Button
-              onClick={() => setDeleteDialogOpen(false)}
-              variant="outline"
-              // Removed cyberpunk classes
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={confirmDelete}
-              variant="destructive"
-              // Removed cyberpunk classes
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending ? "Deleting..." : "Delete"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </main>
-  );
-}
-
-function RoadmapCard({ roadmap, onDelete }) {
-  // Xử lý dữ liệu từ API server
-  const categoryName =
-    roadmap.category?.name ||
-    roadmap.categoryName ||
-    roadmap.category ||
-    "General";
-  const courseCount = roadmap.courseCount || 0;
-  const lastUpdated = roadmap.lastUpdated || roadmap.updatedAt || "New";
-
-  return (
-    <Card> {/* Removed cyberpunk-card, cyber-scan-effect, overflow-hidden, border classes, hover classes, transition */}
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div className="mb-2 text-xs bg-primary/10 text-primary py-0.5 px-2 rounded-full">
-            {categoryName}
+      <main className="container mx-auto py-8 px-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Role Based Roadmaps</h1>
+            <p className="text-muted-foreground mt-2">
+              Browse and follow interactive learning paths for IT education
+            </p>
           </div>
-          <div className="text-xs bg-muted text-muted-foreground py-0.5 px-2 rounded-full">
-            {courseCount} courses
+          <Link to="/roadmaps/create">
+            <Button className="bg-green-600 hover:bg-green-700">
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Create New Roadmap
+            </Button>
+          </Link>
+        </div>
+
+        {isLoading ? (
+          <div className="text-center py-12 text-muted-foreground learning-spinner mx-auto"></div>
+        ) : error ? (
+          <div className="text-center py-12 text-destructive">
+            Error loading roadmaps: {error.message}
           </div>
-        </div>
-        <CardTitle className="text-lg text-primary"> {/* Removed font-cyber, neon-text. Added text-primary */}
-          {roadmap.title}
-        </CardTitle>
-        <CardDescription className="line-clamp-2 text-muted-foreground"> {/* Removed font-mono-cyber. Ensured text-muted-foreground */}
-          {roadmap.description}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="pb-2">
-        <div className="flex items-center text-xs text-muted-foreground"> {/* Removed font-mono-cyber */}
-          <span>
-            Updated:{" "}
-            {typeof lastUpdated === "string"
-              ? lastUpdated
-              : new Date(lastUpdated).toLocaleDateString()}
-          </span>
-        </div>
-      </CardContent>
-      <CardFooter>
-        <div className="flex justify-between w-full">
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm"> {/* Removed btn-cyber */}
-              <Link to={`/roadmaps/${roadmap.id}`}>
-                <Eye className="h-4 w-4 mr-1" />
-                View
+        ) : (
+          <div className="roadmap-grid">
+            {roadmaps.map((roadmap, index) => (
+              <Link
+                key={roadmap.id}
+                to={`/roadmaps/${roadmap.id}`}
+                className={`roadmap-item learning-card-effect`}
+              >
+                {roadmap.title}
               </Link>
-            </Button>
-            <Button
-              asChild
-              variant="default" // Can also be "outline" if preferred
-              size="sm"
-              // Removed btn-cyber-yellow
-            >
-              <Link to={`/roadmaps/${roadmap.id}/edit`}>
-                <Edit className="h-4 w-4 mr-1" />
-                Edit
-              </Link>
-            </Button>
+            ))}
           </div>
-          <Button
-            variant="destructive" // Can also be "outline" with destructive text
-            size="sm"
-            // Removed btn-cyber-pink
-            onClick={onDelete}
-          >
-            <Trash2 className="h-4 w-4 mr-1" />
-            Delete
-          </Button>
-        </div>
-      </CardFooter>
-      {/* Removed bottom gradient line div */}
-    </Card>
+        )}
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-destructive">
+                Confirm Deletion
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                Are you sure you want to delete the roadmap
+                <span className="text-accent font-semibold">
+                  {" "}
+                  "{roadmapToDelete?.title}"
+                </span>
+                ? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-6">
+              <Button
+                onClick={() => setDeleteDialogOpen(false)}
+                variant="outline"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={confirmDelete}
+                variant="destructive"
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? "Deleting..." : "Delete"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </main>
+    </div>
   );
 }
