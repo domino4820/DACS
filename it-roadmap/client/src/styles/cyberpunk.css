@@ -1,0 +1,344 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap");
+
+:root {
+  /* Base colors */
+  --background: 240 18% 8%;
+  --foreground: 210 40% 98%;
+
+  /* Cyberpunk theme */
+  --primary: 294 100% 50%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 183 100% 50%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 240 10% 20%;
+  --muted-foreground: 240 5% 80%;
+
+  --accent: 58 100% 50%;
+  --accent-foreground: 0 0% 0%;
+
+  --destructive: 346 100% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  --card: 240 25% 10%;
+  --card-foreground: 210 40% 98%;
+
+  --border: 240 20% 20%;
+  --input: 240 15% 18%;
+
+  /* Font settings */
+  --font-cyber: "Orbitron", "Rajdhani", "Roboto", sans-serif;
+  --font-mono: "Share Tech Mono", monospace;
+}
+
+/* Global styles for cyberpunk theme */
+body {
+  background-color: #0d0e19;
+  background-image: radial-gradient(
+      circle at 50% 50%,
+      rgba(0, 246, 255, 0.08),
+      transparent 80%
+    ),
+    linear-gradient(180deg, #070814 0%, #0d0e19 100%);
+  background-attachment: fixed;
+  font-family: "Rajdhani", sans-serif;
+  color: white;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Noise overlay for gritty effect */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/png;base64,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");
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Scan line effect */
+body::before {
+  content: none;
+  display: none;
+}
+
+/* Cyberpunk button */
+.btn-cyber {
+  position: relative;
+  background: transparent;
+  border: 2px solid #00f6ff;
+  color: #00f6ff;
+  font-family: "Orbitron", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  overflow: hidden;
+  transition: 0.3s;
+  z-index: 1;
+}
+
+.btn-cyber::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: rgba(0, 246, 255, 0.2);
+  z-index: -1;
+  transition: 0.3s ease-in-out;
+}
+
+.btn-cyber:hover {
+  color: white;
+  text-shadow: 0 0 5px #00f6ff, 0 0 10px #00f6ff;
+  box-shadow: 0 0 5px rgba(0, 246, 255, 0.5), 0 0 10px rgba(0, 246, 255, 0.3);
+}
+
+.btn-cyber:hover::before {
+  width: 100%;
+}
+
+/* Neon text */
+.neon-text {
+  color: #fff;
+  text-shadow: 0 0 5px #00f6ff, 0 0 10px #00f6ff, 0 0 20px #00f6ff;
+  animation: neon-pulse 1.5s infinite alternate;
+}
+
+.neon-text-pink {
+  color: #fff;
+  text-shadow: 0 0 5px #f700ff, 0 0 10px #f700ff, 0 0 20px #f700ff;
+  animation: neon-pulse 2s infinite alternate;
+}
+
+.neon-text-yellow {
+  color: #fff;
+  text-shadow: 0 0 5px #ffde00, 0 0 10px #ffde00, 0 0 20px #ffde00;
+  animation: neon-pulse 2.5s infinite alternate;
+}
+
+/* Neon borders */
+.neon-border {
+  border: 2px solid #00f6ff;
+  box-shadow: 0 0 5px #00f6ff, inset 0 0 5px #00f6ff;
+}
+
+.neon-border-pink {
+  border: 2px solid #f700ff;
+  box-shadow: 0 0 5px #f700ff, inset 0 0 5px #f700ff;
+}
+
+.neon-border-yellow {
+  border: 2px solid #ffde00;
+  box-shadow: 0 0 5px #ffde00, inset 0 0 5px #ffde00;
+}
+
+/* Glitch text effect */
+.glitch-text {
+  position: relative;
+  animation: text-glitch 3s infinite;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch-text::before {
+  left: 2px;
+  text-shadow: -2px 0 #f700ff;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim-1 5s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+  left: -2px;
+  text-shadow: -2px 0 #00f6ff;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim-2 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+  0% {
+    clip-path: inset(40% 0 61% 0);
+  }
+  20% {
+    clip-path: inset(92% 0 1% 0);
+  }
+  40% {
+    clip-path: inset(43% 0 1% 0);
+  }
+  60% {
+    clip-path: inset(25% 0 58% 0);
+  }
+  80% {
+    clip-path: inset(54% 0 7% 0);
+  }
+  100% {
+    clip-path: inset(58% 0 43% 0);
+  }
+}
+
+@keyframes glitch-anim-2 {
+  0% {
+    clip-path: inset(69% 0 10% 0);
+  }
+  20% {
+    clip-path: inset(14% 0 31% 0);
+  }
+  40% {
+    clip-path: inset(66% 0 25% 0);
+  }
+  60% {
+    clip-path: inset(95% 0 5% 0);
+  }
+  80% {
+    clip-path: inset(24% 0 26% 0);
+  }
+  100% {
+    clip-path: inset(87% 0 6% 0);
+  }
+}
+
+/* Card with neon effect */
+.cyberpunk-card {
+  background-color: rgba(13, 14, 25, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 246, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 246, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.cyberpunk-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00f6ff, transparent);
+  animation: neon-pulse 2s infinite;
+}
+
+/* Flicker animation for neon elements */
+@keyframes flicker {
+  0%,
+  19.999%,
+  22%,
+  62.999%,
+  64%,
+  64.999%,
+  70%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 5px #00f6ff, 0 0 10px #00f6ff, 0 0 20px #00f6ff;
+  }
+  20%,
+  21.999%,
+  63%,
+  63.999%,
+  65%,
+  69.999% {
+    opacity: 0.4;
+    text-shadow: none;
+  }
+}
+
+/* Gundam/mecha inspired element */
+.mecha-panel {
+  background-color: #151934;
+  border: 2px solid #ffde00;
+  position: relative;
+  padding: 1.5rem;
+  transform: skew(-5deg);
+  box-shadow: inset 0 0 10px rgba(255, 222, 0, 0.3);
+}
+
+.mecha-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    transparent 48%,
+    #ffde00 49%,
+    #ffde00 51%,
+    transparent 52%
+  );
+  opacity: 0.2;
+}
+
+.mecha-panel-title {
+  font-family: "Orbitron", sans-serif;
+  text-transform: uppercase;
+  color: #ffde00;
+  letter-spacing: 2px;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 5px rgba(255, 222, 0, 0.7);
+}
+
+/* Terminal/console style for text areas */
+.cyber-console {
+  background-color: #070814;
+  color: #0fff50;
+  font-family: "Share Tech Mono", monospace;
+  border: 1px solid #0fff50;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(15, 255, 80, 0.3),
+    inset 0 0 10px rgba(15, 255, 80, 0.1);
+}
+
+.cyber-console::before {
+  content: "> ";
+  color: #0fff50;
+}
+
+/* Keyframes for animations */
+@keyframes scan-line {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scaleX(0.75);
+  }
+}
+
+@keyframes neon-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}

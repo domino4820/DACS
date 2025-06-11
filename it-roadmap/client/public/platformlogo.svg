@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="340" height="50" viewBox="0 0 340 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- 
+        Logo Hutech.IO - Phong cách LeetCode (Mẫu 4)
+        Font sử dụng: 'Roboto Mono', monospace
+        Màu chữ Hutech: #FFFFFF (Trắng)
+        Màu chữ .IO: #FBBF24 (Vàng)
+    -->
+    <title>Logo Hutech.IO</title>
+    <g id="Logo" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" font-family="'Roboto Mono', monospace" font-size="40" font-weight="bold">
+        <!-- Phần chữ "Hutech" màu trắng -->
+        <text id="Hutech" fill="#FFFFFF">
+            <tspan x="0" y="40">Hutech</tspan>
+        </text>
+        <!-- Phần ".IO" màu vàng -->
+        <text id=".IO" fill="#FBBF24">
+            <tspan x="185" y="40">.IO</tspan>
+        </text>
+    </g>
+</svg>

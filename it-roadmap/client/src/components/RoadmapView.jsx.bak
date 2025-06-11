@@ -1,0 +1,980 @@
+"use client";
+
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
+import ReactFlow, {
+  MiniMap,
+  Controls,
+  Background,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  Panel,
+  ReactFlowProvider,
+  useReactFlow,
+  MarkerType,
+  Connection,
+} from "reactflow";
+import "reactflow/dist/style.css";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { Button } from "./ui/button";
+import { useToast } from "./ui/use-toast";
+import {
+  PlusCircle,
+  Save,
+  Trash,
+  Plus,
+  X,
+  Link as LinkIcon,
+  LinkOff,
+  Palette,
+} from "lucide-react";
+import CourseNode from "./CourseNode";
+import CourseInfoPanel from "./CourseInfoPanel";
+import AddCourseDialog from "./AddCourseDialog";
+import RoadmapEditorPanel from "./RoadmapEditorPanel";
+
+// Định nghĩa nodeTypes bên ngoài component để tránh tạo lại mỗi lần render
+const nodeTypes = {
+  courseNode: CourseNode,
+};
+
+const RoadmapViewInner = forwardRef(
+  (
+    {
+      id,
+      initialNodes = [],
+      initialEdges = [],
+      isEditing = false,
+      readOnly = false,
+      onSave,
+      onInternalUpdate,
+    },
+    ref
+  ) => {
+    const { toast } = useToast();
+    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const [selectedNode, setSelectedNode] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState("all");
+    const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
+    const [editMode, setEditMode] = useState("select"); // select, connect, add, delete
+    const [connectionType, setConnectionType] = useState("arrow"); // arrow, none
+    const [showEditorPanel, setShowEditorPanel] = useState(true);
+    const reactFlowWrapper = useRef(null);
+    const reactFlowInstance = useReactFlow();
+    const [undoStack, setUndoStack] = useState([]);
+    const [redoStack, setRedoStack] = useState([]);
+    const isInitialMount = useRef(true);
+    // Keep track of manually added nodes to prevent them from being lost
+    const addedNodesRef = useRef([]);
+
+    // Define handleCompleteToggle before it's used
+    const handleCompleteToggle = useCallback(
+      (nodeId, completed) => {
+        if (readOnly) return;
+
+        // Get the current timestamp
+        const completedAt = completed ? new Date().toISOString() : null;
+
+        setNodes((nds) =>
+          nds.map((node) => {
+            if (node.id === nodeId) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  completed,
+                  completedAt,
+                },
+              };
+            }
+            return node;
+          })
+        );
+
+        toast({
+          title: completed
+            ? "Course marked as completed"
+            : "Course marked as incomplete",
+          description: `You've ${completed ? "completed" : "unmarked"} ${
+            nodes.find((n) => n.id === nodeId)?.data.label
+          }`,
+        });
+      },
+      [nodes, setNodes, toast, readOnly]
+    );
+
+    // Save current state for undo feature
+    const saveCurrentState = useCallback(() => {
+      setUndoStack((prev) => [
+        ...prev,
+        { nodes: [...nodes], edges: [...edges] },
+      ]);
+      setRedoStack([]);
+    }, [nodes, edges]);
+
+    // Define saveChanges before it's used by any other function
+    const saveChanges = useCallback(() => {
+      if (!onSave) return;
+
+      try {
+        console.log("[VIEW] Preparing to save changes");
+        console.log("[VIEW] Current nodes count:", nodes.length);
+        console.log("[VIEW] Current edges count:", edges.length);
+
+        // Ensure all nodes have required properties
+        const cleanedNodes = nodes.map((node) => {
+          // Create a clean copy of the node without React references
+          return {
+            id: node.id,
+            type: node.type || "courseNode",
+            position: {
+              x: node.position?.x || 0,
+              y: node.position?.y || 0,
+            },
+            // Extract only the data we need from node.data
+            data: {
+              label: node.data?.label || "",
+              id: node.id,
+              code: node.data?.code || "",
+              description: node.data?.description || "",
+              completed: node.data?.completed || false,
+              completedAt: node.data?.completedAt || null,
+              documents: node.data?.documents || [],
+              courseId: node.data?.courseId,
+              nodeColor: node.data?.nodeColor,
+              nodeBgColor: node.data?.nodeBgColor,
+              textColor: node.data?.textColor,
+              fontSize: node.data?.fontSize,
+            },
+          };
+        });
+
+        // Remove any invalid edges
+        const nodeIdMap = new Set(cleanedNodes.map((node) => node.id));
+
+        // Lọc bỏ các edges không hợp lệ
+        const validEdges = edges.filter((edge) => {
+          if (!edge || !edge.id || !edge.source || !edge.target) {
+            console.warn(
+              "[VIEW] Skipping invalid edge missing id/source/target"
+            );
+            return false;
+          }
+          return true;
+        });
+
+        // Clean edges - make sure they connect to existing nodes
+        const cleanedEdges = validEdges
+          .filter((edge) => {
+            // Check if source and target nodes exist
+            const sourceExists = nodeIdMap.has(edge.source);
+            const targetExists = nodeIdMap.has(edge.target);
+
+            if (!sourceExists || !targetExists) {
+              console.warn(
+                `[VIEW] Removing invalid edge - Source exists: ${sourceExists}, Target exists: ${targetExists}`,
+                edge
+              );
+              return false;
+            }
+            return true;
+          })
+          .map((edge) => {
+            // Tạo một edge sạch không chứa các tham chiếu React/DOM
+            return {
+              id: edge.id,
+              source: edge.source,
+              target: edge.target,
+              type: edge.type || "smoothstep",
+              animated: edge.animated || false,
+              sourceHandle: edge.sourceHandle || null,
+              targetHandle: edge.targetHandle || null,
+              style: edge.style ? { ...edge.style } : { stroke: "#999" },
+              data: {
+                connectionType: edge.data?.connectionType || "arrow",
+              },
+            };
+          });
+
+        console.log("[VIEW] Cleaned nodes count:", cleanedNodes.length);
+        console.log("[VIEW] Cleaned edges count:", cleanedEdges.length);
+
+        // Debug: kiểm tra kiểu dữ liệu trước khi gọi callback
+        console.log(
+          "[VIEW] Cleaned nodes type:",
+          Array.isArray(cleanedNodes) ? "Array" : typeof cleanedNodes
+        );
+        console.log(
+          "[VIEW] Cleaned edges type:",
+          Array.isArray(cleanedEdges) ? "Array" : typeof cleanedEdges
+        );
+        console.log("[VIEW] First node in cleaned array:", cleanedNodes[0]);
+
+        // Đảm bảo dữ liệu luôn là mảng
+        const finalNodes = Array.isArray(cleanedNodes) ? cleanedNodes : [];
+        const finalEdges = Array.isArray(cleanedEdges) ? cleanedEdges : [];
+
+        // Gọi callback để lưu dữ liệu đã được làm sạch
+        console.log(
+          "[VIEW] Calling onSave with:",
+          finalNodes.length,
+          "nodes and",
+          finalEdges.length,
+          "edges"
+        );
+        onSave(finalNodes, finalEdges);
+      } catch (error) {
+        console.error("[VIEW] Error preparing data for save:", error);
+        toast({
+          title: "Lỗi khi chuẩn bị dữ liệu",
+          description: "Không thể chuẩn bị dữ liệu để lưu. Vui lòng thử lại.",
+          variant: "destructive",
+        });
+      }
+    }, [nodes, edges, onSave, toast]);
+
+    const onConnect = useCallback(
+      (params) => {
+        if (readOnly) return false;
+
+        console.log("[CONNECT] Creating new connection:", params);
+
+        // Save existing state for potential undo
+        saveCurrentState();
+
+        // Generate unique ID for edge
+        const newEdgeId = `edge-${Date.now()}-${Math.floor(
+          Math.random() * 1000000
+        )}`;
+
+        // Create edge with appropriate styling
+        const newEdge = {
+          ...params,
+          id: newEdgeId,
+          type: "smoothstep",
+          animated: false,
+          style: { stroke: "#6d28d9", strokeWidth: 2 },
+          data: {
+            connectionType: connectionType,
+          },
+        };
+
+        console.log("[CONNECT] New edge created:", newEdge);
+
+        // Add edge to state
+        setEdges((eds) => {
+          const updatedEdges = addEdge(newEdge, eds);
+          console.log(
+            "[CONNECT] Updated edges, new count:",
+            updatedEdges.length
+          );
+          return updatedEdges;
+        });
+
+        // Show confirmation
+        toast({
+          title: "Connection created",
+          description: "A new connection has been added to the roadmap",
+        });
+
+        // Save changes immediately if we're in edit mode to prevent loss
+        if (isEditing && onSave) {
+          console.log("[CONNECT] Auto-saving changes after adding edge");
+          setTimeout(() => {
+            saveChanges();
+          }, 500);
+        }
+
+        return true;
+      },
+      [
+        connectionType,
+        readOnly,
+        setEdges,
+        saveCurrentState,
+        toast,
+        isEditing,
+        onSave,
+        saveChanges,
+      ]
+    );
+
+    // Set initial nodes and edges when they change
+    useEffect(() => {
+      // Skip effect if no initial data
+      if (!initialNodes?.length && !initialEdges?.length) {
+        return;
+      }
+
+      // Only run once during initial mount to avoid re-render cycles
+      if (isInitialMount.current) {
+        console.log("[FLOW] Initial setup with nodes:", initialNodes?.length);
+
+        if (initialNodes?.length > 0) {
+          // Process nodes once with required properties for display
+          const processedNodes = initialNodes.map((node) => ({
+            ...node,
+            type: "courseNode",
+            position: node.position || {
+              x: Math.random() * 500,
+              y: Math.random() * 300,
+            },
+            data: {
+              ...node.data,
+              showQuickToggle: true,
+              onQuickToggle: handleCompleteToggle,
+              label: node.data?.label || "Untitled Node",
+            },
+          }));
+
+          // Initialize with the processed nodes
+          setNodes(processedNodes);
+          // Store initial nodes in our ref for tracking
+          addedNodesRef.current = [...processedNodes];
+        }
+
+        // Process edges only after nodes are set
+        if (initialEdges?.length > 0) {
+          console.log("[FLOW] Setting initial edges:", initialEdges.length);
+
+          // Create a map of node IDs for quick lookup
+          const nodeMap = new Map(initialNodes.map((node) => [node.id, node]));
+
+          // Validate edges against existing nodes to ensure they connect to valid nodes
+          const validEdges = initialEdges.filter((edge) => {
+            // Check that both source and target nodes exist
+            const sourceExists = nodeMap.has(edge.source);
+            const targetExists = nodeMap.has(edge.target);
+
+            if (!sourceExists || !targetExists) {
+              console.warn(
+                `[FLOW] Skipping invalid edge: Source exists: ${sourceExists}, Target exists: ${targetExists}`,
+                edge
+              );
+              return false;
+            }
+            return true;
+          });
+
+          // Log the handle positions found in the data
+          console.log(
+            "[FLOW] Edge handle data:",
+            validEdges.map((edge) => ({
+              id: edge.id,
+              sourceHandle: edge.sourceHandle || edge.data?.sourceHandle,
+              targetHandle: edge.targetHandle || edge.data?.targetHandle,
+            }))
+          );
+
+          // Process edges with additional data
+          const processedEdges = validEdges.map((edge) => {
+            // Extract handle information from wherever it might be stored
+            const sourceHandle =
+              edge.sourceHandle || edge.data?.sourceHandle || null;
+            const targetHandle =
+              edge.targetHandle || edge.data?.targetHandle || null;
+
+            // Generate a consistent ID based on all connection points
+            const edgeId =
+              edge.id ||
+              `edge-${edge.source}-${sourceHandle || "default"}-${
+                edge.target
+              }-${targetHandle || "default"}`;
+
+            return {
+              ...edge,
+              // Ensure edge has required properties
+              id: edgeId,
+              type: edge.type || "smoothstep",
+              animated: edge.animated !== undefined ? edge.animated : true,
+              style: edge.style || { stroke: "hsl(var(--muted-foreground))" },
+              // Ensure handle positions are preserved
+              sourceHandle: sourceHandle,
+              targetHandle: targetHandle,
+              // Add class names for CSS targeting
+              className: `custom-edge source-${
+                sourceHandle || "default"
+              } target-${targetHandle || "default"}`,
+              // Store explicit connection information in data
+              data: {
+                ...(edge.data || {}),
+                sourceId: edge.source,
+                targetId: edge.target,
+                // Store handle positions in data for redundancy
+                sourceHandle: sourceHandle,
+                targetHandle: targetHandle,
+                // Store handle types for better visualization
+                sourceHandleType: sourceHandle || "default",
+                targetHandleType: targetHandle || "default",
+                connectionType: edge.data?.connectionType || "arrow",
+              },
+              // Ensure markerEnd if using arrow type
+              ...(!edge.markerEnd &&
+                edge.data?.connectionType !== "none" && {
+                  markerEnd: {
+                    type: MarkerType.ArrowClosed,
+                    width: 20,
+                    height: 20,
+                    color: "hsl(var(--primary))",
+                  },
+                }),
+            };
+          });
+
+          console.log("[FLOW] Processed edges:", processedEdges.length);
+          setEdges(processedEdges);
+        }
+
+        // Mark as initialized to prevent future re-processing
+        isInitialMount.current = false;
+      }
+    }, [initialNodes, initialEdges, setNodes, setEdges, handleCompleteToggle]);
+
+    // Update parent component with internal changes - optimized for fewer updates
+    useEffect(() => {
+      // Skip during initial render or if no update function provided
+      if (isInitialMount.current || !onInternalUpdate) return;
+
+      // Use a debounce to avoid too frequent updates
+      const timer = setTimeout(() => {
+        console.log(`[FLOW] Debounced parent update: ${nodes.length} nodes`);
+        onInternalUpdate(nodes, edges);
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }, [nodes, edges, onInternalUpdate]);
+
+    // Simplify the node preservation effect
+    useEffect(() => {
+      if (addedNodesRef.current.length > 0 && nodes.length === 0) {
+        // Only restore if we've lost ALL nodes (prevents loops)
+        console.log("[FLOW] Lost all nodes, restoring from ref");
+        setNodes(addedNodesRef.current);
+      }
+    }, [nodes.length, setNodes]);
+
+    const onNodeClick = useCallback(
+      (event, node) => {
+        event.stopPropagation();
+
+        if (editMode === "delete") {
+          // Delete mode: remove the node
+          saveCurrentState();
+          setNodes(nodes.filter((n) => n.id !== node.id));
+          // Also remove any connected edges
+          setEdges(
+            edges.filter((e) => e.source !== node.id && e.target !== node.id)
+          );
+
+          toast({
+            title: "Node deleted",
+            description: `${node.data.label} has been removed from the roadmap`,
+          });
+        } else if (editMode === "connect" && selectedNode) {
+          // Connect mode: create an edge between selectedNode and this node
+          if (selectedNode.id !== node.id) {
+            const newEdge = {
+              id: `edge-${Date.now()}`,
+              source: selectedNode.id,
+              target: node.id,
+              type: "smoothstep",
+              animated: true,
+              style: { stroke: "hsl(var(--muted-foreground))" },
+              ...(connectionType === "arrow" && {
+                markerEnd: {
+                  type: MarkerType.ArrowClosed,
+                  width: 20,
+                  height: 20,
+                  color: "hsl(var(--primary))",
+                },
+              }),
+              data: {
+                connectionType,
+              },
+            };
+
+            saveCurrentState();
+            setEdges((eds) => [...eds, newEdge]);
+            setSelectedNode(null);
+            setEditMode("select");
+
+            toast({
+              title: "Connection created",
+              description: `Connected ${selectedNode.data.label} to ${node.data.label}`,
+            });
+          }
+        } else if (editMode === "select") {
+          // Regular select mode: show node details
+          setSelectedNode(node);
+        }
+      },
+      [
+        editMode,
+        selectedNode,
+        nodes,
+        edges,
+        setNodes,
+        setEdges,
+        saveCurrentState,
+        toast,
+      ]
+    );
+
+    const onPaneClick = useCallback(() => {
+      // In regular mode, clicking the pane should deselect the node
+      setSelectedNode(null);
+
+      // If in connect mode but no node selected, return to select mode
+      if (editMode === "connect" && selectedNode) {
+        setEditMode("select");
+        setSelectedNode(null);
+        toast({
+          title: "Connection cancelled",
+          description: "Node connection has been cancelled",
+        });
+      }
+    }, [editMode, selectedNode, toast]);
+
+    // Update node positions when they are dragged
+    const onNodeDragStop = useCallback(() => {
+      if (isEditing) {
+        saveCurrentState();
+      }
+    }, [isEditing, saveCurrentState]);
+
+    // Handle category filtering
+    const filteredNodes = useCallback(() => {
+      if (selectedCategory === "all") {
+        return nodes;
+      }
+      return nodes.filter(
+        (node) =>
+          node.data.category?.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }, [nodes, selectedCategory]);
+
+    const handleStyleChange = useCallback(
+      (styles) => {
+        // Apply styles to selected node or default edge options
+        if (selectedNode) {
+          handleCompleteToggle(selectedNode.id, styles.nodeStyle.completed);
+        }
+
+        // Update default edge options
+        // (would be implemented in a full version)
+      },
+      [selectedNode, handleCompleteToggle]
+    );
+
+    const handleConnectionTypeChange = useCallback((type) => {
+      setConnectionType(type);
+    }, []);
+
+    // Ngăn chặn cảnh báo ResizeObserver
+    useEffect(() => {
+      // Chỉ áp dụng trong môi trường phát triển
+      if (process.env.NODE_ENV !== "production") {
+        // Instead of suppressing errors, let's implement a proper fix
+        let resizeObserverLoopErrCount = 0;
+        const debouncedResizeObserverCallback = debounce(() => {
+          resizeObserverLoopErrCount = 0;
+        }, 200);
+
+        const originalError = console.error;
+        console.error = (...args) => {
+          if (
+            args[0]?.includes?.("ResizeObserver loop") ||
+            args[0]?.message?.includes?.("ResizeObserver loop")
+          ) {
+            // Increment counter and invoke debounced callback
+            resizeObserverLoopErrCount += 1;
+            if (resizeObserverLoopErrCount <= 1) {
+              debouncedResizeObserverCallback();
+            }
+            // Suppress the error
+            return;
+          }
+          originalError.apply(console, args);
+        };
+
+        return () => {
+          console.error = originalError;
+        };
+      }
+
+      // Helper function for debounce
+      function debounce(fn, delay) {
+        let timeoutId;
+        return function () {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => fn.apply(this, arguments), delay);
+        };
+      }
+    }, []);
+
+    // Optimize edge rendering and enhance edge interaction
+    useEffect(() => {
+      // Configure ReactFlow for improved edge connection
+      const reactFlowEl = document.querySelector(".react-flow");
+      if (reactFlowEl) {
+        // Add custom class for better edge interaction
+        reactFlowEl.classList.add("improved-edge-connection");
+      }
+
+      return () => {
+        if (reactFlowEl) {
+          reactFlowEl.classList.remove("improved-edge-connection");
+        }
+      };
+    }, []);
+
+    // Ensure nodes are visible in the viewport
+    useEffect(() => {
+      if (!isInitialMount.current && nodes.length > 0 && reactFlowInstance) {
+        // Wait for rendering to complete, then fit view
+        const timeoutId = setTimeout(() => {
+          console.log("[FLOW] Fitting view to ensure nodes are visible");
+          reactFlowInstance.fitView({
+            padding: 0.5,
+            includeHiddenNodes: true,
+            minZoom: 0.5,
+            maxZoom: 1.5,
+          });
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+      }
+    }, [nodes.length, reactFlowInstance]);
+
+    // Add a debug useEffect to log whenever nodes change
+    useEffect(() => {
+      if (nodes.length > 0) {
+        console.log("[FLOW] Nodes changed, current count:", nodes.length);
+      }
+    }, [nodes]);
+
+    // Cleanup on unmount to prevent memory leaks
+    useEffect(() => {
+      return () => {
+        // Clear any timeouts that might be pending
+        const viewportEl = document.querySelector(".react-flow__viewport");
+        if (viewportEl) {
+          viewportEl.style.transitionProperty = "";
+          viewportEl.style.transitionDuration = "";
+        }
+
+        console.log("[FLOW] Component unmounting, performing cleanup");
+      };
+    }, []);
+
+    // Add special effect to prevent excessive console logging during development
+    useEffect(() => {
+      if (process.env.NODE_ENV === "development") {
+        const originalConsoleLog = console.log;
+        const flowLogPattern = /^\[FLOW\]/;
+
+        // Filter out excessive flow logs in development
+        console.log = (...args) => {
+          if (typeof args[0] === "string" && flowLogPattern.test(args[0])) {
+            // Only log important flow messages or when explicitly debugging
+            if (
+              args[0].includes("error") ||
+              args[0].includes("Creating") ||
+              args[0].includes("deleted")
+            ) {
+              originalConsoleLog.apply(console, args);
+            }
+          } else {
+            originalConsoleLog.apply(console, args);
+          }
+        };
+
+        return () => {
+          console.log = originalConsoleLog;
+        };
+      }
+    }, []);
+
+    // Expose methods to parent component through ref
+    useImperativeHandle(
+      ref,
+      () => ({
+        saveChanges,
+      }),
+      [saveChanges]
+    );
+
+    return (
+      <div ref={reactFlowWrapper} className="h-full w-full">
+        {isEditing && showEditorPanel && (
+          <Panel position="right" className="w-72 mr-2">
+            <RoadmapEditorPanel
+              onStyleChange={handleStyleChange}
+              onConnectionTypeChange={handleConnectionTypeChange}
+              activeEdgeStyle={connectionType}
+              editMode={editMode}
+              onEditModeChange={(mode) => {
+                setEditMode(mode);
+                if (mode === "connect") {
+                  toast({
+                    title: "Connect mode",
+                    description:
+                      "Click on a source node, then click on a target node to create a connection",
+                  });
+                } else if (mode === "delete") {
+                  toast({
+                    title: "Delete mode",
+                    description: "Click on a node or connection to delete it",
+                  });
+                }
+              }}
+              onAddNodeClick={() => setIsAddCourseOpen(true)}
+            />
+          </Panel>
+        )}
+
+        {isEditing && (
+          <Panel
+            position="top-right"
+            className="bg-card p-3 rounded-sm border border-[hsl(var(--border))] shadow-md mb-4" // Updated Panel classes, kept mr-[300px] for now
+          >
+            <div className="flex gap-2 justify-end">
+              <Button
+                size="sm"
+                variant="outline" // Changed to variant
+                onClick={() => {
+                  handleUndo();
+                }}
+                disabled={undoStack.length === 0}
+              >
+                Undo
+              </Button>
+              <Button
+                size="sm"
+                variant="outline" // Changed to variant
+                onClick={() => {
+                  handleRedo();
+                }}
+                disabled={redoStack.length === 0}
+              >
+                Redo
+              </Button>
+              <Button
+                variant="default" // Changed to variant
+                size="sm"
+                onClick={saveChanges}
+              >
+                <Save className="h-4 w-4 mr-1" /> Save
+              </Button>
+            </div>
+          </Panel>
+        )}
+
+        <div className="h-full">
+          <ReactFlow
+            key={`flow-${id}-${nodes.length}`}
+            nodes={filteredNodes()}
+            edges={edges}
+            onNodesChange={isEditing ? onNodesChange : undefined}
+            onEdgesChange={isEditing ? onEdgesChange : undefined}
+            onConnect={isEditing ? onConnect : undefined}
+            onNodeClick={onNodeClick}
+            onEdgeClick={() => {}}
+            onPaneClick={onPaneClick}
+            nodeTypes={nodeTypes}
+            onNodeDragStop={onNodeDragStop}
+            nodesDraggable={isEditing}
+            nodesConnectable={isEditing && editMode === "connect"}
+            elementsSelectable={!readOnly}
+            defaultEdgeOptions={{
+              type: "smoothstep",
+              style: { stroke: "hsl(var(--muted-foreground))" }, // Updated stroke color
+              animated: true,
+              ...(connectionType === "arrow" && {
+                markerEnd: {
+                  type: MarkerType.ArrowClosed,
+                  width: 20,
+                  height: 20,
+                  color: "hsl(var(--primary))", // Updated marker color
+                },
+              }),
+              data: {
+                connectionType,
+              },
+            }}
+            fitView
+            fitViewOptions={{
+              padding: 0.5,
+              includeHiddenNodes: true,
+              minZoom: 0.5,
+              maxZoom: 1.5,
+            }}
+            minZoom={0.2}
+            maxZoom={4}
+            snapToGrid={true}
+            snapGrid={[10, 10]}
+            nodeExtent={[
+              [-2000, -2000],
+              [2000, 2000],
+            ]}
+            proOptions={{ hideAttribution: true }}
+            disableKeyboardA11y={true}
+            autoPanOnNodeDrag={false}
+            elevateEdgesOnSelect={false}
+            onInit={(instance) => {
+              // Use setTimeout to ensure proper initialization
+              setTimeout(() => {
+                if (nodes.length > 0) {
+                  instance.fitView({ padding: 0.5 });
+                  console.log(
+                    "[FLOW] Flow initialized with nodes:",
+                    nodes.length
+                  );
+                }
+              }, 300);
+            }}
+            // Add custom edge rendering to set data attributes based on handle positions
+            edgeUpdaterRadius={10}
+            edgesUpdatable={true}
+            edgesFocusable={true}
+            onEdgeUpdate={(oldEdge, newConnection) => {
+              setEdges((els) =>
+                els.map((edge) => {
+                  if (edge.id === oldEdge.id) {
+                    // Generate new ID based on new connection points
+                    const newId = `edge-${newConnection.source}-${
+                      newConnection.sourceHandle || "default"
+                    }-${newConnection.target}-${
+                      newConnection.targetHandle || "default"
+                    }`;
+                    return {
+                      ...edge,
+                      id: newId,
+                      source: newConnection.source,
+                      target: newConnection.target,
+                      sourceHandle: newConnection.sourceHandle,
+                      targetHandle: newConnection.targetHandle,
+                      data: {
+                        ...edge.data,
+                        sourceId: newConnection.source,
+                        targetId: newConnection.target,
+                        sourceHandle: newConnection.sourceHandle,
+                        targetHandle: newConnection.targetHandle,
+                        sourceHandleType:
+                          newConnection.sourceHandle || "default",
+                        targetHandleType:
+                          newConnection.targetHandle || "default",
+                      },
+                    };
+                  }
+                  return edge;
+                })
+              );
+              return true;
+            }}
+          >
+            <Controls />
+            <MiniMap nodeStrokeWidth={3} zoomable pannable />
+            <Background
+              variant="dots"
+              gap={12}
+              size={1}
+              color="hsl(var(--border))"
+            />{" "}
+            {/* Updated Background color */}
+            {/* Add custom edge styles for colored connections */}
+            {edges.map((edge) => (
+              <div key={`handle-${edge.id}`} style={{ display: "none" }}>
+                <div
+                  data-edgeid={edge.id}
+                  data-sourcehandle={edge.sourceHandle || "default"}
+                  data-targethandle={edge.targetHandle || "default"}
+                />
+              </div>
+            ))}
+          </ReactFlow>
+        </div>
+
+        {selectedNode && (
+          <CourseInfoPanel
+            node={selectedNode}
+            onClose={() => setSelectedNode(null)}
+            onCompleteToggle={handleCompleteToggle}
+            onDelete={isEditing ? () => {} : undefined}
+            onUpdateStyle={(style) => {
+              handleCompleteToggle(selectedNode.id, style.completed);
+            }}
+            isAdmin={isEditing}
+            readOnly={readOnly}
+          />
+        )}
+
+        {isAddCourseOpen && (
+          <AddCourseDialog
+            open={isAddCourseOpen}
+            onClose={() => setIsAddCourseOpen(false)}
+            onAdd={(courseData) => {
+              saveCurrentState();
+              handleCompleteToggle(courseData.id, false);
+              setNodes((currentNodes) => {
+                const updatedNodes = [
+                  ...currentNodes,
+                  {
+                    id: courseData.id,
+                    type: "courseNode",
+                    position: {
+                      x: Math.random() * 500,
+                      y: Math.random() * 300,
+                    },
+                    data: {
+                      ...courseData,
+                      completed: false,
+                      completedAt: null,
+                      showQuickToggle: true,
+                      onQuickToggle: handleCompleteToggle,
+                    },
+                  },
+                ];
+                return updatedNodes;
+              });
+              setIsAddCourseOpen(false);
+              toast({
+                title: "Course added",
+                description: `${courseData.label} has been added to the roadmap`,
+              });
+              setTimeout(() => {
+                saveChanges();
+              }, 500);
+            }}
+          />
+        )}
+      </div>
+    );
+  }
+);
+
+const RoadmapView = forwardRef((props, ref) => {
+  console.log("[FLOW] RoadmapView wrapper rendering with props:", {
+    id: props.id,
+    nodesCount: props.initialNodes?.length,
+    edgesCount: props.initialEdges?.length,
+  });
+
+  return (
+    <ReactFlowProvider>
+      <div className="w-full h-full">
+        <RoadmapViewInner ref={ref} {...props} />
+      </div>
+    </ReactFlowProvider>
+  );
+});
+
+export default RoadmapView;

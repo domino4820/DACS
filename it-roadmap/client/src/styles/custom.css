@@ -1,0 +1,366 @@
+/* Minimal Cyberpunk Theme */
+
+/* Base styling */
+body {
+  background-color: #070814;
+  color: #e5e7eb;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+}
+
+/* Custom text effects */
+.neon-text {
+  color: #8b5cf6;
+  text-shadow: 0 0 5px rgba(139, 92, 246, 0.7);
+}
+
+.text-cyber-gradient {
+  background-image: linear-gradient(90deg, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Card styling */
+.card-cyber {
+  background: linear-gradient(to bottom right, #0d0e19, #151934);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card-cyber:hover {
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Custom button styling */
+.btn-minimal {
+  background-color: transparent;
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  color: #8b5cf6;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.btn-minimal:hover {
+  background-color: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.8);
+}
+
+.btn-primary {
+  background-color: #8b5cf6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #7c3aed;
+  transform: translateY(-1px);
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 0.25rem;
+  background-color: rgba(139, 92, 246, 0.2);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #8b5cf6;
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+/* Subtle grid background */
+.bg-grid {
+  background-image: linear-gradient(
+      rgba(139, 92, 246, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d0e19;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.5);
+}
+
+/* Loading spinner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: hsl(var(--primary));
+  animation: spin 1s ease-in-out infinite;
+}
+
+.dark .spinner {
+  border-color: rgba(255, 255, 255, 0.1);
+  border-top-color: hsl(var(--primary));
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* User stats card */
+.stat-card {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #0d0e19;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+}
+
+/* Badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-purple {
+  background-color: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.badge-blue {
+  background-color: rgba(6, 182, 212, 0.1);
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.badge-pink {
+  background-color: rgba(236, 72, 153, 0.1);
+  color: #ec4899;
+  border: 1px solid rgba(236, 72, 153, 0.2);
+}
+
+/* 自定义样式，增强亮色和暗色主题 */
+
+:root {
+  --radius: 0.5rem;
+}
+
+.dark body {
+  background-color: hsl(222 47% 11%);
+  color: hsl(210 40% 98%);
+}
+
+/* 卡片悬浮效果 */
+.roadmap-card {
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.roadmap-card:hover {
+  transform: translateY(-4px);
+}
+
+.light .roadmap-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.dark .roadmap-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 标签颜色 */
+.tag {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tag-frontend {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: rgb(37, 99, 235);
+}
+
+.dark .tag-frontend {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: rgb(96, 165, 250);
+}
+
+.tag-backend {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: rgb(217, 119, 6);
+}
+
+.dark .tag-backend {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: rgb(251, 191, 36);
+}
+
+.tag-devops {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: rgb(220, 38, 38);
+}
+
+.dark .tag-devops {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: rgb(248, 113, 113);
+}
+
+.tag-mobile {
+  background-color: rgba(236, 72, 153, 0.15);
+  color: rgb(219, 39, 119);
+}
+
+.dark .tag-mobile {
+  background-color: rgba(236, 72, 153, 0.2);
+  color: rgb(244, 114, 182);
+}
+
+.tag-database {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: rgb(5, 150, 105);
+}
+
+.dark .tag-database {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: rgb(52, 211, 153);
+}
+
+/* 顶部导航标签优化 */
+.dark .bg-muted\/50 {
+  background-color: rgba(30, 41, 59, 0.3);
+}
+
+/* 按钮圆角增强 */
+.rounded-full {
+  border-radius: 9999px;
+}
+
+/* 页面渐变过渡效果 */
+.transition-theme {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 200ms;
+}
+
+/* 按钮悬浮特效 */
+@keyframes button-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px 0 rgba(var(--primary), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px 0 rgba(var(--primary), 0.3);
+  }
+}
+
+.btn-create:hover {
+  animation: button-glow 2s infinite;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* 使连接点更明显 */
+.connection-handle {
+  background-color: #8b5cf6 !important; /* 紫色连接点 */
+  border: 2px solid white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.connection-handle:hover {
+  transform: scale(1.5);
+  background-color: #6d28d9 !important; /* 悬停时深紫色 */
+  box-shadow: 0 0 10px rgba(109, 40, 217, 0.7); /* 悬停时紫色阴影 */
+}
+
+/* 优化连接拖拽线样式 */
+.react-flow__connection-path {
+  stroke: #8b5cf6;
+  stroke-width: 3;
+  stroke-dasharray: 5, 5;
+  animation: flowingDashes 1s linear infinite;
+}
+
+@keyframes flowingDashes {
+  to {
+    stroke-dashoffset: -10;
+  }
+}

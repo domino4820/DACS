@@ -1,0 +1,75 @@
+/* animated-background.css */
+body.has-animated-bg {
+  background-color: hsl(var(--background)); /* Ensure base background is set */
+}
+
+.animated-bg-parent-container {
+  position: relative; /* Needed for z-index stacking of the ::before/::after */
+  isolation: isolate; /* New stacking context */
+  background-color: hsl(var(--background)); /* Ensure this container has the base bg color */
+}
+
+.animated-bg-shapes-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1; /* Place it behind the content */
+  pointer-events: none; /* Make sure it doesn't interfere with interactions */
+}
+
+@keyframes subtleMove1 {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.25; } /* Refined */
+  50% { transform: translate(20px, 30px) rotate(5deg); opacity: 0.4; } /* Refined */
+  100% { transform: translate(0, 0) rotate(0deg); opacity: 0.25; } /* Refined */
+}
+
+@keyframes subtleMove2 {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.2; } /* Refined */
+  50% { transform: translate(-25px, -15px) rotate(-8deg); opacity: 0.3; } /* Refined */
+  100% { transform: translate(0, 0) rotate(0deg); opacity: 0.2; } /* Refined */
+}
+
+.animated-bg-shapes-container::before,
+.animated-bg-shapes-container::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%; /* For dot-like shapes initially */
+}
+
+/* Shape Group 1: Primary Accent Dots */
+.animated-bg-shapes-container::before {
+  width: 80vmax; /* Large area for sparse dots */
+  height: 80vmax;
+  left: 10vw;
+  top: 10vh;
+  /* Using CSS conic-gradient for dots to control sparsity and size */
+  background: conic-gradient(
+    from 0deg,
+    hsla(var(--primary)/0.35) 0deg 1deg, /* small dot - Refined opacity */
+    transparent 1deg 30deg /* space between dots */
+  );
+  /* Repeat the pattern to fill the area */
+  background-size: 50px 50px; /* size of each repeating cell - Refined size */
+  animation: subtleMove1 120s linear infinite alternate;
+}
+
+/* Shape Group 2: Secondary Accent Dots (different size, speed, movement) */
+.animated-bg-shapes-container::after {
+  width: 100vmax;
+  height: 100vmax;
+  left: -20vw; /* Offset to distribute differently */
+  top: 40vh;
+  background: conic-gradient(
+    from 0deg,
+    hsla(var(--secondary)/0.25) 0deg 0.8deg, /* smaller dot - Refined opacity */
+    transparent 0.8deg 45deg /* more space */
+  );
+  background-size: 70px 70px; /* Refined size */
+  animation: subtleMove2 180s linear infinite alternate;
+  animation-delay: -60s; /* Offset animation start */
+}
+/* Further refinement can involve adding more pseudo-elements or child divs for lines/squares/triangles */
+/* For example, using linear-gradients for lines, or border tricks for triangles/squares */
